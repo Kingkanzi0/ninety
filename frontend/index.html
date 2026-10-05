@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ninety — soccer markets settled by GenLayer</title>
+<meta name="description" content="Back match results, goals, both-teams-to-score and correct scores. GenLayer validators read the match pages and agree on the 90-minute score.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --turf: #17643f;
+  --turf-dark: #12553a;
+  --turf-deep: #0d3f2b;
+  --chalk: #f4f7f1;
+  --board: #ffffff;
+  --ink: #12261b;
+  --ink-soft: #4d6157;
+  --line: #d6dfd8;
+  --yellow: #f3c623;
+  --yellow-ink: #2a2200;
+  --red: #d2402b;
+  --sky: #2f6fb3;
+  --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --body: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --r-board: 6px;
+  --r-ctl: 4px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font: 400 16px/1.5 var(--body);
+  color: var(--ink);
+  background-color: var(--turf);
+  /* mown stripes: the page is the pitch */
+  background-image: repeating-linear-gradient(90deg, var(--turf) 0 96px, var(--turf-dark) 96px 192px);
+  min-height: 100vh;
+}
+a { color: var(--sky); }
+button, input, select { font: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+
+/* ---------- header ---------- */
+.top {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 14px 24px;
+  color: var(--chalk);
+  border-bottom: 2px solid rgba(244,247,241,.85);
+}
+.brand { display: flex; align-items: baseline; gap: 12px; margin-right: auto; }
+.brand h1 {
+  margin: 0; font: 900 40px/1 var(--display); letter-spacing: .5px;
+}
+.brand p { margin: 0; font-size: 14px; opacity: .85; max-width: 46ch; }
+.net {
+  font-size: 13px; padding: 4px 10px; border-radius: 99px;
+  border: 1px solid rgba(244,247,241,.6);
+}
+.btn {
+  border: 0; border-radius: var(--r-ctl); padding: 10px 16px; cursor: pointer;
+  font-weight: 700; background: var(--yellow); color: var(--yellow-ink);
+}
+.btn:hover { filter: brightness(1.05); }
+.btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.btn.ghost { background: transparent; color: inherit; border: 1.5px solid currentColor; }
+.btn.small { padding: 6px 12px; font-size: 14px; }
+
+/* ---------- layout ---------- */
+.wrap {
+  display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 24px;
+  max-width: 1240px; margin: 0 auto; padding: 24px;
+}
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+  .top { padding: 12px 16px; }
+  .brand p { display: none; }
+}
+.board {
+  background: var(--board); border-radius: var(--r-board);
+  box-shadow: 0 2px 0 var(--turf-deep);
+}
+
+/* ---------- fixture list ---------- */
+.list-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; }
+.list-head h2 { margin: 0; font: 800 24px/1 var(--display); }
+.filters { display: flex; gap: 6px; padding: 0 16px 12px; flex-wrap: wrap; }
+.chip {
+  border: 1px solid var(--line); background: var(--board); border-radius: 99px;
+  padding: 3px 10px; font-size: 13px; cursor: pointer; color: var(--ink-soft);
+}
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--chalk); border-color: var(--ink); }
+.fixtures { list-style: none; margin: 0; padding: 0; max-height: calc(100vh - 220px); overflow: auto; }
+@media (max-width: 900px) { .fixtures { max-height: 320px; } }
+.fixtures li + li { border-top: 1px solid var(--line); }
+.fx {
+  width: 100%; text-align: left; background: none; border: 0; cursor: pointer;
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center;
+  padding: 12px 16px; color: var(--ink);
+}
+.fx:hover { background: #f1f5f2; }
+.fx[aria-current="true"] { background: #e7efe9; box-shadow: inset 4px 0 0 var(--turf); }
+.fx .t { font: 700 18px/1.1 var(--display); text-transform: none; }
+.fx .t.away { text-align: right; }
+.fx .mid { font: 800 18px/1 var(--display); text-align: center; min-width: 54px; }
+.fx .meta { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); }
+.status { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 3px; }
+.s-SCHEDULED { background: #e3efe7; color: var(--turf-deep); }
+.s-FINAL { background: var(--ink); color: var(--chalk); }
+.s-VOID, .s-REJECTED { background: var(--red); color: #fff; }
+.empty { padding: 20px 16px; color: var(--ink-soft); }
+
+/* ---------- scoreboard ---------- */
+.scoreboard {
+  background: var(--ink); color: var(--chalk); border-radius: var(--r-board) var(--r-board) 0 0;
+  padding: 22px 24px 18px;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+}
+.scoreboard .team { font: 900 clamp(30px, 5vw, 54px)/.95 var(--display); }
+.scoreboard .team.away { text-align: right; }
+.scoreboard .side { display: block; font: 500 13px/1.4 var(--body); opacity: .7; margin-top: 4px; }
+.scoreboard .score {
+  font: 900 clamp(48px, 8vw, 92px)/1 var(--display); letter-spacing: 2px; text-align: center;
+  font-variant-numeric: tabular-nums; color: var(--yellow); white-space: nowrap;
+}
+.scoreboard .score.pending { color: var(--chalk); font-size: clamp(28px, 4vw, 40px); letter-spacing: 0; }
+.scoreboard .score small { display: block; white-space: normal; max-width: 14ch; margin: 0 auto; font: 500 13px/1.4 var(--body); color: var(--chalk); opacity: .75; letter-spacing: 0; }
+.strip {
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+  padding: 10px 24px; background: #eef3ef; border-bottom: 1px solid var(--line); font-size: 14px;
+}
+.strip b { font-weight: 700; }
+.detail-body { padding: 20px 24px 24px; }
+@media (max-width: 600px) {
+  .scoreboard { padding: 16px; gap: 8px; }
+  .scoreboard .team { font-size: 23px; overflow-wrap: break-word; min-width: 0; }
+  .scoreboard .score small { max-width: 11ch; }
+  .scoreboard .score { font-size: 46px; }
+  .strip, .detail-body { padding-left: 16px; padding-right: 16px; }
+}
+.section-title { font: 800 22px/1.1 var(--display); margin: 0 0 12px; }
+
+/* ---------- markets ---------- */
+.markets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 700px) { .markets { grid-template-columns: 1fr; } }
+.market { border: 1px solid var(--line); border-radius: var(--r-board); padding: 14px; }
+.market h4 { margin: 0; font: 800 20px/1.1 var(--display); }
+.market .rule { margin: 2px 0 10px; font-size: 13px; color: var(--ink-soft); }
+.market .pot { font-size: 13px; color: var(--ink-soft); display: flex; gap: 10px; flex-wrap: wrap; }
+.outcomes { display: grid; gap: 6px; margin: 8px 0 10px; }
+.oc {
+  position: relative; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  width: 100%; padding: 9px 10px; border: 1.5px solid var(--line); border-radius: var(--r-ctl);
+  background: var(--board); cursor: pointer; text-align: left; color: var(--ink); overflow: hidden;
+}
+.oc .fill { position: absolute; inset: 0 auto 0 0; background: #dcebe1; z-index: 0; transition: width .4s ease; }
+.oc span { position: relative; z-index: 1; }
+.oc .name { font-weight: 700; }
+.oc .num { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.oc[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.oc.win { border-color: var(--turf); }
+.oc.win .fill { background: #bfe0c9; }
+.oc.win .name::after { content: " — winner"; font-weight: 600; color: var(--turf); }
+.oc:disabled { cursor: default; }
+.stake-row { display: flex; gap: 8px; }
+.stake-row input { flex: 1; min-width: 0; }
+.market.closed .stake-row { display: none; }
+.verdict-tag { font-size: 13px; font-weight: 700; }
+.verdict-tag.void { color: var(--red); }
+
+input[type="text"], input[type="url"], input[type="number"], input[type="datetime-local"] {
+  width: 100%; padding: 9px 10px; border: 1.5px solid var(--line); border-radius: var(--r-ctl);
+  background: #fff; color: var(--ink);
+}
+input:focus { border-color: var(--ink); outline: none; }
+label { display: block; font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+.hint { font-size: 13px; color: var(--ink-soft); margin: 4px 0 0; }
+
+/* ---------- settlement + position ---------- */
+.below { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; margin-top: 20px; }
+@media (max-width: 700px) { .below { grid-template-columns: 1fr; } }
+.panel { border: 1px solid var(--line); border-radius: var(--r-board); padding: 14px; }
+.panel dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; font-size: 14px; }
+.panel dt { color: var(--ink-soft); }
+.panel dd { margin: 0; overflow-wrap: anywhere; }
+.note { font-size: 14px; background: #f3f6f4; border-left: 3px solid var(--turf); padding: 8px 10px; margin: 10px 0; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.pos-list { list-style: none; padding: 0; margin: 0 0 8px; font-size: 14px; }
+.pos-list li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--line); }
+.claim-amt { font: 800 34px/1 var(--display); margin: 6px 0 2px; }
+
+/* ---------- placeholder detail ---------- */
+.intro { padding: 28px; }
+.intro h2 { font: 900 clamp(32px, 4.4vw, 48px)/1 var(--display); margin: 0 0 12px; max-width: 18ch; }
+.intro p { max-width: 62ch; margin: 0 0 12px; }
+.intro ol { max-width: 62ch; padding-left: 20px; }
+.intro li { margin-bottom: 6px; }
+
+/* ---------- dialog ---------- */
+dialog { border: 0; border-radius: var(--r-board); padding: 0; width: min(560px, calc(100vw - 32px)); color: var(--ink); }
+dialog::backdrop { background: rgba(13,63,43,.6); }
+.dlg-head { background: var(--ink); color: var(--chalk); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+.dlg-head h3 { margin: 0; font: 800 26px/1 var(--display); }
+.dlg-body { padding: 18px 20px 20px; display: grid; gap: 14px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .two { grid-template-columns: 1fr; } }
+.close-x { background: none; border: 0; color: inherit; font-size: 26px; line-height: 1; cursor: pointer; }
+
+/* ---------- toast ---------- */
+.toasts { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 50; max-width: min(420px, calc(100vw - 32px)); }
+.toast { background: var(--ink); color: var(--chalk); padding: 12px 14px; border-radius: var(--r-ctl); font-size: 14px; border-left: 5px solid var(--yellow); }
+.toast.err { border-left-color: var(--red); }
+.toast.ok { border-left-color: #6fd39a; }
+.toast a { color: var(--yellow); }
+
+.config { padding: 14px 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); }
+.config input { margin-top: 4px; font-size: 13px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .oc .fill { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <h1>Ninety</h1>
+    <p>Soccer markets settled by GenLayer validators reading the match pages.</p>
+  </div>
+  <span class="net" id="netLabel">Bradbury testnet</span>
+  <button class="btn ghost small" id="listBtn" type="button">List a fixture</button>
+  <button class="btn" id="connectBtn" type="button">Connect wallet</button>
+</header>
+
+<main class="wrap">
+  <aside class="board" aria-label="Fixtures">
+    <div class="list-head">
+      <h2>Fixtures</h2>
+      <button class="btn ghost small" id="refreshBtn" type="button">Refresh</button>
+    </div>
+    <div class="filters" role="group" aria-label="Filter fixtures">
+      <button class="chip" data-filter="open" aria-pressed="true" type="button">Open</button>
+      <button class="chip" data-filter="settle" aria-pressed="false" type="button">Awaiting result</button>
+      <button class="chip" data-filter="done" aria-pressed="false" type="button">Settled</button>
+      <button class="chip" data-filter="all" aria-pressed="false" type="button">All</button>
+    </div>
+    <ul class="fixtures" id="fixtureList"><li class="empty">Loading fixtures…</li></ul>
+    <div class="config">
+      <label for="contractInput">Contract address</label>
+      <input type="text" id="contractInput" spellcheck="false" placeholder="0x…">
+    </div>
+  </aside>
+
+  <section class="board" id="detail" aria-live="polite">
+    <div class="intro">
+      <h2>Back the result. Validators read the final whistle.</h2>
+      <p>Every fixture opens four markets: the result, over or under 2.5 goals, both teams to score, and an open correct-score pool. Stakes go into shared pots and winners split the pot of their market.</p>
+      <ol>
+        <li>Someone lists a match with a link to its match page. Validators check the page really shows that fixture before it opens.</li>
+        <li>Stakes are accepted until kickoff.</li>
+        <li>Two hours after kickoff, anyone can ask validators to settle. Each validator reads the match pages on its own and they must agree on the 90-minute score.</li>
+        <li>All four markets settle from that score. Postponed or abandoned matches are refunded.</li>
+      </ol>
+      <p>Pick a fixture to start, or list one.</p>
+    </div>
+  </section>
+</main>
+
+<dialog id="listDlg" aria-labelledby="listTitle">
+  <form method="dialog" id="listForm">
+    <div class="dlg-head">
+      <h3 id="listTitle">List a fixture</h3>
+      <button class="close-x" value="cancel" formnovalidate aria-label="Close">&times;</button>
+    </div>
+    <div class="dlg-body">
+      <div class="two">
+        <div><label for="fHome">Home team</label><input type="text" id="fHome" required minlength="2" maxlength="60" placeholder="Arsenal"></div>
+        <div><label for="fAway">Away team</label><input type="text" id="fAway" required minlength="2" maxlength="60" placeholder="Chelsea"></div>
+      </div>
+      <div class="two">
+        <div><label for="fComp">Competition</label><input type="text" id="fComp" maxlength="60" placeholder="Premier League"></div>
+        <div><label for="fKick">Kickoff (your local time)</label><input type="datetime-local" id="fKick" required></div>
+      </div>
+      <div>
+        <label for="fSrcA">Match page</label>
+        <input type="url" id="fSrcA" required placeholder="https://www.bbc.com/sport/football/live/…">
+        <p class="hint">The page for this exact match. Validators read it now to confirm the fixture, and again after full time to read the score.</p>
+      </div>
+      <div>
+        <label for="fSrcB">Second match page (recommended)</label>
+        <input type="url" id="fSrcB" placeholder="https://www.espn.com/soccer/match/_/gameId/…">
+        <p class="hint">An independent site. Both pages must show the same score, so one bad page can't settle the market.</p>
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit" value="default" id="listSubmit">List fixture</button>
+        <button class="btn ghost" value="cancel" formnovalidate type="submit">Cancel</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="assertive"></div>
+
+<script type="module">
+/* ------------------------------------------------------------------ *
+ * Configuration. Override with ?contract=0x…&network=studionet
+ * ------------------------------------------------------------------ */
+const DEFAULT_CONTRACT = "";                 // paste your deployed address here
+const DEFAULT_NETWORK = "testnetBradbury";   // or "studionet"
+const SDK_VERSION = "1.1.8";
+
+const params = new URLSearchParams(location.search);
+const NETWORK = params.get("network") || DEFAULT_NETWORK;
+let CONTRACT = params.get("contract") || localGet("ninety.contract") || DEFAULT_CONTRACT;
+
+const MARKETS = [
+  { key: "RESULT", title: "Match result", rule: "90 minutes plus stoppage time.", outcomes: ["HOME", "DRAW", "AWAY"] },
+  { key: "GOALS", title: "Total goals", rule: "Over or under 2.5 goals in regular time.", outcomes: ["OVER", "UNDER"] },
+  { key: "BTTS", title: "Both teams score", rule: "Each side scores at least once in regular time.", outcomes: ["YES", "NO"] },
+  { key: "SCORE", title: "Correct score", rule: "Pick any score. Exact regular-time score wins.", outcomes: null },
+];
+const OUTCOME_LABEL = { HOME: "Home win", DRAW: "Draw", AWAY: "Away win", OVER: "Over 2.5", UNDER: "Under 2.5", YES: "Yes", NO: "No" };
+
+/* ------------------------------------------------------------------ *
+ * SDK loading (two CDNs, pinned version)
+ * ------------------------------------------------------------------ */
+async function loadSdk() {
+  const sources = [
+    [`https://esm.sh/genlayer-js@${SDK_VERSION}`, `https://esm.sh/genlayer-js@${SDK_VERSION}/chains`],
+    [`https://cdn.jsdelivr.net/npm/genlayer-js@${SDK_VERSION}/+esm`, `https://cdn.jsdelivr.net/npm/genlayer-js@${SDK_VERSION}/dist/chains/index.js/+esm`],
+  ];
+  let lastErr;
+  for (const [main, chainsUrl] of sources) {
+    try {
+      const sdk = await import(main);
+      const chains = await import(chainsUrl);
+      return { sdk, chains };
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr;
+}
+
+const state = {
+  sdk: null, chain: null, reader: null, writer: null, account: null,
+  fixtures: [], selected: null, filter: "open", picks: {}, position: null,
+};
+
+/* ------------------------------------------------------------------ *
+ * Helpers
+ * ------------------------------------------------------------------ */
+const $ = (id) => document.getElementById(id);
+function localGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function localSet(k, v) { try { localStorage.setItem(k, v); } catch {} }
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+const nowSec = () => Math.floor(Date.now() / 1000);
+const WEI = 10n ** 18n;
+
+function fmtGen(wei) {
+  const v = BigInt(wei || 0);
+  const whole = v / WEI;
+  const frac = (v % WEI).toString().padStart(18, "0").slice(0, 4).replace(/0+$/, "");
+  return frac ? `${whole}.${frac}` : `${whole}`;
+}
+function parseGen(text) {
+  const t = String(text).trim();
+  if (!/^\d+(\.\d{1,18})?$/.test(t)) throw new Error("Enter an amount like 1 or 0.5");
+  const [w, f = ""] = t.split(".");
+  const wei = BigInt(w) * WEI + BigInt((f + "0".repeat(18)).slice(0, 18));
+  if (wei <= 0n) throw new Error("Amount must be more than 0");
+  return wei;
+}
+function fmtTime(ts) {
+  return new Date(ts * 1000).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+function fmtIn(ts) {
+  const d = ts - nowSec();
+  const a = Math.abs(d);
+  const s = a < 3600 ? `${Math.max(1, Math.round(a / 60))} min` : a < 86400 ? `${Math.round(a / 3600)} h` : `${Math.round(a / 86400)} days`;
+  return d >= 0 ? `in ${s}` : `${s} ago`;
+}
+function short(a) { return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : ""; }
+function toast(html, kind = "", ms = 7000) {
+  const el = document.createElement("div");
+  el.className = `toast ${kind}`;
+  el.innerHTML = html;
+  $("toasts").appendChild(el);
+  if (ms) setTimeout(() => el.remove(), ms);
+  return el;
+}
+function explorerTx(hash) {
+  const base = state.chain?.blockExplorers?.default?.url;
+  return base ? `${base.replace(/\/$/, "")}/tx/${hash}` : null;
+}
+function errText(e) {
+  const m = e?.shortMessage || e?.details || e?.message || String(e);
+  return m.replace(/\[(EXPECTED|TRANSIENT|LLM_ERROR)\]\s*/g, "");
+}
+function phase(f) {
+  const t = nowSec();
+  if (f.status === "REJECTED") return "rejected";
+  if (f.status === "FINAL" || f.status === "VOID") return "settled";
+  if (t < f.kickoff) return "open";
+  if (t < f.settle_opens) return "playing";
+  return "settle";
+}
+
+/* ------------------------------------------------------------------ *
+ * Chain access
+ * ------------------------------------------------------------------ */
+async function read(functionName, args = []) {
+  if (!CONTRACT) throw new Error("No contract address set");
+  return state.reader.readContract({ address: CONTRACT, functionName, args });
+}
+
+async function connect() {
+  if (!window.ethereum) { toast("No browser wallet found. Install MetaMask or a compatible wallet.", "err"); return; }
+  try {
+    const [acct] = await window.ethereum.request({ method: "eth_requestAccounts" });
+    const c = state.chain;
+    const chainIdHex = "0x" + c.id.toString(16);
+    const current = await window.ethereum.request({ method: "eth_chainId" });
+    if (current !== chainIdHex) {
+      try {
+        await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: chainIdHex }] });
+      } catch (err) {
+        if (err?.code !== 4902) throw err;
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: chainIdHex, chainName: c.name, rpcUrls: c.rpcUrls.default.http,
+            nativeCurrency: c.nativeCurrency,
+            blockExplorerUrls: c.blockExplorers?.default?.url ? [c.blockExplorers.default.url] : undefined,
+          }],
+        });
+      }
+    }
+    state.account = acct;
+    state.writer = state.sdk.createClient({ chain: state.chain, account: acct, provider: window.ethereum });
+    $("connectBtn").textContent = short(acct);
+    window.ethereum.on?.("accountsChanged", () => location.reload());
+    window.ethereum.on?.("chainChanged", () => location.reload());
+    if (state.selected != null) await loadPosition();
+    renderDetail();
+  } catch (e) {
+    toast(`Wallet connection failed: ${esc(errText(e))}`, "err");
+  }
+}
+
+async function send(functionName, args, { value, pending } = {}) {
+  if (!state.writer) { await connect(); if (!state.writer) return null; }
+  const write = { address: CONTRACT, functionName, args };
+  if (value != null) write.value = value;
+  let note;
+  try {
+    try {
+      const est = await state.writer.estimateTransactionFeesForWrite(write);
+      write.fees = { distribution: est.distribution, feeValue: est.feeValue };
+    } catch (e) {
+      console.warn("Fee estimate unavailable, sending without explicit fees", e);
+    }
+    const hash = await state.writer.writeContract(write);
+    const link = explorerTx(hash);
+    note = toast(`${esc(pending || "Transaction sent")}. Validators are reaching consensus…${link ? ` <a href="${link}" target="_blank" rel="noopener">View transaction</a>` : ""}`, "", 0);
+    const tx = await state.writer.waitForTransactionReceipt({ hash, waitUntil: "decided", interval: 4000, retries: 300 });
+    note.remove();
+    const ok = state.sdk.isSuccessful ? state.sdk.isSuccessful(tx) : true;
+    if (!ok) {
+      const why = tx?.txExecutionResultName || tx?.statusName || "not successful";
+      toast(`Transaction did not succeed (${esc(why)}).${link ? ` <a href="${link}" target="_blank" rel="noopener">Inspect it</a>` : ""} It may still be retried by the network — check before sending again.`, "err", 15000);
+      return null;
+    }
+    toast(`Done.${link ? ` <a href="${link}" target="_blank" rel="noopener">View transaction</a>` : ""}`, "ok");
+    return tx;
+  } catch (e) {
+    note?.remove();
+    toast(esc(errText(e)), "err", 12000);
+    return null;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Data
+ * ------------------------------------------------------------------ */
+function userIsTyping() {
+  return [...$("detail").querySelectorAll("input")].some((i) => i.value.trim() !== "" || i === document.activeElement);
+}
+
+async function loadFixtures({ auto = false } = {}) {
+  if (!CONTRACT) {
+    $("fixtureList").innerHTML = `<li class="empty">Set the contract address below to load fixtures.</li>`;
+    return;
+  }
+  try {
+    const raw = await read("get_fixtures", [0, 50]);
+    state.fixtures = JSON.parse(raw).fixtures;
+    renderList();
+    if (state.selected != null) {
+      if (!(auto && userIsTyping())) renderDetail();
+    } else {
+      const hashId = Number(location.hash.replace("#fixture-", ""));
+      if (location.hash.startsWith("#fixture-") && state.fixtures.some((f) => f.id === hashId)) select(hashId);
+    }
+  } catch (e) {
+    $("fixtureList").innerHTML = `<li class="empty">Couldn't load fixtures: ${esc(errText(e))}. Check the contract address and network.</li>`;
+  }
+}
+
+async function loadPosition() {
+  state.position = null;
+  if (!state.account || state.selected == null) return;
+  try { state.position = JSON.parse(await read("get_position", [state.selected, state.account])); }
+  catch (e) { console.warn(e); }
+}
+
+async function refreshSelected() {
+  if (state.selected == null) return;
+  try {
+    const f = JSON.parse(await read("get_fixture", [state.selected]));
+    const i = state.fixtures.findIndex((x) => x.id === f.id);
+    if (i >= 0) state.fixtures[i] = f; else state.fixtures.unshift(f);
+  } catch (e) { console.warn(e); }
+  await loadPosition();
+  renderList();
+  renderDetail();
+}
+
+/* ------------------------------------------------------------------ *
+ * Rendering
+ * ------------------------------------------------------------------ */
+function renderList() {
+  const filt = state.filter;
+  const rows = state.fixtures.filter((f) => {
+    const p = phase(f);
+    if (filt === "open") return p === "open";
+    if (filt === "settle") return p === "playing" || p === "settle";
+    if (filt === "done") return p === "settled" || p === "rejected";
+    return true;
+  });
+  if (!rows.length) {
+    const msg = { open: "No fixtures are open for staking. List one to get started.", settle: "No fixtures are waiting for a result.", done: "Nothing has been settled yet.", all: "No fixtures yet. List the first one." }[filt];
+    $("fixtureList").innerHTML = `<li class="empty">${msg}</li>`;
+    return;
+  }
+  $("fixtureList").innerHTML = rows.map((f) => {
+    const mid = f.status === "FINAL" ? `${f.home_goals}–${f.away_goals}` : f.status === "SCHEDULED" ? "v" : "—";
+    const statusLabel = { SCHEDULED: phase(f) === "open" ? "Open" : "Awaiting result", FINAL: "Full time", VOID: "Refunded", REJECTED: "Rejected" }[f.status];
+    return `<li><button class="fx" type="button" data-id="${f.id}" aria-current="${state.selected === f.id}">
+      <span class="t">${esc(f.home)}</span><span class="mid">${mid}</span><span class="t away">${esc(f.away)}</span>
+      <span class="meta"><span>${esc(f.competition || "Friendly")} · ${fmtTime(f.kickoff)}</span><span class="status s-${f.status}">${statusLabel}</span></span>
+    </button></li>`;
+  }).join("");
+}
+
+function marketOutcomes(f, m) {
+  if (m.outcomes) return m.outcomes;
+  return Object.keys(f.markets.SCORE.pools).sort((a, b) => {
+    const [ah, aa] = a.split("-").map(Number), [bh, ba] = b.split("-").map(Number);
+    return ah - bh || aa - ba;
+  });
+}
+
+function renderMarket(f, m) {
+  const mk = f.markets[m.key];
+  const total = BigInt(mk.total);
+  const p = phase(f);
+  const open = p === "open";
+  const outs = marketOutcomes(f, m);
+  const picked = state.picks[m.key];
+  const winner = mk.winner;
+
+  const buttons = outs.map((o) => {
+    const pool = BigInt(mk.pools[o] || 0);
+    const share = total > 0n ? Number((pool * 1000n) / total) / 10 : 0;
+    const label = OUTCOME_LABEL[o] || o.replace("-", "–");
+    const cls = winner && winner === o ? "oc win" : "oc";
+    return `<button class="${cls}" type="button" data-market="${m.key}" data-outcome="${o}" aria-pressed="${picked === o}" ${open ? "" : "disabled"}>
+      <span class="fill" style="width:${share}%"></span>
+      <span class="name">${esc(label)}</span>
+      <span class="num">${fmtGen(pool)} GEN · ${share}%</span>
+    </button>`;
+  }).join("");
+
+  const scoreInput = m.key === "SCORE" && open
+    ? `<input type="text" inputmode="numeric" placeholder="Your score, e.g. 2-1" aria-label="Correct score pick" data-score-input value="${esc(picked && !outs.includes(picked) ? picked : "")}">`
+    : "";
+  let verdict = "";
+  if (winner === "VOID") verdict = `<span class="verdict-tag void">Refunded${f.status === "FINAL" ? ": nobody backed the winning outcome" : ""}</span>`;
+  else if (winner) verdict = `<span class="verdict-tag">Winner: ${esc(OUTCOME_LABEL[winner] || winner.replace("-", "–"))}</span>`;
+
+  return `<article class="market ${open ? "" : "closed"}" aria-labelledby="mk-${m.key}">
+    <h4 id="mk-${m.key}">${m.title}</h4>
+    <p class="rule">${m.rule}</p>
+    <div class="pot"><span>Pot ${fmtGen(total)} GEN</span>${verdict}</div>
+    <div class="outcomes">${buttons || (m.key === "SCORE" ? `<p class="hint">No scores picked yet.</p>` : "")}</div>
+    ${scoreInput ? `<div style="margin-bottom:8px">${scoreInput}</div>` : ""}
+    <div class="stake-row">
+      <input type="text" inputmode="decimal" placeholder="GEN" aria-label="${m.title} stake amount" data-amount="${m.key}">
+      <button class="btn small" type="button" data-stake="${m.key}">Stake</button>
+    </div>
+  </article>`;
+}
+
+function renderDetail() {
+  const f = state.fixtures.find((x) => x.id === state.selected);
+  if (!f) return;
+  const p = phase(f);
+
+  let center;
+  if (f.status === "FINAL") center = `<div class="score">${f.home_goals}–${f.away_goals}<small>Full time, agreed by validators</small></div>`;
+  else if (f.status === "VOID") center = `<div class="score pending">Void<small>All stakes refunded</small></div>`;
+  else if (f.status === "REJECTED") center = `<div class="score pending">Not listed<small>Match page didn't match</small></div>`;
+  else center = `<div class="score pending">${new Date(f.kickoff * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}<small>${new Date(f.kickoff * 1000).toLocaleDateString(undefined, { day: "numeric", month: "short" })}</small></div>`;
+
+  const stripMsg = {
+    open: `Staking closes at kickoff, <b>${fmtIn(f.kickoff)}</b>`,
+    playing: `In play. Settlement opens <b>${fmtIn(f.settle_opens)}</b>`,
+    settle: `Ready to settle. Anyone can ask validators to read the result`,
+    settled: f.status === "FINAL" ? `Settled ${fmtIn(f.settled_ts)}` : `Voided ${fmtIn(f.settled_ts)}`,
+    rejected: `Validators did not accept this listing`,
+  }[p];
+
+  const sources = [f.source_a, f.source_b].filter(Boolean).map((u, i) =>
+    `<dt>Source ${"AB"[i]}</dt><dd><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https:\/\//, ""))}</a></dd>`).join("");
+
+  const verdictLine = f.last_verdict
+    ? `<dt>Last check</dt><dd>${esc({ FINAL: "Score agreed", PENDING: "Result not published yet", CONFLICT: "Sources disagreed", VOID: "Postponed or abandoned" }[f.last_verdict] || f.last_verdict)}${f.conflicts ? ` (${f.conflicts} of ${f.max_conflicts} disagreements before refund)` : ""}</dd>`
+    : "";
+
+  const settleBtn = p === "settle" ? `<button class="btn" type="button" id="settleBtn">Settle with validators</button>` : "";
+  const expireBtn = f.status === "SCHEDULED" && nowSec() >= f.expires ? `<button class="btn ghost" type="button" id="expireBtn">Refund (expired)</button>` : "";
+
+  $("detail").innerHTML = `
+    <div class="scoreboard">
+      <div class="team">${esc(f.home)}<span class="side">Home</span></div>
+      ${center}
+      <div class="team away">${esc(f.away)}<span class="side">Away</span></div>
+    </div>
+    <div class="strip"><span>${esc(f.competition || "Friendly")}</span><span>${fmtTime(f.kickoff)}</span><span>${stripMsg}</span></div>
+    <div class="detail-body">
+      ${f.status === "REJECTED" ? `<div class="note">${esc(f.listing_note || "The match page did not show this fixture.")}</div>` : `
+      <h3 class="section-title">Markets</h3>
+      <div class="markets">${MARKETS.map((m) => renderMarket(f, m)).join("")}</div>`}
+      <div class="below">
+        <section class="panel" aria-labelledby="evTitle">
+          <h3 class="section-title" id="evTitle">How this match is settled</h3>
+          <dl>${sources}${verdictLine}<dt>Listing check</dt><dd>${esc(f.listing_note || "—")}</dd></dl>
+          ${f.settle_note ? `<div class="note">${esc(f.settle_note)}</div>` : ""}
+          <p class="hint">Validators read ${f.source_b ? "both pages" : "the page"} independently and must agree on the 90-minute score and match status. Extra time and penalties don't count.</p>
+          <div class="actions">${settleBtn}${expireBtn}</div>
+        </section>
+        <section class="panel" aria-labelledby="posTitle">
+          <h3 class="section-title" id="posTitle">Your position</h3>
+          ${renderPosition(f)}
+        </section>
+      </div>
+    </div>`;
+}
+
+function renderPosition(f) {
+  if (!state.account) return `<p class="hint">Connect your wallet to see your stakes.</p><div class="actions"><button class="btn" type="button" data-connect>Connect wallet</button></div>`;
+  const pos = state.position;
+  if (!pos) return `<p class="hint">Loading…</p>`;
+  const rows = [];
+  for (const m of MARKETS) {
+    for (const [o, amt] of Object.entries(pos.stakes[m.key] || {})) {
+      rows.push(`<li><span>${m.title}: ${esc(OUTCOME_LABEL[o] || o.replace("-", "–"))}</span><span>${fmtGen(amt)} GEN</span></li>`);
+    }
+  }
+  const list = rows.length ? `<ul class="pos-list">${rows.join("")}</ul>` : `<p class="hint">No stakes on this fixture.</p>`;
+  const settled = f.status === "FINAL" || f.status === "VOID";
+  let claim = "";
+  if (settled && pos.claimed) claim = `<p class="hint">Collected.</p>`;
+  else if (settled && BigInt(pos.claimable) > 0n) claim = `<div class="claim-amt">${fmtGen(pos.claimable)} GEN</div><p class="hint">Ready to collect across all four markets.</p><div class="actions"><button class="btn" type="button" id="claimBtn">Collect ${fmtGen(pos.claimable)} GEN</button></div>`;
+  else if (settled && rows.length) claim = `<p class="hint">Nothing to collect on this fixture.</p>`;
+  return list + claim;
+}
+
+function select(id) {
+  state.selected = id;
+  state.picks = {};
+  history.replaceState(null, "", `#fixture-${id}`);
+  renderList();
+  renderDetail();
+  loadPosition().then(renderDetail);
+}
+
+/* ------------------------------------------------------------------ *
+ * Events
+ * ------------------------------------------------------------------ */
+$("fixtureList").addEventListener("click", (e) => {
+  const b = e.target.closest(".fx");
+  if (b) select(Number(b.dataset.id));
+});
+document.querySelector(".filters").addEventListener("click", (e) => {
+  const c = e.target.closest(".chip");
+  if (!c) return;
+  state.filter = c.dataset.filter;
+  document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
+  renderList();
+});
+$("refreshBtn").addEventListener("click", () => loadFixtures());
+$("connectBtn").addEventListener("click", () => connect());
+$("contractInput").addEventListener("change", (e) => {
+  CONTRACT = e.target.value.trim();
+  localSet("ninety.contract", CONTRACT);
+  state.selected = null;
+  loadFixtures();
+});
+
+$("detail").addEventListener("click", async (e) => {
+  const t = e.target;
+  if (t.closest("[data-connect]")) return connect();
+
+  const oc = t.closest(".oc");
+  if (oc && !oc.disabled) {
+    state.picks[oc.dataset.market] = oc.dataset.outcome;
+    document.querySelectorAll(`.oc[data-market="${oc.dataset.market}"]`).forEach((x) => x.setAttribute("aria-pressed", String(x === oc)));
+    const si = document.querySelector("[data-score-input]");
+    if (oc.dataset.market === "SCORE" && si) si.value = "";
+    return;
+  }
+
+  const st = t.closest("[data-stake]");
+  if (st) {
+    const key = st.dataset.stake;
+    let outcome = state.picks[key];
+    if (key === "SCORE") {
+      const typed = document.querySelector("[data-score-input]")?.value.trim();
+      if (typed) outcome = typed;
+      if (outcome && !/^\d{1,2}\s*[-:–]\s*\d{1,2}$/.test(outcome)) return toast("Write the score like 2-1.", "err");
+      if (outcome) outcome = outcome.replace(/\s/g, "").replace(/[:–]/, "-");
+    }
+    if (!outcome) return toast("Choose an outcome first.", "err");
+    let value;
+    try { value = parseGen(document.querySelector(`[data-amount="${key}"]`).value); }
+    catch (err) { return toast(esc(err.message), "err"); }
+    st.disabled = true;
+    const label = OUTCOME_LABEL[outcome] || outcome;
+    const ok = await send("stake", [state.selected, key, outcome], { value, pending: `Staking ${fmtGen(value)} GEN on ${label}` });
+    st.disabled = false;
+    if (ok) refreshSelected();
+    return;
+  }
+
+  if (t.id === "settleBtn") {
+    t.disabled = true;
+    const ok = await send("settle", [state.selected], { pending: "Asking validators to read the result" });
+    t.disabled = false;
+    if (ok) refreshSelected();
+    return;
+  }
+  if (t.id === "expireBtn") {
+    t.disabled = true;
+    const ok = await send("expire", [state.selected], { pending: "Refunding expired fixture" });
+    if (ok) refreshSelected(); else t.disabled = false;
+    return;
+  }
+  if (t.id === "claimBtn") {
+    t.disabled = true;
+    const ok = await send("claim", [state.selected], { pending: "Collecting" });
+    if (ok) refreshSelected(); else t.disabled = false;
+  }
+});
+
+$("listBtn").addEventListener("click", () => {
+  if (!CONTRACT) return toast("Set the contract address first.", "err");
+  const d = new Date(Date.now() + 2 * 3600e3);
+  d.setMinutes(0, 0, 0);
+  const pad = (n) => String(n).padStart(2, "0");
+  if (!$("fKick").value) $("fKick").value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:00`;
+  $("listDlg").showModal();
+});
+$("listForm").addEventListener("submit", async (e) => {
+  if (e.submitter?.value === "cancel") return;
+  e.preventDefault();
+  const kickoff = Math.floor(new Date($("fKick").value).getTime() / 1000);
+  if (!kickoff || kickoff < nowSec() + 600) return toast("Kickoff must be at least 10 minutes from now.", "err");
+  const args = [$("fHome").value.trim(), $("fAway").value.trim(), $("fComp").value.trim(), kickoff, $("fSrcA").value.trim(), $("fSrcB").value.trim()];
+  $("listSubmit").disabled = true;
+  const ok = await send("create_fixture", args, { pending: "Validators are checking the match page" });
+  $("listSubmit").disabled = false;
+  if (ok) {
+    $("listDlg").close();
+    $("listForm").reset();
+    await loadFixtures();
+    const newest = state.fixtures[0];
+    if (newest) {
+      select(newest.id);
+      if (newest.status === "REJECTED") toast("Validators didn't accept this listing. See their note on the fixture.", "err", 10000);
+    }
+  }
+});
+
+/* ------------------------------------------------------------------ *
+ * Boot
+ * ------------------------------------------------------------------ */
+(async function boot() {
+  $("contractInput").value = CONTRACT;
+  try {
+    state.sdk = (await loadSdk());
+    const { sdk, chains } = state.sdk;
+    state.chain = chains[NETWORK];
+    if (!state.chain) throw new Error(`Unknown network "${NETWORK}"`);
+    state.sdk = sdk;
+    state.reader = sdk.createClient({ chain: state.chain });
+    $("netLabel").textContent = { testnetBradbury: "Bradbury testnet", studionet: "Studionet", testnetAsimov: "Asimov testnet", localnet: "Localnet" }[NETWORK] || NETWORK;
+  } catch (e) {
+    $("fixtureList").innerHTML = `<li class="empty">Couldn't load the GenLayer SDK: ${esc(errText(e))}</li>`;
+    return;
+  }
+  await loadFixtures();
+  setInterval(() => { if (!document.hidden) loadFixtures({ auto: true }); }, 30000);
+})();
+</script>
+</body>
+</html>
