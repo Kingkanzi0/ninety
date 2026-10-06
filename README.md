@@ -140,45 +140,53 @@ The page uses the `testnetBradbury` chain from genlayer-js. Add `?network=studio
 
 ## Submission checklist
 
-- [ ] `contracts/ninety.py` is on `main` and opens directly in the GitHub browser view
-- [ ] Bradbury contract address + Explorer link in this README
-- [ ] Live transactions recorded below: deploy, `create_fixture` (accepted), a rejected listing, `stake`, `settle` (FINAL), `claim`
-- [ ] Live frontend URL
-- [ ] `python3 tests/test_ninety.py` passes
+- [x] `contracts/ninety.py` is on `main` and is the exact file deployed to Bradbury
+- [x] Bradbury contract address + Explorer link in this README
+- [x] Live transactions on Bradbury: deploy, `create_fixture` (accepted), `stake`, `settle` (FINAL), `claim`
+- [x] Live frontend URL
+- [x] `python3 tests/test_ninety.py` passes
 
 ## Deployment record
+
+### ✅ Current live deployment — Testnet Bradbury (chain 4221)
+
+| Item | Value |
+| --- | --- |
+| Contract | [`0xF94F652d77249feE167d888F2a7AE14858FeD2eb`](https://explorer-bradbury.genlayer.com/address/0xF94F652d77249feE167d888F2a7AE14858FeD2eb) |
+| Deploy tx | [`0x5a8c6497…656f4f`](https://explorer-bradbury.genlayer.com/tx/0x5a8c64979a6d65d4c46e100254c33c1c7c648bc7fc002f94fc527e680b656f4f) — `ACCEPTED`, `FINISHED_WITH_RETURN` |
+| Live app | <https://kingkanzi0.github.io/ninety/frontend/> |
+| All transactions | listed on the [contract page](https://explorer-bradbury.genlayer.com/address/0xF94F652d77249feE167d888F2a7AE14858FeD2eb) |
+
+Full lifecycle completed on Bradbury, through the live app:
+
+1. **Listing check:** Arsenal v Leeds United (fixture #0, Premier League) and Martinique v El Salvador (fixture #1, CONCACAF Nations League). Validators opened each Flashscore page and agreed it showed that fixture, so both were stored as `SCHEDULED`.
+2. **Stakes:** on fixture #1, 0.2 GEN on RESULT/AWAY and 1 GEN on GOALS/UNDER ([tx](https://explorer-bradbury.genlayer.com/tx/0xe7170f3c6c0de09a5dd8b2ca7082be6a41b38dcf5d2f1ff59f325d7b5fb19f23), FINALIZED).
+3. **Settlement:** after full time, validators each read the match page independently and agreed on **FINAL 1–1**. GOALS settled to UNDER. RESULT settled to DRAW, which nobody had backed, so that market was refunded automatically instead of locking funds.
+4. **Claim:** winnings plus the refund were paid to the staker's wallet via `emit_transfer`.
+
+### Superseded Bradbury contract
+
+`0x9756e7cDF6A59cd0F57A1298e5cA23d265D0950c` (deploy tx `0x535813200cd4f689b1612bb7957184e26ce9de97019b892128364de3265cec8a`). Deployed fine, but its listings timed out on Bradbury (`VALIDATORS_TIMEOUT`, then `LEADER_TIMEOUT`). The fix in the current contract:
+
+- page text given to the LLM cut from 10,000 to 4,000 characters
+- render wait cut from 4s to 3s
+- `source_b = "none"` allowed for single-source fixtures
 
 ### GenLayer Studio (studionet) — live run, 3 Oct 2026
 
 | Item | Value |
 | --- | --- |
-| Listing accepted (Arsenal v Leeds United, fixture #0, Flashscore source) | `0x5b8b559d257e7366b4a17c8398e39f181dcaf6042e7006bf6d522cdb4a49b778` |
+| Listing accepted (Arsenal v Leeds United, Flashscore source) | `0x5b8b559d257e7366b4a17c8398e39f181dcaf6042e7006bf6d522cdb4a49b778` |
 | Stake 1 GEN on RESULT / HOME | `0xe3efb54e8e4971255d654fe494a3f80410a6c232405452bfe0bcd42aa9810acd` |
 | Listing refused: source page failed to load (validators agreed, no fixture created) | `0xebfbb7ab6e1d582c6c9fe1429d320904460126bfcbd68ee250e7ac6f4abf1a0b` |
 
-What the live run showed:
+What the Studio run showed:
 
-- **Listing consensus.** The leader (gpt-oss) read the Flashscore match page and judged the fixture valid. Validators running GPT-5.4, DeepSeek and GPT-5 each re-read the page independently and **agreed**, comparing only the `valid` decision. Stored listing note: *"Page shows Arsenal (home) vs Leeds United on 10 Oct 2026 in the Premier League."*
-- **Failure consensus.** When a source page could not be loaded (ESPN, BBC), every validator independently hit `WEBPAGE_LOAD_FAILED`. They agreed on the `[TRANSIENT]` error, and no fixture was created. Nothing was guessed.
-- **JavaScript pages.** Pages are rendered with `wait_after_loaded="4s"`. Without it, Flashscore's scores have not loaded yet when the page is read.
-- **Staking.** `get_fixtures` shows `RESULT.pools.HOME = 1000000000000000000` (1 GEN).
+- **Listing consensus.** The leader read the Flashscore match page and judged the fixture valid. Validators running different models (GPT-5.4, DeepSeek, GPT-5) each re-read the page independently and **agreed**, comparing only the `valid` decision.
+- **Failure consensus.** When a source page could not be loaded (ESPN, BBC), every validator independently hit `WEBPAGE_LOAD_FAILED`. They agreed on the `[TRANSIENT]` error and no fixture was created. Nothing was guessed.
+- **JavaScript pages.** Pages are rendered with a short `wait_after_loaded`. Without it, Flashscore's score has not loaded yet when the page is read.
 
-The Studio run used an earlier, longer revision of the contract with identical logic. The compact file in this repo is the one deployed to Bradbury.
+### Lessons from deploying to Bradbury (covered by tests)
 
-### Testnet Bradbury
-
-| Item | Value |
-| --- | --- |
-| Network | Testnet Bradbury (chain 4221) |
-| Contract | [`0x9756e7cDF6A59cd0F57A1298e5cA23d265D0950c`](https://explorer-bradbury.genlayer.com/address/0x9756e7cDF6A59cd0F57A1298e5cA23d265D0950c) |
-| Deploy tx | [`0x535813200cd4f689b1612bb7957184e26ce9de97019b892128364de3265cec8a`](https://explorer-bradbury.genlayer.com/tx/0x535813200cd4f689b1612bb7957184e26ce9de97019b892128364de3265cec8a) (`FINISHED_WITH_RETURN`) |
-| Listing accepted tx | _fill in_ |
-| Stake tx | _fill in_ |
-| Settle (FINAL) tx | _after kickoff + 2 h_ |
-| Claim tx | _fill in_ |
-| Frontend | _fill in_ |
-
-Two lessons from deploying to Bradbury:
-
-- Source must stay under about 20 KB because of the 16.7M per-transaction gas ceiling (about 730 gas per byte of source). A 28 KB revision was rejected with `gas limit too high`, so `contracts/ninety.py` is written compactly (about 17.5 KB, tab indentation).
-- GenVM joins **all** leading `#` lines into the JSON runner header. Comment lines placed directly under the `Depends` line made the deploy fail with `invalid_contract: trailing characters at line 1 column 84` (failed deploy tx `0x1dd82ac978ff6034dc38a15002785ce7b429430b9ece215ece6d71ee13700ea6`). Line 2 of the contract is therefore blank.
+- Source must stay under about 20 KB because of the 16.7M per-transaction gas ceiling. A 28 KB revision was rejected with `gas limit too high`.
+- GenVM joins **all** leading `#` lines into the JSON runner header. Comment lines directly under the `Depends` line made a deploy fail with `invalid_contract: trailing characters at line 1 column 84` (failed deploy tx `0x1dd82ac978ff6034dc38a15002785ce7b429430b9ece215ece6d71ee13700ea6`). Line 2 of the contract is therefore blank.
