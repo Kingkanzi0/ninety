@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ninety — soccer markets settled by GenLayer</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20512%20512%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22%2312432B%22/%3E%3Crect%20x%3D%2248%22%20y%3D%22248%22%20width%3D%22416%22%20height%3D%2216%22%20rx%3D%228%22%20fill%3D%22%23fff%22%20opacity%3D%22.28%22/%3E%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22146%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%2234%22/%3E%3Cpath%20d%3D%22M256%20110A146%20146%200%200%201%20402%20256%22%20fill%3D%22none%22%20stroke%3D%22%23F5C518%22%20stroke-width%3D%2234%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M256%20256V150%22%20stroke%3D%22%23F5C518%22%20stroke-width%3D%2222%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M256%20256h96%22%20stroke%3D%22%23fff%22%20stroke-width%3D%2222%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%2226%22%20fill%3D%22%23F5C518%22/%3E%3C/svg%3E">
+<meta name="theme-color" content="#12432B">
 <meta name="description" content="Back match results, goals, both-teams-to-score and correct scores. GenLayer validators read the match pages and agree on the 90-minute score.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,7 +51,9 @@ button, input, select { font: inherit; }
   color: var(--chalk);
   border-bottom: 2px solid rgba(244,247,241,.85);
 }
-.brand { display: flex; align-items: baseline; gap: 12px; margin-right: auto; }
+.brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+.logo { display: inline-flex; width: 44px; height: 44px; flex: none; }
+.logo svg { width: 100%; height: 100%; display: block; border-radius: 10px; box-shadow: 0 0 0 2px rgba(244,247,241,.35); }
 .brand h1 {
   margin: 0; font: 900 40px/1 var(--display); letter-spacing: .5px;
 }
@@ -76,6 +80,16 @@ button, input, select { font: inherit; }
   .wrap { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
   .top { padding: 12px 16px; }
   .brand p { display: none; }
+}
+@media (max-width: 560px) {
+  .top { gap: 10px; }
+  .brand { flex: 1; }
+  .brand h1 { font-size: 34px; }
+  .logo { width: 38px; height: 38px; }
+  .net { font-size: 12px; }
+  .top .btn { flex: 1 1 40%; text-align: center; white-space: nowrap; }
+  #connectBtn { order: 3; }
+  #listBtn { order: 2; }
 }
 .board {
   background: var(--board); border-radius: var(--r-board);
@@ -214,6 +228,35 @@ dialog::backdrop { background: rgba(13,63,43,.6); }
 .toast.ok { border-left-color: #6fd39a; }
 .toast a { color: var(--yellow); }
 
+/* ---------- validators-at-work tray ---------- */
+.tray { position: fixed; left: 16px; bottom: 16px; z-index: 45; display: grid; gap: 10px; width: min(380px, calc(100vw - 32px)); }
+.job { background: var(--board); color: var(--ink); border-radius: var(--r-board); box-shadow: 0 6px 24px rgba(0,0,0,.25); overflow: hidden; }
+.job-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--ink); color: var(--chalk); }
+.job-head b { font: 800 18px/1.1 var(--display); flex: 1; }
+.job-head .clock { font-variant-numeric: tabular-nums; font-size: 13px; opacity: .85; }
+.job-head button { background: none; border: 0; color: inherit; font-size: 20px; line-height: 1; cursor: pointer; padding: 0 2px; }
+.steps { list-style: none; margin: 0; padding: 10px 12px 4px; display: grid; gap: 6px; font-size: 14px; }
+.steps li { display: flex; gap: 8px; align-items: center; color: var(--ink-soft); }
+.steps li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+.steps li.done { color: var(--ink); }
+.steps li.done::before { background: var(--turf); border-color: var(--turf); }
+.steps li.now { color: var(--ink); font-weight: 600; }
+.steps li.now::before { border-color: var(--yellow); border-top-color: transparent; animation: spin .8s linear infinite; }
+.steps li.bad::before { background: var(--red); border-color: var(--red); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.job-foot { display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px 10px; font-size: 13px; color: var(--ink-soft); }
+.job.ok .job-head { background: var(--turf); }
+.job.fail .job-head { background: var(--red); }
+.fx.ghost { cursor: default; opacity: .85; }
+.fx.ghost .status { background: #fff4c7; color: #5b4a00; }
+.ret { font-size: 13px; color: var(--ink-soft); margin: 6px 0 0; min-height: 1.4em; }
+.ret b { color: var(--ink); }
+.odds { font-weight: 700; color: var(--ink); margin-right: 6px; }
+details.more summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+details.more[open] summary { margin-bottom: 8px; }
+@media (max-width: 560px) { .tray { left: 8px; right: 8px; bottom: 8px; width: auto; } .toasts { bottom: auto; top: 8px; right: 8px; left: 8px; max-width: none; } }
+@media (prefers-reduced-motion: reduce) { .steps li.now::before { animation: none; border-top-color: var(--yellow); } }
+
 .config { padding: 14px 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); }
 .config input { margin-top: 4px; font-size: 13px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -224,6 +267,7 @@ dialog::backdrop { background: rgba(13,63,43,.6); }
 
 <header class="top">
   <div class="brand">
+    <span class="logo"><svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#12432B"/><rect x="48" y="248" width="416" height="16" rx="8" fill="#fff" opacity=".28"/><circle cx="256" cy="256" r="146" fill="none" stroke="#fff" stroke-width="34"/><path d="M256 110A146 146 0 0 1 402 256" fill="none" stroke="#F5C518" stroke-width="34" stroke-linecap="round"/><path d="M256 256V150" stroke="#F5C518" stroke-width="22" stroke-linecap="round"/><path d="M256 256h96" stroke="#fff" stroke-width="22" stroke-linecap="round"/><circle cx="256" cy="256" r="26" fill="#F5C518"/></svg></span>
     <h1>Ninety</h1>
     <p>Soccer markets settled by GenLayer validators reading the match pages.</p>
   </div>
@@ -282,15 +326,17 @@ dialog::backdrop { background: rgba(13,63,43,.6); }
         <div><label for="fKick">Kickoff (your local time)</label><input type="datetime-local" id="fKick" required></div>
       </div>
       <div>
-        <label for="fSrcA">Match page</label>
-        <input type="url" id="fSrcA" required placeholder="https://www.bbc.com/sport/football/live/…">
+        <label for="fSrcA">Match page (Flashscore works well)</label>
+        <input type="url" id="fSrcA" required placeholder="https://www.flashscore.com/match/football/…">
         <p class="hint">The page for this exact match. Validators read it now to confirm the fixture, and again after full time to read the score.</p>
       </div>
-      <div>
-        <label for="fSrcB">Second match page (recommended)</label>
+      <details class="more">
+        <summary>Add a second match page (optional)</summary>
+        <label for="fSrcB">Second match page</label>
         <input type="url" id="fSrcB" placeholder="https://www.espn.com/soccer/match/_/gameId/…">
-        <p class="hint">An independent site. Both pages must show the same score, so one bad page can't settle the market.</p>
-      </div>
+        <p class="hint">An independent site that must show the same score. Safer, but validators read two pages, so settling takes longer. One Flashscore page is usually enough.</p>
+      </details>
+      <p class="hint">Validators open the page to confirm the fixture. This takes about 1–3 minutes on Bradbury; you can keep browsing while they work.</p>
       <div class="actions">
         <button class="btn" type="submit" value="default" id="listSubmit">List fixture</button>
         <button class="btn ghost" value="cancel" formnovalidate type="submit">Cancel</button>
@@ -300,6 +346,7 @@ dialog::backdrop { background: rgba(13,63,43,.6); }
 </dialog>
 
 <div class="toasts" id="toasts" aria-live="assertive"></div>
+<div class="tray" id="tray" aria-live="polite"></div>
 
 <script type="module">
 /* ------------------------------------------------------------------ *
@@ -412,45 +459,181 @@ async function read(functionName, args = []) {
   return state.reader.readContract({ address: CONTRACT, functionName, args });
 }
 
-async function connect() {
-  if (!window.ethereum) { toast("No browser wallet found. Install MetaMask or a compatible wallet.", "err"); return; }
+/* Wallet discovery (EIP-6963). Browsers like Brave inject their own wallet as
+ * window.ethereum, which can hide MetaMask; announced providers let us pick it. */
+const wallets = [];
+window.addEventListener("eip6963:announceProvider", (e) => {
+  const d = e.detail;
+  if (d?.provider && !wallets.some((w) => w.info.uuid === d.info.uuid)) wallets.push(d);
+});
+window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+function pickProvider() {
+  const mm = wallets.find((w) => w.info.rdns === "io.metamask");
+  if (mm) return mm.provider;
+  if (window.ethereum?.providers?.length) {
+    return window.ethereum.providers.find((p) => p.isMetaMask && !p.isBraveWallet) || window.ethereum.providers[0];
+  }
+  if (window.ethereum) return window.ethereum;
+  return wallets[0]?.provider || null;
+}
+
+async function ensureChain(eth) {
+  const c = state.chain;
+  const chainIdHex = "0x" + c.id.toString(16);
+  const current = await eth.request({ method: "eth_chainId" });
+  if (String(current).toLowerCase() === chainIdHex) return;
   try {
-    const [acct] = await window.ethereum.request({ method: "eth_requestAccounts" });
-    const c = state.chain;
-    const chainIdHex = "0x" + c.id.toString(16);
-    const current = await window.ethereum.request({ method: "eth_chainId" });
-    if (current !== chainIdHex) {
-      try {
-        await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: chainIdHex }] });
-      } catch (err) {
-        if (err?.code !== 4902) throw err;
-        await window.ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [{
-            chainId: chainIdHex, chainName: c.name, rpcUrls: c.rpcUrls.default.http,
-            nativeCurrency: c.nativeCurrency,
-            blockExplorerUrls: c.blockExplorers?.default?.url ? [c.blockExplorers.default.url] : undefined,
-          }],
-        });
-      }
-    }
-    state.account = acct;
-    state.writer = state.sdk.createClient({ chain: state.chain, account: acct, provider: window.ethereum });
-    $("connectBtn").textContent = short(acct);
-    window.ethereum.on?.("accountsChanged", () => location.reload());
-    window.ethereum.on?.("chainChanged", () => location.reload());
-    if (state.selected != null) await loadPosition();
-    renderDetail();
-  } catch (e) {
-    toast(`Wallet connection failed: ${esc(errText(e))}`, "err");
+    await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: chainIdHex }] });
+  } catch (err) {
+    if (err?.code === 4001) throw err;
+    await eth.request({
+      method: "wallet_addEthereumChain",
+      params: [{
+        chainId: chainIdHex, chainName: c.name || "GenLayer Bradbury", rpcUrls: c.rpcUrls.default.http,
+        nativeCurrency: c.nativeCurrency || { name: "GEN", symbol: "GEN", decimals: 18 },
+        blockExplorerUrls: c.blockExplorers?.default?.url ? [c.blockExplorers.default.url] : undefined,
+      }],
+    });
   }
 }
 
-async function send(functionName, args, { value, pending } = {}) {
+async function connect() {
+  if (!state.chain) { toast("Still loading the GenLayer SDK, try again in a moment.", "err"); return; }
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+  await new Promise((r) => setTimeout(r, 150));
+  const eth = pickProvider();
+  if (!eth) { toast("No browser wallet found. Install MetaMask, then reload this page.", "err"); return; }
+  try {
+    const [acct] = await eth.request({ method: "eth_requestAccounts" });
+    if (!acct) throw new Error("The wallet returned no account. Unlock it and try again.");
+    await ensureChain(eth);
+    state.account = acct;
+    state.provider = eth;
+    state.writer = state.sdk.createClient({ chain: state.chain, account: acct, provider: eth });
+    $("connectBtn").textContent = short(acct);
+    eth.on?.("accountsChanged", () => location.reload());
+    eth.on?.("chainChanged", () => location.reload());
+    if (state.selected != null) await loadPosition();
+    renderDetail();
+  } catch (e) {
+    console.error("connect failed", e);
+    const msg = e?.code === 4001 ? "You rejected the request in your wallet." :
+      e?.code === -32002 ? "Your wallet already has a request open. Click the MetaMask icon and approve it." : errText(e);
+    toast(`Wallet connection failed: ${esc(msg)}`, "err", 15000);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Validators-at-work tracker: every transaction gets a live card that
+ * follows its consensus stages, survives reloads, and never blocks the UI.
+ * ------------------------------------------------------------------ */
+const JOBS_KEY = "ninety.jobs";
+const jobs = new Map();               // hash -> job
+const STAGES = ["Signed in your wallet", "Leader validator reads the page", "Other validators re-check on their own", "Consensus reached"];
+const STAGE_OF = { PENDING: 1, UNINITIALIZED: 1, PROPOSING: 1, LEADER_REVEALING: 1, COMMITTING: 2, REVEALING: 2,
+  APPEAL_COMMITTING: 2, APPEAL_REVEALING: 2, ACCEPTED: 4, FINALIZED: 4, READY_TO_FINALIZE: 4 };
+const STATUS_BY_NUM = { 0: "UNINITIALIZED", 1: "PENDING", 2: "PROPOSING", 3: "COMMITTING", 4: "REVEALING", 5: "ACCEPTED",
+  6: "UNDETERMINED", 7: "FINALIZED", 8: "CANCELED", 9: "APPEAL_REVEALING", 10: "APPEAL_COMMITTING", 11: "READY_TO_FINALIZE",
+  12: "VALIDATORS_TIMEOUT", 13: "LEADER_TIMEOUT", 14: "LEADER_REVEALING" };
+const BAD = new Set(["UNDETERMINED", "CANCELED", "VALIDATORS_TIMEOUT", "LEADER_TIMEOUT"]);
+
+function saveJobs() {
+  const keep = [...jobs.values()].filter((j) => !j.final).map(({ hash, kind, title, fixture, args, started }) => ({ hash, kind, title, fixture, args, started }));
+  localSet(JOBS_KEY, JSON.stringify(keep));
+}
+function mmss(sec) { sec = Math.max(0, Math.floor(sec)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`; }
+
+function drawJob(j) {
+  let el = document.getElementById(`job-${j.hash}`);
+  if (!el) {
+    el = document.createElement("div");
+    el.id = `job-${j.hash}`;
+    $("tray").prepend(el);
+  }
+  const link = explorerTx(j.hash);
+  const stage = j.final ? (j.ok ? 4 : j.stage) : j.stage;
+  const steps = STAGES.map((label, i) => {
+    let cls = i < stage ? "done" : i === stage && !j.final ? "now" : "";
+    if (j.final && !j.ok && i === stage) cls = "bad";
+    if (j.final && j.ok) cls = "done";
+    return `<li class="${cls}">${label}</li>`;
+  }).join("");
+  const secs = ((j.ended || Date.now()) - j.started) / 1000;
+  const foot = j.final
+    ? (j.ok ? `Done in ${mmss(secs)}` : esc(j.error || "Not accepted"))
+    : esc(j.statusName ? j.statusName.replace(/_/g, " ").toLowerCase() : "waiting for the network");
+  el.className = `job ${j.final ? (j.ok ? "ok" : "fail") : ""}`;
+  el.innerHTML = `<div class="job-head"><b>${esc(j.title)}</b><span class="clock">${mmss(secs)}</span>
+      <button type="button" data-dismiss="${j.hash}" aria-label="Hide">&times;</button></div>
+    <ul class="steps">${steps}</ul>
+    <div class="job-foot"><span>${foot}</span>${link ? `<a href="${link}" target="_blank" rel="noopener">Explorer</a>` : ""}</div>`;
+}
+
+setInterval(() => { for (const j of jobs.values()) if (!j.final) drawJob(j); }, 1000);
+$("tray").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-dismiss]");
+  if (!b) return;
+  const j = jobs.get(b.dataset.dismiss);
+  document.getElementById(`job-${b.dataset.dismiss}`)?.remove();
+  if (j?.final) jobs.delete(j.hash);
+});
+
+async function pollStage(j) {
+  while (!j.final) {
+    try {
+      const tx = await state.reader.getTransaction({ hash: j.hash });
+      const name = tx?.statusName || STATUS_BY_NUM[Number(tx?.status)] || String(tx?.status || "");
+      if (name) {
+        j.statusName = name;
+        if (STAGE_OF[name] != null) j.stage = Math.max(j.stage, Math.min(STAGE_OF[name], 3));
+      }
+      drawJob(j);
+    } catch (e) { /* transient RPC hiccup; keep going */ }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+}
+
+function track(hash, meta) {
+  const j = { hash, stage: 1, final: false, ok: false, started: meta.started || Date.now(), ...meta };
+  jobs.set(hash, j);
+  saveJobs();
+  drawJob(j);
+  renderList();
+  pollStage(j);
+  j.done = (async () => {
+    try {
+      const tx = await state.reader.waitForTransactionReceipt({ hash, waitUntil: "decided", interval: 3000, retries: 400 });
+      const name = tx?.statusName || STATUS_BY_NUM[Number(tx?.status)] || "";
+      const ok = !BAD.has(name) && (state.sdk.isSuccessful ? state.sdk.isSuccessful(tx) : true);
+      j.ok = ok;
+      j.error = ok ? "" : `${(tx?.txExecutionResultName || name || "not successful").replace(/_/g, " ").toLowerCase()}`;
+      return ok ? tx : null;
+    } catch (e) {
+      j.ok = false; j.error = errText(e);
+      return null;
+    } finally {
+      j.final = true; j.ended = Date.now();
+      saveJobs();
+      drawJob(j);
+      setTimeout(() => { if (jobs.get(hash)?.ok) { document.getElementById(`job-${hash}`)?.remove(); jobs.delete(hash); } }, 12000);
+      await loadFixtures({ auto: true });
+      if (state.selected != null) refreshSelected();
+    }
+  })();
+  return j;
+}
+
+function resumeJobs() {
+  let saved = [];
+  try { saved = JSON.parse(localGet(JOBS_KEY) || "[]"); } catch {}
+  for (const m of saved) if (m?.hash && Date.now() - m.started < 3 * 3600e3) track(m.hash, m);
+}
+
+async function send(functionName, args, { value, title, kind, fixture } = {}) {
   if (!state.writer) { await connect(); if (!state.writer) return null; }
   const write = { address: CONTRACT, functionName, args };
   if (value != null) write.value = value;
-  let note;
   try {
     try {
       const est = await state.writer.estimateTransactionFeesForWrite(write);
@@ -459,20 +642,8 @@ async function send(functionName, args, { value, pending } = {}) {
       console.warn("Fee estimate unavailable, sending without explicit fees", e);
     }
     const hash = await state.writer.writeContract(write);
-    const link = explorerTx(hash);
-    note = toast(`${esc(pending || "Transaction sent")}. Validators are reaching consensus…${link ? ` <a href="${link}" target="_blank" rel="noopener">View transaction</a>` : ""}`, "", 0);
-    const tx = await state.writer.waitForTransactionReceipt({ hash, waitUntil: "decided", interval: 4000, retries: 300 });
-    note.remove();
-    const ok = state.sdk.isSuccessful ? state.sdk.isSuccessful(tx) : true;
-    if (!ok) {
-      const why = tx?.txExecutionResultName || tx?.statusName || "not successful";
-      toast(`Transaction did not succeed (${esc(why)}).${link ? ` <a href="${link}" target="_blank" rel="noopener">Inspect it</a>` : ""} It may still be retried by the network — check before sending again.`, "err", 15000);
-      return null;
-    }
-    toast(`Done.${link ? ` <a href="${link}" target="_blank" rel="noopener">View transaction</a>` : ""}`, "ok");
-    return tx;
+    return track(hash, { kind: kind || functionName, title: title || "Transaction", fixture, args: kind === "list" ? args.slice(0, 4) : undefined });
   } catch (e) {
-    note?.remove();
     toast(esc(errText(e)), "err", 12000);
     return null;
   }
@@ -536,12 +707,16 @@ function renderList() {
     if (filt === "done") return p === "settled" || p === "rejected";
     return true;
   });
+  const ghosts = [...jobs.values()].filter((j) => j.kind === "list" && !j.final && j.args).map((j) =>
+    `<li><div class="fx ghost"><span class="t">${esc(j.args[0])}</span><span class="mid">v</span><span class="t away">${esc(j.args[1])}</span>
+      <span class="meta"><span>${esc(j.args[2] || "Friendly")} · ${fmtTime(j.args[3])}</span><span class="status">Validators checking…</span></span></div></li>`).join("");
+  if (!rows.length && ghosts) { $("fixtureList").innerHTML = ghosts; return; }
   if (!rows.length) {
     const msg = { open: "No fixtures are open for staking. List one to get started.", settle: "No fixtures are waiting for a result.", done: "Nothing has been settled yet.", all: "No fixtures yet. List the first one." }[filt];
     $("fixtureList").innerHTML = `<li class="empty">${msg}</li>`;
     return;
   }
-  $("fixtureList").innerHTML = rows.map((f) => {
+  $("fixtureList").innerHTML = ghosts + rows.map((f) => {
     const mid = f.status === "FINAL" ? `${f.home_goals}–${f.away_goals}` : f.status === "SCHEDULED" ? "v" : "—";
     const statusLabel = { SCHEDULED: phase(f) === "open" ? "Open" : "Awaiting result", FINAL: "Full time", VOID: "Refunded", REJECTED: "Rejected" }[f.status];
     return `<li><button class="fx" type="button" data-id="${f.id}" aria-current="${state.selected === f.id}">
@@ -576,7 +751,7 @@ function renderMarket(f, m) {
     return `<button class="${cls}" type="button" data-market="${m.key}" data-outcome="${o}" aria-pressed="${picked === o}" ${open ? "" : "disabled"}>
       <span class="fill" style="width:${share}%"></span>
       <span class="name">${esc(label)}</span>
-      <span class="num">${fmtGen(pool)} GEN · ${share}%</span>
+      <span class="num">${pool > 0n ? `<span class="odds">×${(Number(total * 100n / pool) / 100).toFixed(2)}</span>` : ""}${fmtGen(pool)} GEN · ${share}%</span>
     </button>`;
   }).join("");
 
@@ -597,6 +772,7 @@ function renderMarket(f, m) {
       <input type="text" inputmode="decimal" placeholder="GEN" aria-label="${m.title} stake amount" data-amount="${m.key}">
       <button class="btn small" type="button" data-stake="${m.key}">Stake</button>
     </div>
+    ${open ? `<p class="ret" data-ret="${m.key}"></p>` : ""}
   </article>`;
 }
 
@@ -717,6 +893,7 @@ $("detail").addEventListener("click", async (e) => {
     document.querySelectorAll(`.oc[data-market="${oc.dataset.market}"]`).forEach((x) => x.setAttribute("aria-pressed", String(x === oc)));
     const si = document.querySelector("[data-score-input]");
     if (oc.dataset.market === "SCORE" && si) si.value = "";
+    document.querySelector(`[data-amount="${oc.dataset.market}"]`)?.dispatchEvent(new Event("input", { bubbles: true }));
     return;
   }
 
@@ -736,30 +913,47 @@ $("detail").addEventListener("click", async (e) => {
     catch (err) { return toast(esc(err.message), "err"); }
     st.disabled = true;
     const label = OUTCOME_LABEL[outcome] || outcome;
-    const ok = await send("stake", [state.selected, key, outcome], { value, pending: `Staking ${fmtGen(value)} GEN on ${label}` });
+    const job = await send("stake", [state.selected, key, outcome], { value, title: `Stake ${fmtGen(value)} GEN · ${label}`, fixture: state.selected });
     st.disabled = false;
-    if (ok) refreshSelected();
+    if (job) document.querySelector(`[data-amount="${key}"]`).value = "";
     return;
   }
 
   if (t.id === "settleBtn") {
     t.disabled = true;
-    const ok = await send("settle", [state.selected], { pending: "Asking validators to read the result" });
-    t.disabled = false;
-    if (ok) refreshSelected();
+    const f = state.fixtures.find((x) => x.id === state.selected);
+    const job = await send("settle", [state.selected], { title: `Read result · ${f ? `${f.home} v ${f.away}` : ""}`, fixture: state.selected });
+    if (!job) t.disabled = false;
     return;
   }
   if (t.id === "expireBtn") {
     t.disabled = true;
-    const ok = await send("expire", [state.selected], { pending: "Refunding expired fixture" });
-    if (ok) refreshSelected(); else t.disabled = false;
+    const job = await send("expire", [state.selected], { title: "Refund expired fixture", fixture: state.selected });
+    if (!job) t.disabled = false;
     return;
   }
   if (t.id === "claimBtn") {
     t.disabled = true;
-    const ok = await send("claim", [state.selected], { pending: "Collecting" });
-    if (ok) refreshSelected(); else t.disabled = false;
+    const job = await send("claim", [state.selected], { title: "Collect winnings", fixture: state.selected });
+    if (!job) t.disabled = false;
   }
+});
+
+$("detail").addEventListener("input", (e) => {
+  const inp = e.target.closest("[data-amount]");
+  if (!inp) return;
+  const key = inp.dataset.amount;
+  const out = document.querySelector(`[data-ret="${key}"]`);
+  const f = state.fixtures.find((x) => x.id === state.selected);
+  let pick = state.picks[key];
+  if (key === "SCORE") { const t = document.querySelector("[data-score-input]")?.value.trim(); if (t) pick = t.replace(/\s/g, "").replace(/[:–]/, "-"); }
+  if (!out || !f) return;
+  let v; try { v = parseGen(inp.value); } catch { out.textContent = ""; return; }
+  if (!pick) { out.textContent = "Pick an outcome to see your return."; return; }
+  const mk = f.markets[key];
+  const total = BigInt(mk.total) + v, pool = BigInt(mk.pools[pick] || 0) + v;
+  const ret = v * total / pool;
+  out.innerHTML = `If ${esc(OUTCOME_LABEL[pick] || pick)} wins you get <b>${fmtGen(ret)} GEN</b> at today's pot${ret === v ? " (your stake back until others bet against you)" : ""}.`;
 });
 
 $("listBtn").addEventListener("click", () => {
@@ -776,18 +970,23 @@ $("listForm").addEventListener("submit", async (e) => {
   const kickoff = Math.floor(new Date($("fKick").value).getTime() / 1000);
   if (!kickoff || kickoff < nowSec() + 600) return toast("Kickoff must be at least 10 minutes from now.", "err");
   const args = [$("fHome").value.trim(), $("fAway").value.trim(), $("fComp").value.trim(), kickoff, $("fSrcA").value.trim(), $("fSrcB").value.trim()];
+  if (args[5] && args[5].toLowerCase() !== "none" && args[5] === args[4]) return toast("The second page must be a different link.", "err");
   $("listSubmit").disabled = true;
-  const ok = await send("create_fixture", args, { pending: "Validators are checking the match page" });
+  const before = state.fixtures.length ? Math.max(...state.fixtures.map((f) => f.id)) : -1;
+  const job = await send("create_fixture", args, { kind: "list", title: `List ${args[0]} v ${args[1]}` });
   $("listSubmit").disabled = false;
-  if (ok) {
-    $("listDlg").close();
-    $("listForm").reset();
-    await loadFixtures();
-    const newest = state.fixtures[0];
-    if (newest) {
-      select(newest.id);
-      if (newest.status === "REJECTED") toast("Validators didn't accept this listing. See their note on the fixture.", "err", 10000);
-    }
+  if (!job) return;
+  $("listDlg").close();
+  $("listForm").reset();
+  state.filter = "all";
+  document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.filter === "all")));
+  renderList();
+  toast("Signed. Validators are opening the match page now — it appears in the list when they agree.", "ok", 8000);
+  const tx = await job.done;
+  const created = state.fixtures.find((f) => f.id > before);
+  if (tx && created) {
+    select(created.id);
+    if (created.status === "REJECTED") toast("Validators didn't accept this listing. Their note is on the fixture.", "err", 10000);
   }
 });
 
@@ -809,7 +1008,8 @@ $("listForm").addEventListener("submit", async (e) => {
     return;
   }
   await loadFixtures();
-  setInterval(() => { if (!document.hidden) loadFixtures({ auto: true }); }, 30000);
+  resumeJobs();
+  setInterval(() => { if (!document.hidden) loadFixtures({ auto: true }); }, 20000);
 })();
 </script>
 </body>
