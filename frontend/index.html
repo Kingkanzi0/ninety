@@ -257,6 +257,11 @@ details.more[open] summary { margin-bottom: 8px; }
 @media (max-width: 560px) { .tray { left: 8px; right: 8px; bottom: 8px; width: auto; } .toasts { bottom: auto; top: 8px; right: 8px; left: 8px; max-width: none; } }
 @media (prefers-reduced-motion: reduce) { .steps li.now::before { animation: none; border-top-color: var(--yellow); } }
 
+.wallet-list { display: grid; gap: 8px; }
+.wallet-opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--r-ctl); background: var(--board); color: var(--ink); font-weight: 700; cursor: pointer; text-align: left; }
+.wallet-opt:hover { border-color: var(--ink); }
+.wallet-opt img { border-radius: 6px; }
+.wallet-dot { width: 28px; height: 28px; border-radius: 6px; background: var(--turf); }
 .config { padding: 14px 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); }
 .config input { margin-top: 4px; font-size: 13px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -347,6 +352,10 @@ details.more[open] summary { margin-bottom: 8px; }
 
 <div class="toasts" id="toasts" aria-live="assertive"></div>
 <div class="tray" id="tray" aria-live="polite"></div>
+<dialog id="walletDlg" aria-labelledby="walletTitle">
+  <div class="dlg-head"><h3 id="walletTitle">Choose a wallet</h3><button class="close-x" type="button" data-cancel aria-label="Close">&times;</button></div>
+  <div class="dlg-body"><div id="walletList" class="wallet-list"></div><p class="hint">Pick the wallet that holds your Bradbury GEN. Click your address later to switch.</p></div>
+</dialog>
 
 <script type="module">
 /* ------------------------------------------------------------------ *
@@ -468,14 +477,31 @@ window.addEventListener("eip6963:announceProvider", (e) => {
 });
 window.dispatchEvent(new Event("eip6963:requestProvider"));
 
-function pickProvider() {
-  const mm = wallets.find((w) => w.info.rdns === "io.metamask");
-  if (mm) return mm.provider;
-  if (window.ethereum?.providers?.length) {
-    return window.ethereum.providers.find((p) => p.isMetaMask && !p.isBraveWallet) || window.ethereum.providers[0];
-  }
-  if (window.ethereum) return window.ethereum;
-  return wallets[0]?.provider || null;
+const WALLET_KEY = "ninety.wallet";
+function walletChoices() {
+  const list = wallets.map((w) => ({ id: w.info.rdns || w.info.uuid, name: w.info.name, icon: w.info.icon, provider: w.provider }));
+  if (!list.length && window.ethereum) list.push({ id: "injected", name: window.ethereum.isOkxWallet ? "OKX Wallet" : window.ethereum.isMetaMask ? "MetaMask" : "Browser wallet", icon: "", provider: window.ethereum });
+  return list;
+}
+function chooseWallet(list) {
+  return new Promise((resolve) => {
+    const dlg = $("walletDlg");
+    $("walletList").innerHTML = list.map((w, i) => `<button class="wallet-opt" type="button" data-i="${i}">
+      ${w.icon ? `<img src="${esc(w.icon)}" alt="" width="28" height="28">` : `<span class="wallet-dot"></span>`}<span>${esc(w.name)}</span></button>`).join("");
+    const done = (v) => { dlg.close(); dlg.onclick = null; dlg.onclose = null; resolve(v); };
+    dlg.onclick = (e) => { const b = e.target.closest(".wallet-opt"); if (b) done(list[Number(b.dataset.i)]); else if (e.target.closest("[data-cancel]")) done(null); };
+    dlg.onclose = () => resolve(null);
+    dlg.showModal();
+  });
+}
+async function pickProvider() {
+  const list = walletChoices();
+  if (!list.length) return null;
+  if (list.length === 1) return list[0];
+  const saved = localGet(WALLET_KEY);
+  const remembered = list.find((w) => w.id === saved);
+  if (remembered) return remembered;
+  return chooseWallet(list);
 }
 
 async function ensureChain(eth) {
@@ -502,14 +528,16 @@ async function connect() {
   if (!state.chain) { toast("Still loading the GenLayer SDK, try again in a moment.", "err"); return; }
   window.dispatchEvent(new Event("eip6963:requestProvider"));
   await new Promise((r) => setTimeout(r, 150));
-  const eth = pickProvider();
-  if (!eth) { toast("No browser wallet found. Install MetaMask, then reload this page.", "err"); return; }
+  const choice = await pickProvider();
+  if (!choice) { if (!walletChoices().length) toast("No browser wallet found. Install OKX Wallet or MetaMask, then reload this page.", "err"); return; }
+  const eth = choice.provider;
   try {
     const [acct] = await eth.request({ method: "eth_requestAccounts" });
     if (!acct) throw new Error("The wallet returned no account. Unlock it and try again.");
     await ensureChain(eth);
     state.account = acct;
     state.provider = eth;
+    localSet(WALLET_KEY, choice.id);
     state.writer = state.sdk.createClient({ chain: state.chain, account: acct, provider: eth });
     $("connectBtn").textContent = short(acct);
     eth.on?.("accountsChanged", () => location.reload());
@@ -519,7 +547,7 @@ async function connect() {
   } catch (e) {
     console.error("connect failed", e);
     const msg = e?.code === 4001 ? "You rejected the request in your wallet." :
-      e?.code === -32002 ? "Your wallet already has a request open. Click the MetaMask icon and approve it." : errText(e);
+      e?.code === -32002 ? "Your wallet already has a request open. Open your wallet extension and approve it." : errText(e);
     toast(`Wallet connection failed: ${esc(msg)}`, "err", 15000);
   }
 }
@@ -875,7 +903,10 @@ document.querySelector(".filters").addEventListener("click", (e) => {
   renderList();
 });
 $("refreshBtn").addEventListener("click", () => loadFixtures());
-$("connectBtn").addEventListener("click", () => connect());
+$("connectBtn").addEventListener("click", () => {
+  if (state.account) { localSet(WALLET_KEY, ""); state.account = null; state.writer = null; $("connectBtn").textContent = "Connect wallet"; renderDetail(); }
+  connect();
+});
 $("contractInput").addEventListener("change", (e) => {
   CONTRACT = e.target.value.trim();
   localSet("ninety.contract", CONTRACT);
