@@ -2,323 +2,418 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ninety — soccer markets settled by GenLayer</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20512%20512%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22%2312432B%22/%3E%3Crect%20x%3D%2248%22%20y%3D%22248%22%20width%3D%22416%22%20height%3D%2216%22%20rx%3D%228%22%20fill%3D%22%23fff%22%20opacity%3D%22.28%22/%3E%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22146%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%2234%22/%3E%3Cpath%20d%3D%22M256%20110A146%20146%200%200%201%20402%20256%22%20fill%3D%22none%22%20stroke%3D%22%23F5C518%22%20stroke-width%3D%2234%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M256%20256V150%22%20stroke%3D%22%23F5C518%22%20stroke-width%3D%2222%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M256%20256h96%22%20stroke%3D%22%23fff%22%20stroke-width%3D%2222%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%2226%22%20fill%3D%22%23F5C518%22/%3E%3C/svg%3E">
-<meta name="theme-color" content="#12432B">
+<meta name="theme-color" content="#0b1712">
 <meta name="description" content="Back match results, goals, both-teams-to-score and correct scores. GenLayer validators read the match pages and agree on the 90-minute score.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* Sportsbook layout: competitions rail | match board | bet slip. Night-match stadium palette. */
 :root {
-  --turf: #17643f;
-  --turf-dark: #12553a;
-  --turf-deep: #0d3f2b;
-  --chalk: #f4f7f1;
-  --board: #ffffff;
-  --ink: #12261b;
-  --ink-soft: #4d6157;
-  --line: #d6dfd8;
-  --yellow: #f3c623;
-  --yellow-ink: #2a2200;
-  --red: #d2402b;
-  --sky: #2f6fb3;
+  color-scheme: dark;
+  --bg: #0a1510;
+  --rail: #0f1e17;
+  --panel: #13261d;
+  --panel-2: #1a3126;
+  --panel-3: #22402f;
+  --line: #24402f;
+  --fg: #eaf3ee;
+  --soft: #8fa89a;
+  --mute: #5f786b;
+  --yellow: #f5c518;
+  --yellow-ink: #1d1700;
+  --green: #22a764;
+  --green-soft: #133a26;
+  --red: #e5533d;
   --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
   --body: "Barlow", "Helvetica Neue", Arial, sans-serif;
-  --r-board: 6px;
-  --r-ctl: 4px;
+  --r: 10px;
+  --r-sm: 7px;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
-  margin: 0;
-  font: 400 16px/1.5 var(--body);
-  color: var(--ink);
-  background-color: var(--turf);
-  /* mown stripes: the page is the pitch */
-  background-image: repeating-linear-gradient(90deg, var(--turf) 0 96px, var(--turf-dark) 96px 192px);
-  min-height: 100vh;
+  margin: 0; min-height: 100vh;
+  font: 500 15px/1.45 var(--body); color: var(--fg);
+  background: radial-gradient(1200px 500px at 50% -200px, #18402c 0%, transparent 70%), var(--bg);
 }
-a { color: var(--sky); }
-button, input, select { font: inherit; }
-:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+a { color: var(--yellow); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
 
-/* ---------- header ---------- */
+/* ---------- top bar ---------- */
 .top {
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-  padding: 14px 24px;
-  color: var(--chalk);
-  border-bottom: 2px solid rgba(244,247,241,.85);
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 20px; background: rgba(10,21,16,.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
-.logo { display: inline-flex; width: 44px; height: 44px; flex: none; }
-.logo svg { width: 100%; height: 100%; display: block; border-radius: 10px; box-shadow: 0 0 0 2px rgba(244,247,241,.35); }
-.brand h1 {
-  margin: 0; font: 900 40px/1 var(--display); letter-spacing: .5px;
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); }
+.logo { display: inline-flex; width: 38px; height: 38px; flex: none; }
+.logo svg { width: 100%; height: 100%; display: block; border-radius: 9px; }
+.brand b { font: 900 30px/1 var(--display); letter-spacing: .5px; }
+.nav { display: flex; gap: 6px; margin-left: 10px; }
+.nav button {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 9px 16px; font-weight: 700; color: var(--soft);
 }
-.brand p { margin: 0; font-size: 14px; opacity: .85; max-width: 46ch; }
-.net {
-  font-size: 13px; padding: 4px 10px; border-radius: 99px;
-  border: 1px solid rgba(244,247,241,.6);
-}
+.nav button[aria-pressed="true"] { background: var(--panel-3); color: var(--fg); border-color: #2f5640; }
+.spacer { flex: 1; }
+.net { font-size: 12px; font-weight: 700; color: var(--soft); padding: 6px 10px; border: 1px solid var(--line); border-radius: 99px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.net::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(34,167,100,.25); }
 .btn {
-  border: 0; border-radius: var(--r-ctl); padding: 10px 16px; cursor: pointer;
-  font-weight: 700; background: var(--yellow); color: var(--yellow-ink);
+  border: 0; border-radius: var(--r); padding: 10px 16px; font-weight: 800;
+  background: var(--yellow); color: var(--yellow-ink); white-space: nowrap;
 }
-.btn:hover { filter: brightness(1.05); }
+.btn:hover { filter: brightness(1.06); }
 .btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
-.btn.ghost { background: transparent; color: inherit; border: 1.5px solid currentColor; }
-.btn.small { padding: 6px 12px; font-size: 14px; }
+.btn.ghost { background: var(--panel); color: var(--fg); border: 1px solid var(--line); }
+.btn.green { background: var(--green); color: #04150c; }
+.btn.block { width: 100%; padding: 13px; font-size: 16px; }
+.btn.small { padding: 7px 12px; font-size: 14px; }
 
-/* ---------- layout ---------- */
-.wrap {
-  display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 24px;
-  max-width: 1240px; margin: 0 auto; padding: 24px;
+/* ---------- three-column shell ---------- */
+.shell {
+  display: grid; grid-template-columns: 240px minmax(0, 1fr) 340px; gap: 16px;
+  max-width: 1440px; margin: 0 auto; padding-inline: 20px; padding-block: 16px 40px;
+  align-items: start;
 }
-@media (max-width: 900px) {
-  .wrap { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
-  .top { padding: 12px 16px; }
-  .brand p { display: none; }
+.shell > * { min-width: 0; }
+.rail, .slip { position: sticky; top: 78px; max-height: calc(100vh - 94px); overflow: auto; }
+.card { background: var(--rail); border: 1px solid var(--line); border-radius: 14px; }
+.rail { padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.rail > * { min-width: 0; }
+.search { position: relative; }
+.search input[type="text"] {
+  width: 100%; padding: 10px 12px 10px 36px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--r); color: var(--fg);
 }
-@media (max-width: 560px) {
-  .top { gap: 10px; }
-  .brand { flex: 1; }
-  .brand h1 { font-size: 34px; }
-  .logo { width: 38px; height: 38px; }
-  .net { font-size: 12px; }
-  .top .btn { flex: 1 1 40%; text-align: center; white-space: nowrap; }
-  #connectBtn { order: 3; }
-  #listBtn { order: 2; }
+.search svg { position: absolute; left: 11px; top: 50%; margin-top: -8px; }
+.rail h3 { margin: 0 0 6px; font: 800 13px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.rail-list { display: grid; gap: 4px; }
+.rail-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
+  background: transparent; border: 1px solid transparent; border-radius: var(--r); padding: 9px 10px;
+  text-align: left; font-weight: 600; color: var(--fg);
 }
-.board {
-  background: var(--board); border-radius: var(--r-board);
-  box-shadow: 0 2px 0 var(--turf-deep);
-}
+.rail-item:hover { background: var(--panel); }
+.rail-item[aria-pressed="true"] { background: var(--panel-2); border-color: var(--green); }
+.rail-item .count { font-size: 12px; color: var(--soft); background: var(--panel); border-radius: 99px; padding: 1px 8px; }
+.rail-item .ic { display: inline-flex; gap: 10px; align-items: center; min-width: 0; }
+.rail-item .ic span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.how { font-size: 13px; color: var(--soft); background: var(--panel); border-radius: var(--r); padding: 12px; }
+.how b { color: var(--fg); }
+.how ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
 
-/* ---------- fixture list ---------- */
-.list-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; }
-.list-head h2 { margin: 0; font: 800 24px/1 var(--display); }
-.filters { display: flex; gap: 6px; padding: 0 16px 12px; flex-wrap: wrap; }
-.chip {
-  border: 1px solid var(--line); background: var(--board); border-radius: 99px;
-  padding: 3px 10px; font-size: 13px; cursor: pointer; color: var(--ink-soft);
+/* ---------- board ---------- */
+.board { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.board > * { min-width: 0; }
+.hero {
+  border-radius: 14px; padding: 20px 22px; display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  background: linear-gradient(120deg, #1b5a3a 0%, #123b28 55%, #0f2a1d 100%); border: 1px solid #2c6345;
 }
-.chip[aria-pressed="true"] { background: var(--ink); color: var(--chalk); border-color: var(--ink); }
-.fixtures { list-style: none; margin: 0; padding: 0; max-height: calc(100vh - 220px); overflow: auto; }
-@media (max-width: 900px) { .fixtures { max-height: 320px; } }
-.fixtures li + li { border-top: 1px solid var(--line); }
-.fx {
-  width: 100%; text-align: left; background: none; border: 0; cursor: pointer;
-  display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center;
-  padding: 12px 16px; color: var(--ink);
-}
-.fx:hover { background: #f1f5f2; }
-.fx[aria-current="true"] { background: #e7efe9; box-shadow: inset 4px 0 0 var(--turf); }
-.fx .t { font: 700 18px/1.1 var(--display); text-transform: none; }
-.fx .t.away { text-align: right; }
-.fx .mid { font: 800 18px/1 var(--display); text-align: center; min-width: 54px; }
-.fx .meta { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); }
-.status { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 3px; }
-.s-SCHEDULED { background: #e3efe7; color: var(--turf-deep); }
-.s-FINAL { background: var(--ink); color: var(--chalk); }
-.s-VOID, .s-REJECTED { background: var(--red); color: #fff; }
-.empty { padding: 20px 16px; color: var(--ink-soft); }
+.hero h1 { margin: 0; font: 900 clamp(26px, 3.2vw, 38px)/1 var(--display); letter-spacing: .3px; text-wrap: balance; }
+.hero h1 span { color: var(--yellow); }
+.hero p { margin: 6px 0 0; color: #cfe3d7; max-width: 60ch; }
+.stats { display: flex; gap: 10px; }
+.stat { background: rgba(0,0,0,.25); border-radius: var(--r); padding: 8px 14px; text-align: center; min-width: 88px; }
+.stat b { display: block; font: 900 24px/1.1 var(--display); }
+.stat small { color: #cfe3d7; font-size: 12px; }
+.board-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.board-head h2 { margin: 0; font: 800 26px/1 var(--display); }
+.chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; max-width: 100%; }
+.chip { flex: none; background: var(--panel); border: 1px solid var(--line); color: var(--soft); border-radius: 99px; padding: 6px 12px; font-size: 13px; font-weight: 700; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 
-/* ---------- scoreboard ---------- */
-.scoreboard {
-  background: var(--ink); color: var(--chalk); border-radius: var(--r-board) var(--r-board) 0 0;
-  padding: 22px 24px 18px;
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+.events { display: grid; gap: 8px; }
+.ev {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 330px) 58px; gap: 10px; align-items: stretch;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px;
 }
-.scoreboard .team { font: 900 clamp(30px, 5vw, 54px)/.95 var(--display); }
-.scoreboard .team.away { text-align: right; }
-.scoreboard .side { display: block; font: 500 13px/1.4 var(--body); opacity: .7; margin-top: 4px; }
-.scoreboard .score {
-  font: 900 clamp(48px, 8vw, 92px)/1 var(--display); letter-spacing: 2px; text-align: center;
-  font-variant-numeric: tabular-nums; color: var(--yellow); white-space: nowrap;
+.ev:hover { border-color: #2f5640; }
+.ev-main { min-width: 0; display: grid; gap: 4px; background: none; border: 0; text-align: left; padding: 2px 4px; }
+.ev-meta { display: flex; gap: 8px; align-items: center; font-size: 12.5px; color: var(--soft); flex-wrap: wrap; }
+.ev-meta .comp { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--mute); }
+.ev-team { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; min-width: 0; }
+.ev-team .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev-team .g { margin-left: auto; font: 900 20px/1 var(--display); color: var(--yellow); }
+.crest {
+  width: 24px; height: 24px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  font: 800 11px/1 var(--body); color: #fff;
 }
-.scoreboard .score.pending { color: var(--chalk); font-size: clamp(28px, 4vw, 40px); letter-spacing: 0; }
-.scoreboard .score small { display: block; white-space: normal; max-width: 14ch; margin: 0 auto; font: 500 13px/1.4 var(--body); color: var(--chalk); opacity: .75; letter-spacing: 0; }
-.strip {
-  display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
-  padding: 10px 24px; background: #eef3ef; border-bottom: 1px solid var(--line); font-size: 14px;
+.odds-head { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; font-size: 11px; color: var(--mute); font-weight: 700; letter-spacing: .06em; }
+.odds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--panel-2); border-radius: var(--r); overflow: hidden; }
+.odd {
+  display: grid; place-content: center; gap: 2px; text-align: center; min-height: 64px; padding: 6px 4px;
+  background: var(--panel-2); border: 0; color: var(--fg);
 }
-.strip b { font-weight: 700; }
-.detail-body { padding: 20px 24px 24px; }
-@media (max-width: 600px) {
-  .scoreboard { padding: 16px; gap: 8px; }
-  .scoreboard .team { font-size: 23px; overflow-wrap: break-word; min-width: 0; }
-  .scoreboard .score small { max-width: 11ch; }
-  .scoreboard .score { font-size: 46px; }
-  .strip, .detail-body { padding-left: 16px; padding-right: 16px; }
+.odd:hover:not(:disabled) { background: var(--panel-3); }
+.odd .k { font-size: 12px; color: var(--soft); font-weight: 700; }
+.odd .v { font: 800 19px/1 var(--body); }
+.odd .p { font-size: 11px; color: var(--mute); }
+.odd.on { background: var(--yellow); color: var(--yellow-ink); }
+.odd.on .k, .odd.on .p { color: rgba(29,23,0,.75); }
+.odd.win { box-shadow: inset 0 0 0 2px var(--green); }
+.odd:disabled { cursor: default; }
+.more {
+  border: 0; background: var(--panel-2); border-radius: var(--r); color: var(--soft); font-weight: 800; font-size: 14px;
 }
-.section-title { font: 800 22px/1.1 var(--display); margin: 0 0 12px; }
+.more:hover { background: var(--panel-3); color: var(--fg); }
+.tag { white-space: nowrap; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 5px; letter-spacing: .03em; }
+.t-open { background: var(--green-soft); color: #7fe0a9; }
+.t-play { background: #3a1611; color: #ff9a86; }
+.t-wait { background: #3a3110; color: #ffd75e; }
+.t-done { background: #26302b; color: #c9d6cf; }
+.t-rej { background: #3a1611; color: #ff9a86; }
+.t-chk { background: #3a3110; color: #ffd75e; }
+.empty { padding: 28px 16px; text-align: center; color: var(--soft); background: var(--panel); border: 1px dashed var(--line); border-radius: 12px; }
 
-/* ---------- markets ---------- */
-.markets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-@media (max-width: 700px) { .markets { grid-template-columns: 1fr; } }
-.market { border: 1px solid var(--line); border-radius: var(--r-board); padding: 14px; }
-.market h4 { margin: 0; font: 800 20px/1.1 var(--display); }
-.market .rule { margin: 2px 0 10px; font-size: 13px; color: var(--ink-soft); }
-.market .pot { font-size: 13px; color: var(--ink-soft); display: flex; gap: 10px; flex-wrap: wrap; }
-.outcomes { display: grid; gap: 6px; margin: 8px 0 10px; }
-.oc {
-  position: relative; display: flex; justify-content: space-between; align-items: center; gap: 8px;
-  width: 100%; padding: 9px 10px; border: 1.5px solid var(--line); border-radius: var(--r-ctl);
-  background: var(--board); cursor: pointer; text-align: left; color: var(--ink); overflow: hidden;
+/* ---------- match view ---------- */
+.back { background: none; border: 0; color: var(--soft); font-weight: 700; padding: 0; display: inline-flex; gap: 6px; align-items: center; }
+.back:hover { color: var(--fg); }
+.score-card { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); }
+.sb {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 22px;
+  background: linear-gradient(180deg, #102a1d, #0d2018);
 }
-.oc .fill { position: absolute; inset: 0 auto 0 0; background: #dcebe1; z-index: 0; transition: width .4s ease; }
-.oc span { position: relative; z-index: 1; }
-.oc .name { font-weight: 700; }
-.oc .num { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-.oc[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.oc.win { border-color: var(--turf); }
-.oc.win .fill { background: #bfe0c9; }
-.oc.win .name::after { content: " — winner"; font-weight: 600; color: var(--turf); }
-.oc:disabled { cursor: default; }
-.stake-row { display: flex; gap: 8px; }
-.stake-row input { flex: 1; min-width: 0; }
-.market.closed .stake-row { display: none; }
-.verdict-tag { font-size: 13px; font-weight: 700; }
-.verdict-tag.void { color: var(--red); }
-
-input[type="text"], input[type="url"], input[type="number"], input[type="datetime-local"] {
-  width: 100%; padding: 9px 10px; border: 1.5px solid var(--line); border-radius: var(--r-ctl);
-  background: #fff; color: var(--ink);
-}
-input:focus { border-color: var(--ink); outline: none; }
-label { display: block; font-size: 14px; font-weight: 600; margin: 0 0 4px; }
-.hint { font-size: 13px; color: var(--ink-soft); margin: 4px 0 0; }
-
-/* ---------- settlement + position ---------- */
-.below { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; margin-top: 20px; }
-@media (max-width: 700px) { .below { grid-template-columns: 1fr; } }
-.panel { border: 1px solid var(--line); border-radius: var(--r-board); padding: 14px; }
-.panel dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; font-size: 14px; }
-.panel dt { color: var(--ink-soft); }
+.sb .tm { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; min-width: 0; }
+.sb .tm .crest { width: 52px; height: 52px; font-size: 18px; }
+.sb .tm b { font: 900 clamp(22px, 3vw, 34px)/1 var(--display); overflow-wrap: anywhere; }
+.sb .tm small { color: var(--soft); font-size: 12px; }
+.sb .mid { text-align: center; }
+.sb .big { font: 900 clamp(46px, 7vw, 80px)/1 var(--display); color: var(--yellow); letter-spacing: 2px; }
+.sb .big.t { font-size: clamp(30px, 4vw, 44px); color: var(--fg); letter-spacing: 0; }
+.sb .mid small { display: block; color: var(--soft); font-size: 13px; margin-top: 4px; }
+.strip { display: flex; gap: 8px 18px; flex-wrap: wrap; padding: 10px 18px; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--soft); }
+.strip b { color: var(--fg); }
+.mk-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.mk { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.mk-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.mk-h h4 { margin: 0; font: 800 20px/1 var(--display); }
+.mk-h span { font-size: 12.5px; color: var(--soft); }
+.mk .rule { margin: -4px 0 0; font-size: 13px; color: var(--soft); }
+.mk .odds { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+.mk .verdict { font-size: 13px; font-weight: 700; color: #7fe0a9; }
+.mk .verdict.void { color: #ff9a86; }
+.score-add { display: flex; gap: 8px; }
+.score-add input { flex: 1; min-width: 0; }
+.info-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel h3 { margin: 0; font: 800 20px/1 var(--display); }
+.panel dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; font-size: 13.5px; }
+.panel dt { color: var(--soft); }
 .panel dd { margin: 0; overflow-wrap: anywhere; }
-.note { font-size: 14px; background: #f3f6f4; border-left: 3px solid var(--turf); padding: 8px 10px; margin: 10px 0; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.pos-list { list-style: none; padding: 0; margin: 0 0 8px; font-size: 14px; }
-.pos-list li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--line); }
-.claim-amt { font: 800 34px/1 var(--display); margin: 6px 0 2px; }
+.note { font-size: 13.5px; background: var(--panel-2); border-left: 3px solid var(--green); padding: 8px 10px; border-radius: 4px; }
+.hint { font-size: 13px; color: var(--soft); margin: 0; }
+.claim-amt { font: 900 34px/1 var(--display); color: var(--yellow); }
 
-/* ---------- placeholder detail ---------- */
-.intro { padding: 28px; }
-.intro h2 { font: 900 clamp(32px, 4.4vw, 48px)/1 var(--display); margin: 0 0 12px; max-width: 18ch; }
-.intro p { max-width: 62ch; margin: 0 0 12px; }
-.intro ol { max-width: 62ch; padding-left: 20px; }
-.intro li { margin-bottom: 6px; }
+input[type="text"], input[type="url"], input[type="datetime-local"] {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--bg); color: var(--fg);
+}
+input:focus { border-color: var(--yellow); outline: none; }
 
-/* ---------- dialog ---------- */
-dialog { border: 0; border-radius: var(--r-board); padding: 0; width: min(560px, calc(100vw - 32px)); color: var(--ink); }
-dialog::backdrop { background: rgba(13,63,43,.6); }
-.dlg-head { background: var(--ink); color: var(--chalk); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
-.dlg-head h3 { margin: 0; font: 800 26px/1 var(--display); }
-.dlg-body { padding: 18px 20px 20px; display: grid; gap: 14px; }
+/* ---------- bet slip ---------- */
+.slip { display: flex; flex-direction: column; overflow: hidden; }
+.slip-tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--panel); }
+.slip-tabs button { border: 0; background: none; padding: 13px; font-weight: 800; color: var(--soft); border-bottom: 2px solid transparent; }
+.slip-tabs button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--yellow); background: var(--rail); }
+.slip-tabs .badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 99px; background: var(--yellow); color: var(--yellow-ink); font-size: 12px; }
+.slip-body { padding: 12px; display: grid; gap: 10px; overflow: auto; }
+.pick { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 10px; display: grid; gap: 8px; }
+.pick-top { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+.pick-top small { color: var(--soft); font-size: 12px; display: block; }
+.pick-top b { font-size: 15px; }
+.pick-x { background: none; border: 0; color: var(--mute); font-size: 20px; line-height: 1; padding: 0 2px; }
+.pick-x:hover { color: var(--fg); }
+.pick-row { display: flex; align-items: center; gap: 8px; }
+.pick-row input { flex: 1; min-width: 0; }
+.pick-odd { font: 800 16px/1 var(--body); color: var(--yellow); white-space: nowrap; }
+.pick-ret { font-size: 12.5px; color: var(--soft); }
+.pick-ret b { color: var(--fg); }
+.quick { display: flex; gap: 6px; }
+.quick button { flex: 1; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 5px 0; font-size: 13px; font-weight: 700; color: var(--soft); }
+.quick button:hover { color: var(--fg); }
+.slip-sum { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 10px; background: var(--rail); }
+.sum-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--soft); }
+.sum-row b { color: var(--fg); font-size: 16px; }
+.slip-empty { text-align: center; color: var(--soft); padding: 26px 10px; display: grid; gap: 8px; justify-items: center; }
+.slip-empty svg { opacity: .6; }
+.mybet { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 10px; display: grid; gap: 6px; font-size: 14px; }
+.mybet .row { display: flex; justify-content: space-between; gap: 8px; }
+.mybet .row span:first-child { color: var(--soft); }
+.mybet-h { display: flex; justify-content: space-between; gap: 8px; align-items: center; font-weight: 800; }
+.slip-fab { display: none; }
+.slip-close { display: none; }
+
+/* ---------- dialogs, toasts, tray ---------- */
+dialog { border: 1px solid var(--line); border-radius: 14px; padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--rail); color: var(--fg); }
+dialog::backdrop { background: rgba(0,0,0,.6); }
+.dlg-head { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
+.dlg-head h3 { margin: 0; font: 800 24px/1 var(--display); }
+.dlg-body { padding: 16px 18px 18px; display: grid; gap: 14px; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 520px) { .two { grid-template-columns: 1fr; } }
-.close-x { background: none; border: 0; color: inherit; font-size: 26px; line-height: 1; cursor: pointer; }
+label { display: block; font-size: 13.5px; font-weight: 700; margin: 0 0 4px; }
+.close-x { background: none; border: 0; color: var(--soft); font-size: 26px; line-height: 1; }
+details.more-src summary { cursor: pointer; font-size: 14px; font-weight: 700; color: var(--soft); }
+details.more-src[open] summary { margin-bottom: 8px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.wallet-list { display: grid; gap: 8px; }
+.wallet-opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); font-weight: 800; text-align: left; }
+.wallet-opt:hover { border-color: var(--yellow); }
+.wallet-opt img { border-radius: 6px; }
+.wallet-dot { width: 28px; height: 28px; border-radius: 6px; background: var(--green); }
 
-/* ---------- toast ---------- */
-.toasts { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 50; max-width: min(420px, calc(100vw - 32px)); }
-.toast { background: var(--ink); color: var(--chalk); padding: 12px 14px; border-radius: var(--r-ctl); font-size: 14px; border-left: 5px solid var(--yellow); }
+.toasts { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 60; max-width: min(420px, calc(100vw - 32px)); }
+.toast { background: var(--panel-3); color: var(--fg); padding: 12px 14px; border-radius: var(--r); font-size: 14px; border-left: 4px solid var(--yellow); box-shadow: 0 10px 30px rgba(0,0,0,.4); }
 .toast.err { border-left-color: var(--red); }
-.toast.ok { border-left-color: #6fd39a; }
-.toast a { color: var(--yellow); }
-
-/* ---------- validators-at-work tray ---------- */
-.tray { position: fixed; left: 16px; bottom: 16px; z-index: 45; display: grid; gap: 10px; width: min(380px, calc(100vw - 32px)); }
-.job { background: var(--board); color: var(--ink); border-radius: var(--r-board); box-shadow: 0 6px 24px rgba(0,0,0,.25); overflow: hidden; }
-.job-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--ink); color: var(--chalk); }
-.job-head b { font: 800 18px/1.1 var(--display); flex: 1; }
-.job-head .clock { font-variant-numeric: tabular-nums; font-size: 13px; opacity: .85; }
-.job-head button { background: none; border: 0; color: inherit; font-size: 20px; line-height: 1; cursor: pointer; padding: 0 2px; }
-.steps { list-style: none; margin: 0; padding: 10px 12px 4px; display: grid; gap: 6px; font-size: 14px; }
-.steps li { display: flex; gap: 8px; align-items: center; color: var(--ink-soft); }
-.steps li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
-.steps li.done { color: var(--ink); }
-.steps li.done::before { background: var(--turf); border-color: var(--turf); }
-.steps li.now { color: var(--ink); font-weight: 600; }
+.toast.ok { border-left-color: var(--green); }
+.tray { position: fixed; left: 16px; bottom: 16px; z-index: 55; display: grid; gap: 10px; width: min(360px, calc(100vw - 32px)); }
+.job { background: var(--rail); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.45); overflow: hidden; }
+.job-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--panel-2); }
+.job-head b { font: 800 17px/1.1 var(--display); flex: 1; }
+.job-head .clock { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--soft); }
+.job-head button { background: none; border: 0; color: var(--soft); font-size: 20px; line-height: 1; padding: 0 2px; }
+.steps { list-style: none; margin: 0; padding: 10px 12px 4px; display: grid; gap: 6px; font-size: 13.5px; }
+.steps li { display: flex; gap: 8px; align-items: center; color: var(--mute); }
+.steps li::before { content: ""; width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+.steps li.done { color: var(--fg); }
+.steps li.done::before { background: var(--green); border-color: var(--green); }
+.steps li.now { color: var(--fg); font-weight: 700; }
 .steps li.now::before { border-color: var(--yellow); border-top-color: transparent; animation: spin .8s linear infinite; }
 .steps li.bad::before { background: var(--red); border-color: var(--red); }
 @keyframes spin { to { transform: rotate(360deg); } }
-.job-foot { display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px 10px; font-size: 13px; color: var(--ink-soft); }
-.job.ok .job-head { background: var(--turf); }
-.job.fail .job-head { background: var(--red); }
-.fx.ghost { cursor: default; opacity: .85; }
-.fx.ghost .status { background: #fff4c7; color: #5b4a00; }
-.ret { font-size: 13px; color: var(--ink-soft); margin: 6px 0 0; min-height: 1.4em; }
-.ret b { color: var(--ink); }
-.odds { font-weight: 700; color: var(--ink); margin-right: 6px; }
-details.more summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
-details.more[open] summary { margin-bottom: 8px; }
-@media (max-width: 560px) { .tray { left: 8px; right: 8px; bottom: 8px; width: auto; } .toasts { bottom: auto; top: 8px; right: 8px; left: 8px; max-width: none; } }
-@media (prefers-reduced-motion: reduce) { .steps li.now::before { animation: none; border-top-color: var(--yellow); } }
-
-.wallet-list { display: grid; gap: 8px; }
-.wallet-opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--r-ctl); background: var(--board); color: var(--ink); font-weight: 700; cursor: pointer; text-align: left; }
-.wallet-opt:hover { border-color: var(--ink); }
-.wallet-opt img { border-radius: 6px; }
-.wallet-dot { width: 28px; height: 28px; border-radius: 6px; background: var(--turf); }
-.config { padding: 14px 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); }
-.config input { margin-top: 4px; font-size: 13px; }
+.job-foot { display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px 10px; font-size: 12.5px; color: var(--soft); }
+.job.ok .job-head { background: #14472d; }
+.job.fail .job-head { background: #4a1d15; }
+.config { font-size: 12px; color: var(--mute); }
+.config input { margin-top: 4px; font-size: 12px; padding: 7px 9px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (prefers-reduced-motion: reduce) { .oc .fill { transition: none; } }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1180px) {
+  .shell { grid-template-columns: 210px minmax(0, 1fr) 300px; }
+  .ev { grid-template-columns: minmax(0, 1fr) minmax(0, 270px) 50px; }
+}
+@media (max-width: 980px) {
+  .shell { grid-template-columns: minmax(0, 1fr); padding-inline: 12px; }
+  .rail { display: none; }
+  .rail .search { display: none; }
+  .rail .grp { display: none; }
+  .rail .grp.status { display: block; }
+  .rail .grp.status .rail-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .rail .grp.status h3, .rail .how, .rail .config { display: none; }
+  .rail .grp.status .rail-item { width: auto; flex: none; background: var(--panel); border-color: var(--line); padding: 7px 12px; }
+  .rail .grp.status .rail-item[aria-pressed="true"] { border-color: var(--green); background: var(--panel-2); }
+  .slip { position: fixed; left: 0; right: 0; bottom: 0; top: auto; max-height: 82vh; z-index: 50; border-radius: 16px 16px 0 0; transform: translateY(105%); transition: transform .25s ease; box-shadow: 0 -10px 40px rgba(0,0,0,.5); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .slip.open { transform: none; }
+  .slip-close { display: block; width: 100%; padding: 10px 0 4px; background: var(--rail); border: 0; }
+  .slip-close span { display: block; width: 44px; height: 5px; border-radius: 99px; background: var(--mute); margin: 0 auto; }
+  .slip-fab { display: flex; position: fixed; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 45; align-items: center; gap: 8px; box-shadow: 0 10px 26px rgba(0,0,0,.45); }
+  .nav { display: none; }
+  .tray { bottom: 72px; }
+}
+@media (max-width: 640px) {
+  .top { padding: 10px 12px; gap: 8px; }
+  .brand b { font-size: 24px; }
+  .logo { width: 32px; height: 32px; }
+  .lbl { display: none; }
+  #listBtn { padding: 9px 14px; font-size: 18px; line-height: 1; }
+  #connectBtn { padding: 10px 12px; font-size: 14px; }
+  .hero h1 { font-size: 28px; }
+  .hero p { font-size: 14px; }
+  .stat { padding: 8px 6px; }
+  .sb .tm b { font-size: 20px; overflow-wrap: break-word; hyphens: auto; }
+  .sb .big { font-size: 48px; }
+  .net { display: none; }
+  .hero { padding: 16px; }
+  .stats { width: 100%; }
+  .stat { flex: 1; min-width: 0; }
+  .ev { grid-template-columns: minmax(0, 1fr) 46px; }
+  .ev .odds { grid-column: 1 / -1; grid-row: 2; }
+  .ev .more { grid-row: 1; grid-column: 2; }
+  .odds-head { display: none; }
+  .mk-grid, .info-grid { grid-template-columns: 1fr; }
+  .sb { padding: 16px 10px; }
+  .sb .tm .crest { width: 40px; height: 40px; }
+  .two { grid-template-columns: 1fr; }
+  .tray { left: 8px; right: 8px; width: auto; }
+  .toasts { bottom: auto; top: 8px; right: 8px; left: 8px; max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { .steps li.now::before { animation: none; border-top-color: var(--yellow); } .slip { transition: none; } }
 </style>
 </head>
 <body>
 
 <header class="top">
-  <div class="brand">
-    <span class="logo"><svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#12432B"/><rect x="48" y="248" width="416" height="16" rx="8" fill="#fff" opacity=".28"/><circle cx="256" cy="256" r="146" fill="none" stroke="#fff" stroke-width="34"/><path d="M256 110A146 146 0 0 1 402 256" fill="none" stroke="#F5C518" stroke-width="34" stroke-linecap="round"/><path d="M256 256V150" stroke="#F5C518" stroke-width="22" stroke-linecap="round"/><path d="M256 256h96" stroke="#fff" stroke-width="22" stroke-linecap="round"/><circle cx="256" cy="256" r="26" fill="#F5C518"/></svg></span>
-    <h1>Ninety</h1>
-    <p>Soccer markets settled by GenLayer validators reading the match pages.</p>
-  </div>
+  <a class="brand" href="#" id="homeLink"><span class="logo"><svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#12432B"/><rect x="48" y="248" width="416" height="16" rx="8" fill="#fff" opacity=".28"/><circle cx="256" cy="256" r="146" fill="none" stroke="#fff" stroke-width="34"/><path d="M256 110A146 146 0 0 1 402 256" fill="none" stroke="#F5C518" stroke-width="34" stroke-linecap="round"/><path d="M256 256V150" stroke="#F5C518" stroke-width="22" stroke-linecap="round"/><path d="M256 256h96" stroke="#fff" stroke-width="22" stroke-linecap="round"/><circle cx="256" cy="256" r="26" fill="#F5C518"/></svg></span><b>Ninety</b></a>
+  <nav class="nav" aria-label="Sections">
+    <button type="button" data-nav="matches" aria-pressed="true">Matches</button>
+    <button type="button" data-nav="mybets" aria-pressed="false">My bets</button>
+  </nav>
+  <span class="spacer"></span>
   <span class="net" id="netLabel">Bradbury testnet</span>
-  <button class="btn ghost small" id="listBtn" type="button">List a fixture</button>
+  <button class="btn ghost" id="listBtn" type="button" aria-label="List a match">+<span class="lbl"> List match</span></button>
   <button class="btn" id="connectBtn" type="button">Connect wallet</button>
 </header>
 
-<main class="wrap">
-  <aside class="board" aria-label="Fixtures">
-    <div class="list-head">
-      <h2>Fixtures</h2>
-      <button class="btn ghost small" id="refreshBtn" type="button">Refresh</button>
+<div class="shell">
+  <aside class="rail card" aria-label="Filters">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#8fa89a" stroke-width="2"/><path d="M11 11l3.5 3.5" stroke="#8fa89a" stroke-width="2" stroke-linecap="round"/></svg>
+      <label for="q" class="sr">Search teams</label>
+      <input type="text" id="q" placeholder="Search teams" autocomplete="off">
     </div>
-    <div class="filters" role="group" aria-label="Filter fixtures">
-      <button class="chip" data-filter="open" aria-pressed="true" type="button">Open</button>
-      <button class="chip" data-filter="settle" aria-pressed="false" type="button">Awaiting result</button>
-      <button class="chip" data-filter="done" aria-pressed="false" type="button">Settled</button>
-      <button class="chip" data-filter="all" aria-pressed="false" type="button">All</button>
+    <div class="grp status">
+      <h3>Matches</h3>
+      <div class="rail-list" id="statusList"></div>
     </div>
-    <ul class="fixtures" id="fixtureList"><li class="empty">Loading fixtures…</li></ul>
+    <div class="grp">
+      <h3>Competitions</h3>
+      <div class="rail-list" id="compList"></div>
+    </div>
+    <div class="how">
+      <b>How settling works</b>
+      <ol>
+        <li>Matches open with a link to the match page.</li>
+        <li>Stakes close at kickoff.</li>
+        <li>From 2 hours after kickoff anyone can ask validators to read the result.</li>
+        <li>Validators must agree on the 90-minute score. Payouts follow automatically.</li>
+      </ol>
+    </div>
     <div class="config">
-      <label for="contractInput">Contract address</label>
+      <label for="contractInput">Contract</label>
       <input type="text" id="contractInput" spellcheck="false" placeholder="0x…">
     </div>
   </aside>
 
-  <section class="board" id="detail" aria-live="polite">
-    <div class="intro">
-      <h2>Back the result. Validators read the final whistle.</h2>
-      <p>Every fixture opens four markets: the result, over or under 2.5 goals, both teams to score, and an open correct-score pool. Stakes go into shared pots and winners split the pot of their market.</p>
-      <ol>
-        <li>Someone lists a match with a link to its match page. Validators check the page really shows that fixture before it opens.</li>
-        <li>Stakes are accepted until kickoff.</li>
-        <li>Two hours after kickoff, anyone can ask validators to settle. Each validator reads the match pages on its own and they must agree on the 90-minute score.</li>
-        <li>All four markets settle from that score. Postponed or abandoned matches are refunded.</li>
-      </ol>
-      <p>Pick a fixture to start, or list one.</p>
+  <main class="board" id="board" aria-live="polite">
+    <div class="empty">Loading matches…</div>
+  </main>
+
+  <aside class="slip card" id="slip" aria-label="Bet slip">
+    <button class="slip-close" type="button" id="slipClose" aria-label="Close bet slip"><span></span></button>
+    <div class="slip-tabs">
+      <button type="button" data-slip="slip" aria-pressed="true">Bet slip<span class="badge" id="slipCount" hidden>0</span></button>
+      <button type="button" data-slip="mybets" aria-pressed="false">My bets</button>
     </div>
-  </section>
-</main>
+    <div class="slip-body" id="slipBody"></div>
+    <div class="slip-sum" id="slipSum"></div>
+  </aside>
+</div>
+
+<button class="btn slip-fab" id="slipFab" type="button">Bet slip <span class="num" id="fabCount">0</span></button>
 
 <dialog id="listDlg" aria-labelledby="listTitle">
   <form method="dialog" id="listForm">
     <div class="dlg-head">
-      <h3 id="listTitle">List a fixture</h3>
+      <h3 id="listTitle">List a match</h3>
       <button class="close-x" value="cancel" formnovalidate aria-label="Close">&times;</button>
     </div>
     <div class="dlg-body">
@@ -333,29 +428,29 @@ details.more[open] summary { margin-bottom: 8px; }
       <div>
         <label for="fSrcA">Match page (Flashscore works well)</label>
         <input type="url" id="fSrcA" required placeholder="https://www.flashscore.com/match/football/…">
-        <p class="hint">The page for this exact match. Validators read it now to confirm the fixture, and again after full time to read the score.</p>
       </div>
-      <details class="more">
+      <details class="more-src">
         <summary>Add a second match page (optional)</summary>
         <label for="fSrcB">Second match page</label>
         <input type="url" id="fSrcB" placeholder="https://www.espn.com/soccer/match/_/gameId/…">
-        <p class="hint">An independent site that must show the same score. Safer, but validators read two pages, so settling takes longer. One Flashscore page is usually enough.</p>
+        <p class="hint">An independent site that must show the same score. Safer, but settling takes longer.</p>
       </details>
-      <p class="hint">Validators open the page to confirm the fixture. This takes about 1–3 minutes on Bradbury; you can keep browsing while they work.</p>
+      <p class="hint">Validators open the page to confirm the match. This takes a few minutes on Bradbury; you can keep browsing while they work.</p>
       <div class="actions">
-        <button class="btn" type="submit" value="default" id="listSubmit">List fixture</button>
+        <button class="btn" type="submit" value="default" id="listSubmit">List match</button>
         <button class="btn ghost" value="cancel" formnovalidate type="submit">Cancel</button>
       </div>
     </div>
   </form>
 </dialog>
 
-<div class="toasts" id="toasts" aria-live="assertive"></div>
-<div class="tray" id="tray" aria-live="polite"></div>
 <dialog id="walletDlg" aria-labelledby="walletTitle">
   <div class="dlg-head"><h3 id="walletTitle">Choose a wallet</h3><button class="close-x" type="button" data-cancel aria-label="Close">&times;</button></div>
   <div class="dlg-body"><div id="walletList" class="wallet-list"></div><p class="hint">Pick the wallet that holds your Bradbury GEN. Click your address later to switch.</p></div>
 </dialog>
+
+<div class="toasts" id="toasts" aria-live="assertive"></div>
+<div class="tray" id="tray" aria-live="polite"></div>
 
 <script type="module">
 /* ------------------------------------------------------------------ *
@@ -431,7 +526,7 @@ function fmtTime(ts) {
 function fmtIn(ts) {
   const d = ts - nowSec();
   const a = Math.abs(d);
-  const s = a < 3600 ? `${Math.max(1, Math.round(a / 60))} min` : a < 86400 ? `${Math.round(a / 3600)} h` : `${Math.round(a / 86400)} days`;
+  const s = a < 3600 ? `${Math.max(1, Math.round(a / 60))} min` : a < 86400 ? `${Math.round(a / 3600)} h` : (Math.round(a / 86400) === 1 ? "1 day" : `${Math.round(a / 86400)} days`);
   return d >= 0 ? `in ${s}` : `${s} ago`;
 }
 function short(a) { return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : ""; }
@@ -677,314 +772,487 @@ async function send(functionName, args, { value, title, kind, fixture } = {}) {
   }
 }
 
+
+/* ------------------------------------------------------------------ *
+ * Sportsbook UI state
+ * ------------------------------------------------------------------ */
+Object.assign(state, {
+  view: "list",          // "list" | "match"
+  status: "open",        // open | live | settle | done | all
+  comp: "",              // competition filter
+  q: "",
+  slip: [],              // [{fid, market, outcome, amount}]
+  slipTab: "slip",
+  positions: {},         // fid -> position JSON
+});
+const SLIP_KEY = "ninety.slip";
+try { state.slip = JSON.parse(localGet(SLIP_KEY) || "[]").filter((p) => p && p.market); } catch {}
+const saveSlip = () => localSet(SLIP_KEY, JSON.stringify(state.slip));
+
+const STATUS_TABS = [
+  { key: "open", label: "Upcoming", color: "#22a764" },
+  { key: "live", label: "In play", color: "#e5533d" },
+  { key: "settle", label: "Awaiting result", color: "#f5c518" },
+  { key: "done", label: "Settled", color: "#8fa89a" },
+  { key: "all", label: "All matches", color: "#eaf3ee" },
+];
+const SHORT = { HOME: "1", DRAW: "X", AWAY: "2", OVER: "Over", UNDER: "Under", YES: "Yes", NO: "No" };
+
+function bucket(f) {
+  const p = phase(f);
+  if (p === "open") return "open";
+  if (p === "playing") return "live";
+  if (p === "settle") return "settle";
+  return "done";
+}
+function crestColor(name) {
+  let h = 0;
+  for (const c of String(name)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return `hsl(${h % 360} 55% 38%)`;
+}
+function crest(name) {
+  const letters = String(name).split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  return `<span class="crest" style="background:${crestColor(name)}" aria-hidden="true">${esc(letters)}</span>`;
+}
+function oddsOf(mk, o) {
+  const total = BigInt(mk.total || 0), pool = BigInt(mk.pools?.[o] || 0);
+  return pool > 0n ? Number(total * 100n / pool) / 100 : null;
+}
+function fmtOdds(x) { return x == null ? "—" : `×${x.toFixed(2)}`; }
+function outLabel(market, o) { return OUTCOME_LABEL[o] || String(o).replace("-", "–"); }
+function inSlip(fid, market, outcome) { return state.slip.some((p) => p.fid === fid && p.market === market && p.outcome === outcome); }
+function fixtureById(id) { return state.fixtures.find((f) => f.id === id); }
+function marketDef(key) { return MARKETS.find((m) => m.key === key); }
+
 /* ------------------------------------------------------------------ *
  * Data
  * ------------------------------------------------------------------ */
-function userIsTyping() {
-  return [...$("detail").querySelectorAll("input")].some((i) => i.value.trim() !== "" || i === document.activeElement);
-}
-
 async function loadFixtures({ auto = false } = {}) {
-  if (!CONTRACT) {
-    $("fixtureList").innerHTML = `<li class="empty">Set the contract address below to load fixtures.</li>`;
-    return;
-  }
+  if (!CONTRACT) { $("board").innerHTML = `<div class="empty">Set the contract address in the left panel to load matches.</div>`; return; }
   try {
     const raw = await read("get_fixtures", [0, 50]);
     state.fixtures = JSON.parse(raw).fixtures;
-    renderList();
-    if (state.selected != null) {
-      if (!(auto && userIsTyping())) renderDetail();
-    } else {
-      const hashId = Number(location.hash.replace("#fixture-", ""));
-      if (location.hash.startsWith("#fixture-") && state.fixtures.some((f) => f.id === hashId)) select(hashId);
-    }
+    if (!auto || !userIsTyping()) render();
+    else { renderRail(); renderSlip(); }
+    if (state.account) loadAllPositions();
   } catch (e) {
-    $("fixtureList").innerHTML = `<li class="empty">Couldn't load fixtures: ${esc(errText(e))}. Check the contract address and network.</li>`;
+    $("board").innerHTML = `<div class="empty">Couldn't load matches: ${esc(errText(e))}. Check the contract address and network.</div>`;
   }
 }
-
+function userIsTyping() {
+  const a = document.activeElement;
+  return a && a.tagName === "INPUT" && !a.closest("dialog");
+}
 async function loadPosition() {
-  state.position = null;
   if (!state.account || state.selected == null) return;
-  try { state.position = JSON.parse(await read("get_position", [state.selected, state.account])); }
+  try { state.positions[state.selected] = JSON.parse(await read("get_position", [state.selected, state.account])); }
   catch (e) { console.warn(e); }
 }
-
-async function refreshSelected() {
-  if (state.selected == null) return;
+let posLoading = false;
+async function loadAllPositions() {
+  if (!state.account || posLoading) return;
+  posLoading = true;
   try {
-    const f = JSON.parse(await read("get_fixture", [state.selected]));
-    const i = state.fixtures.findIndex((x) => x.id === f.id);
-    if (i >= 0) state.fixtures[i] = f; else state.fixtures.unshift(f);
-  } catch (e) { console.warn(e); }
-  await loadPosition();
-  renderList();
-  renderDetail();
+    await Promise.all(state.fixtures.filter((f) => f.status !== "REJECTED").map(async (f) => {
+      try { state.positions[f.id] = JSON.parse(await read("get_position", [f.id, state.account])); } catch {}
+    }));
+  } finally { posLoading = false; }
+  renderSlip();
+  if (state.view === "match") renderBoard();
+}
+async function refreshSelected() {
+  if (state.selected != null) {
+    try {
+      const f = JSON.parse(await read("get_fixture", [state.selected]));
+      const i = state.fixtures.findIndex((x) => x.id === f.id);
+      if (i >= 0) state.fixtures[i] = f; else state.fixtures.unshift(f);
+    } catch (e) { console.warn(e); }
+    await loadPosition();
+  }
+  render();
 }
 
 /* ------------------------------------------------------------------ *
  * Rendering
  * ------------------------------------------------------------------ */
-function renderList() {
-  const filt = state.filter;
-  const rows = state.fixtures.filter((f) => {
-    const p = phase(f);
-    if (filt === "open") return p === "open";
-    if (filt === "settle") return p === "playing" || p === "settle";
-    if (filt === "done") return p === "settled" || p === "rejected";
+function render() { renderRail(); renderBoard(); renderSlip(); }
+function renderList() { renderRail(); if (state.view === "list") renderBoard(); }
+function renderDetail() { render(); }
+
+function renderRail() {
+  const counts = { open: 0, live: 0, settle: 0, done: 0, all: 0 };
+  for (const f of state.fixtures) { if (f.status === "REJECTED") continue; counts[bucket(f)]++; counts.all++; }
+  $("statusList").innerHTML = STATUS_TABS.map((t) => `
+    <button class="rail-item" type="button" data-status="${t.key}" aria-pressed="${state.status === t.key}">
+      <span class="ic"><span class="dot" style="background:${t.color}"></span><span>${t.label}</span></span><span class="count num">${counts[t.key]}</span>
+    </button>`).join("");
+  const comps = {};
+  for (const f of state.fixtures) if (f.status !== "REJECTED") comps[f.competition || "Friendly"] = (comps[f.competition || "Friendly"] || 0) + 1;
+  const entries = Object.entries(comps).sort((a, b) => b[1] - a[1]);
+  $("compList").innerHTML = `<button class="rail-item" type="button" data-comp="" aria-pressed="${state.comp === ""}"><span class="ic"><span>All competitions</span></span><span class="count num">${counts.all}</span></button>` +
+    entries.map(([c, n]) => `<button class="rail-item" type="button" data-comp="${esc(c)}" aria-pressed="${state.comp === c}"><span class="ic">${crest(c)}<span>${esc(c)}</span></span><span class="count num">${n}</span></button>`).join("");
+}
+
+function visibleFixtures() {
+  const q = state.q.trim().toLowerCase();
+  return state.fixtures.filter((f) => {
+    if (f.status === "REJECTED" && state.status !== "all") return false;
+    if (state.status !== "all" && bucket(f) !== state.status) return false;
+    if (state.comp && (f.competition || "Friendly") !== state.comp) return false;
+    if (q && !`${f.home} ${f.away} ${f.competition}`.toLowerCase().includes(q)) return false;
     return true;
-  });
-  const ghosts = [...jobs.values()].filter((j) => j.kind === "list" && !j.final && j.args).map((j) =>
-    `<li><div class="fx ghost"><span class="t">${esc(j.args[0])}</span><span class="mid">v</span><span class="t away">${esc(j.args[1])}</span>
-      <span class="meta"><span>${esc(j.args[2] || "Friendly")} · ${fmtTime(j.args[3])}</span><span class="status">Validators checking…</span></span></div></li>`).join("");
-  if (!rows.length && ghosts) { $("fixtureList").innerHTML = ghosts; return; }
+  }).sort((a, b) => state.status === "done" || state.status === "all" ? b.kickoff - a.kickoff : a.kickoff - b.kickoff);
+}
+
+function tagFor(f) {
+  if (f.status === "REJECTED") return `<span class="tag t-rej">Rejected</span>`;
+  if (f.status === "FINAL") return `<span class="tag t-done">Full time</span>`;
+  if (f.status === "VOID") return `<span class="tag t-done">Refunded</span>`;
+  const b = bucket(f);
+  if (b === "live") return `<span class="tag t-play">In play</span>`;
+  if (b === "settle") return `<span class="tag t-wait">Awaiting result</span>`;
+  return `<span class="tag t-open">Open · closes ${fmtIn(f.kickoff)}</span>`;
+}
+
+function oddButton(f, market, o, label) {
+  const mk = f.markets[market];
+  const x = oddsOf(mk, o);
+  const open = phase(f) === "open";
+  const win = mk.winner && mk.winner === o;
+  const on = inSlip(f.id, market, o);
+  return `<button class="odd${on ? " on" : ""}${win ? " win" : ""}" type="button" data-pick="${f.id}|${market}|${esc(o)}" ${open ? "" : "disabled"}
+      aria-pressed="${on}" aria-label="${esc(outLabel(market, o))} ${x == null ? "no stakes yet" : fmtOdds(x)}">
+    <span class="k">${esc(label)}</span><span class="v num">${fmtOdds(x)}</span><span class="p num">${fmtGen(mk.pools?.[o] || 0)} GEN</span></button>`;
+}
+
+function renderEvents() {
+  const rows = visibleFixtures();
+  const ghosts = [...jobs.values()].filter((j) => j.kind === "list" && !j.final && j.args).map((j) => `
+    <div class="ev"><div class="ev-main">
+      <div class="ev-meta"><span class="tag t-chk">Validators checking the match page…</span><span>${esc(j.args[2] || "Friendly")} · ${fmtTime(j.args[3])}</span></div>
+      <div class="ev-team">${crest(j.args[0])}<span class="nm">${esc(j.args[0])}</span></div>
+      <div class="ev-team">${crest(j.args[1])}<span class="nm">${esc(j.args[1])}</span></div></div></div>`).join("");
   if (!rows.length) {
-    const msg = { open: "No fixtures are open for staking. List one to get started.", settle: "No fixtures are waiting for a result.", done: "Nothing has been settled yet.", all: "No fixtures yet. List the first one." }[filt];
-    $("fixtureList").innerHTML = `<li class="empty">${msg}</li>`;
-    return;
+    const msg = { open: "No upcoming matches. List one to open new markets.", live: "No matches in play right now.", settle: "No matches waiting for a result.", done: "Nothing settled yet.", all: "No matches yet. List the first one." }[state.status];
+    return ghosts + `<div class="empty">${msg}</div>`;
   }
-  $("fixtureList").innerHTML = ghosts + rows.map((f) => {
-    const mid = f.status === "FINAL" ? `${f.home_goals}–${f.away_goals}` : f.status === "SCHEDULED" ? "v" : "—";
-    const statusLabel = { SCHEDULED: phase(f) === "open" ? "Open" : "Awaiting result", FINAL: "Full time", VOID: "Refunded", REJECTED: "Rejected" }[f.status];
-    return `<li><button class="fx" type="button" data-id="${f.id}" aria-current="${state.selected === f.id}">
-      <span class="t">${esc(f.home)}</span><span class="mid">${mid}</span><span class="t away">${esc(f.away)}</span>
-      <span class="meta"><span>${esc(f.competition || "Friendly")} · ${fmtTime(f.kickoff)}</span><span class="status s-${f.status}">${statusLabel}</span></span>
-    </button></li>`;
+  return ghosts + rows.map((f) => {
+    const final = f.status === "FINAL";
+    const r = f.markets.RESULT;
+    return `<div class="ev">
+      <button class="ev-main" type="button" data-open="${f.id}">
+        <span class="ev-meta">${tagFor(f)}<span class="comp">${esc(f.competition || "Friendly")}</span><span>${fmtTime(f.kickoff)}</span></span>
+        <span class="ev-team">${crest(f.home)}<span class="nm">${esc(f.home)}</span>${final ? `<span class="g num">${f.home_goals}</span>` : ""}</span>
+        <span class="ev-team">${crest(f.away)}<span class="nm">${esc(f.away)}</span>${final ? `<span class="g num">${f.away_goals}</span>` : ""}</span>
+      </button>
+      ${f.status === "REJECTED" ? `<div class="odds" style="place-items:center;font-size:13px;color:var(--soft)">Not listed</div>` :
+        `<div class="odds">${oddButton(f, "RESULT", "HOME", "1")}${oddButton(f, "RESULT", "DRAW", "X")}${oddButton(f, "RESULT", "AWAY", "2")}</div>`}
+      <button class="more" type="button" data-open="${f.id}" aria-label="All markets for ${esc(f.home)} v ${esc(f.away)}">+3</button>
+    </div>`;
   }).join("");
 }
 
-function marketOutcomes(f, m) {
-  if (m.outcomes) return m.outcomes;
-  return Object.keys(f.markets.SCORE.pools).sort((a, b) => {
-    const [ah, aa] = a.split("-").map(Number), [bh, ba] = b.split("-").map(Number);
-    return ah - bh || aa - ba;
-  });
+function renderBoard() {
+  if (state.view === "match" && fixtureById(state.selected)) return renderMatch();
+  state.view = "list";
+  const live = state.fixtures.filter((f) => f.status !== "REJECTED");
+  const pot = live.reduce((s, f) => s + Object.values(f.markets).reduce((a, m) => a + BigInt(m.total || 0), 0n), 0n);
+  const settled = live.filter((f) => f.status === "FINAL" || f.status === "VOID").length;
+  const tab = STATUS_TABS.find((t) => t.key === state.status);
+  $("board").innerHTML = `
+    <section class="hero">
+      <div><h1>Soccer markets settled by <span>AI validators</span></h1>
+      <p>Back the result, goals, both teams to score or the exact score. After full time GenLayer validators read the match page and must agree on the score. No oracle, no admin.</p></div>
+      <div class="stats">
+        <div class="stat"><b class="num">${live.length}</b><small>matches</small></div>
+        <div class="stat"><b class="num">${fmtGen(pot)}</b><small>GEN staked</small></div>
+        <div class="stat"><b class="num">${settled}</b><small>settled</small></div>
+      </div>
+    </section>
+    <div class="board-head">
+      <h2>${esc(state.comp || tab.label)}</h2>
+      <div class="chips" role="group" aria-label="Status">${STATUS_TABS.map((t) => `<button class="chip" type="button" data-status="${t.key}" aria-pressed="${state.status === t.key}">${t.label}</button>`).join("")}</div>
+    </div>
+    <div class="odds-head" aria-hidden="true" style="margin:-4px 68px -6px auto;width:min(330px,40%)"><span>1</span><span>X</span><span>2</span></div>
+    <div class="events">${renderEvents()}</div>`;
 }
 
 function renderMarket(f, m) {
   const mk = f.markets[m.key];
-  const total = BigInt(mk.total);
-  const p = phase(f);
-  const open = p === "open";
-  const outs = marketOutcomes(f, m);
-  const picked = state.picks[m.key];
-  const winner = mk.winner;
-
-  const buttons = outs.map((o) => {
-    const pool = BigInt(mk.pools[o] || 0);
-    const share = total > 0n ? Number((pool * 1000n) / total) / 10 : 0;
-    const label = OUTCOME_LABEL[o] || o.replace("-", "–");
-    const cls = winner && winner === o ? "oc win" : "oc";
-    return `<button class="${cls}" type="button" data-market="${m.key}" data-outcome="${o}" aria-pressed="${picked === o}" ${open ? "" : "disabled"}>
-      <span class="fill" style="width:${share}%"></span>
-      <span class="name">${esc(label)}</span>
-      <span class="num">${pool > 0n ? `<span class="odds">×${(Number(total * 100n / pool) / 100).toFixed(2)}</span>` : ""}${fmtGen(pool)} GEN · ${share}%</span>
-    </button>`;
-  }).join("");
-
-  const scoreInput = m.key === "SCORE" && open
-    ? `<input type="text" inputmode="numeric" placeholder="Your score, e.g. 2-1" aria-label="Correct score pick" data-score-input value="${esc(picked && !outs.includes(picked) ? picked : "")}">`
-    : "";
+  const open = phase(f) === "open";
+  let outs = m.outcomes;
+  if (!outs) outs = Object.keys(mk.pools).sort((a, b) => { const [ah, aa] = a.split("-").map(Number), [bh, ba] = b.split("-").map(Number); return ah - bh || aa - ba; });
   let verdict = "";
-  if (winner === "VOID") verdict = `<span class="verdict-tag void">Refunded${f.status === "FINAL" ? ": nobody backed the winning outcome" : ""}</span>`;
-  else if (winner) verdict = `<span class="verdict-tag">Winner: ${esc(OUTCOME_LABEL[winner] || winner.replace("-", "–"))}</span>`;
-
-  return `<article class="market ${open ? "" : "closed"}" aria-labelledby="mk-${m.key}">
-    <h4 id="mk-${m.key}">${m.title}</h4>
+  if (mk.winner === "VOID") verdict = `<span class="verdict void">Refunded${f.status === "FINAL" ? ": nobody backed the winner" : ""}</span>`;
+  else if (mk.winner) verdict = `<span class="verdict">Winner: ${esc(outLabel(m.key, mk.winner))}</span>`;
+  const buttons = outs.map((o) => oddButton(f, m.key, o, m.key === "RESULT" ? outLabel(m.key, o) : (SHORT[o] || o.replace("-", "–")))).join("");
+  const scoreAdd = m.key === "SCORE" && open ? `<div class="score-add"><input type="text" inputmode="numeric" id="scoreIn" placeholder="Your score, e.g. 2-1" aria-label="Correct score"><button class="btn small" type="button" id="scoreAdd">Add to slip</button></div>` : "";
+  return `<article class="mk">
+    <div class="mk-h"><h4>${m.title}</h4><span class="num">Pot ${fmtGen(mk.total)} GEN</span></div>
     <p class="rule">${m.rule}</p>
-    <div class="pot"><span>Pot ${fmtGen(total)} GEN</span>${verdict}</div>
-    <div class="outcomes">${buttons || (m.key === "SCORE" ? `<p class="hint">No scores picked yet.</p>` : "")}</div>
-    ${scoreInput ? `<div style="margin-bottom:8px">${scoreInput}</div>` : ""}
-    <div class="stake-row">
-      <input type="text" inputmode="decimal" placeholder="GEN" aria-label="${m.title} stake amount" data-amount="${m.key}">
-      <button class="btn small" type="button" data-stake="${m.key}">Stake</button>
-    </div>
-    ${open ? `<p class="ret" data-ret="${m.key}"></p>` : ""}
+    ${buttons ? `<div class="odds">${buttons}</div>` : `<p class="hint">No scores backed yet. Be the first.</p>`}
+    ${scoreAdd}${verdict}
   </article>`;
 }
 
-function renderDetail() {
-  const f = state.fixtures.find((x) => x.id === state.selected);
-  if (!f) return;
+function renderMatch() {
+  const f = fixtureById(state.selected);
   const p = phase(f);
-
-  let center;
-  if (f.status === "FINAL") center = `<div class="score">${f.home_goals}–${f.away_goals}<small>Full time, agreed by validators</small></div>`;
-  else if (f.status === "VOID") center = `<div class="score pending">Void<small>All stakes refunded</small></div>`;
-  else if (f.status === "REJECTED") center = `<div class="score pending">Not listed<small>Match page didn't match</small></div>`;
-  else center = `<div class="score pending">${new Date(f.kickoff * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}<small>${new Date(f.kickoff * 1000).toLocaleDateString(undefined, { day: "numeric", month: "short" })}</small></div>`;
-
+  let mid;
+  if (f.status === "FINAL") mid = `<div class="big num">${f.home_goals}–${f.away_goals}</div><small>Full time · agreed by validators</small>`;
+  else if (f.status === "VOID") mid = `<div class="big t">Void</div><small>All stakes refunded</small>`;
+  else if (f.status === "REJECTED") mid = `<div class="big t">Not listed</div><small>Match page didn't match</small>`;
+  else mid = `<div class="big t num">${new Date(f.kickoff * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</div><small>${new Date(f.kickoff * 1000).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</small>`;
   const stripMsg = {
-    open: `Staking closes at kickoff, <b>${fmtIn(f.kickoff)}</b>`,
-    playing: `In play. Settlement opens <b>${fmtIn(f.settle_opens)}</b>`,
-    settle: `Ready to settle. Anyone can ask validators to read the result`,
+    open: `Staking closes <b>${fmtIn(f.kickoff)}</b>`,
+    playing: `In play · result can be read <b>${fmtIn(f.settle_opens)}</b>`,
+    settle: `<b>Ready to settle.</b> Anyone can ask validators to read the result`,
     settled: f.status === "FINAL" ? `Settled ${fmtIn(f.settled_ts)}` : `Voided ${fmtIn(f.settled_ts)}`,
     rejected: `Validators did not accept this listing`,
   }[p];
-
-  const sources = [f.source_a, f.source_b].filter(Boolean).map((u, i) =>
-    `<dt>Source ${"AB"[i]}</dt><dd><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https:\/\//, ""))}</a></dd>`).join("");
-
-  const verdictLine = f.last_verdict
-    ? `<dt>Last check</dt><dd>${esc({ FINAL: "Score agreed", PENDING: "Result not published yet", CONFLICT: "Sources disagreed", VOID: "Postponed or abandoned" }[f.last_verdict] || f.last_verdict)}${f.conflicts ? ` (${f.conflicts} of ${f.max_conflicts} disagreements before refund)` : ""}</dd>`
-    : "";
-
-  const settleBtn = p === "settle" ? `<button class="btn" type="button" id="settleBtn">Settle with validators</button>` : "";
+  const sources = [f.source_a, f.source_b].filter(Boolean).map((u, i) => `<dt>Source ${"AB"[i]}</dt><dd><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https:\/\//, "").slice(0, 70))}…</a></dd>`).join("");
+  const verdictLine = f.last_verdict ? `<dt>Last check</dt><dd>${esc({ FINAL: "Score agreed", PENDING: "Result not published yet", CONFLICT: "Sources disagreed", VOID: "Postponed or abandoned" }[f.last_verdict] || f.last_verdict)}</dd>` : "";
+  const settleBtn = p === "settle" ? `<button class="btn block" type="button" id="settleBtn">Settle with validators</button>` : "";
   const expireBtn = f.status === "SCHEDULED" && nowSec() >= f.expires ? `<button class="btn ghost" type="button" id="expireBtn">Refund (expired)</button>` : "";
-
-  $("detail").innerHTML = `
-    <div class="scoreboard">
-      <div class="team">${esc(f.home)}<span class="side">Home</span></div>
-      ${center}
-      <div class="team away">${esc(f.away)}<span class="side">Away</span></div>
-    </div>
-    <div class="strip"><span>${esc(f.competition || "Friendly")}</span><span>${fmtTime(f.kickoff)}</span><span>${stripMsg}</span></div>
-    <div class="detail-body">
-      ${f.status === "REJECTED" ? `<div class="note">${esc(f.listing_note || "The match page did not show this fixture.")}</div>` : `
-      <h3 class="section-title">Markets</h3>
-      <div class="markets">${MARKETS.map((m) => renderMarket(f, m)).join("")}</div>`}
-      <div class="below">
-        <section class="panel" aria-labelledby="evTitle">
-          <h3 class="section-title" id="evTitle">How this match is settled</h3>
-          <dl>${sources}${verdictLine}<dt>Listing check</dt><dd>${esc(f.listing_note || "—")}</dd></dl>
-          ${f.settle_note ? `<div class="note">${esc(f.settle_note)}</div>` : ""}
-          <p class="hint">Validators read ${f.source_b ? "both pages" : "the page"} independently and must agree on the 90-minute score and match status. Extra time and penalties don't count.</p>
-          <div class="actions">${settleBtn}${expireBtn}</div>
-        </section>
-        <section class="panel" aria-labelledby="posTitle">
-          <h3 class="section-title" id="posTitle">Your position</h3>
-          ${renderPosition(f)}
-        </section>
+  $("board").innerHTML = `
+    <button class="back" type="button" id="backBtn">← All matches</button>
+    <section class="score-card">
+      <div class="sb">
+        <div class="tm">${crest(f.home)}<b>${esc(f.home)}</b><small>Home</small></div>
+        <div class="mid">${mid}</div>
+        <div class="tm">${crest(f.away)}<b>${esc(f.away)}</b><small>Away</small></div>
       </div>
+      <div class="strip"><span>${esc(f.competition || "Friendly")}</span><span>${fmtTime(f.kickoff)}</span><span>${stripMsg}</span></div>
+    </section>
+    ${f.status === "REJECTED" ? `<div class="note">${esc(f.listing_note || "The match page did not show this fixture.")}</div>` :
+      `<div class="mk-grid">${MARKETS.map((m) => renderMarket(f, m)).join("")}</div>`}
+    <div class="info-grid">
+      <section class="panel"><h3>How this match is settled</h3>
+        <dl>${sources}${verdictLine}<dt>Listing check</dt><dd>${esc(f.listing_note || "—")}</dd></dl>
+        ${f.settle_note ? `<div class="note">${esc(f.settle_note)}</div>` : ""}
+        <p class="hint">Validators read ${f.source_b ? "both pages" : "the page"} independently and must agree on the 90-minute score. Extra time and penalties don't count.</p>
+        ${settleBtn || expireBtn ? `<div class="actions">${settleBtn}${expireBtn}</div>` : ""}
+      </section>
+      <section class="panel"><h3>Your position</h3>${renderPosition(f)}</section>
     </div>`;
 }
 
 function renderPosition(f) {
-  if (!state.account) return `<p class="hint">Connect your wallet to see your stakes.</p><div class="actions"><button class="btn" type="button" data-connect>Connect wallet</button></div>`;
-  const pos = state.position;
+  if (!state.account) return `<p class="hint">Connect your wallet to see your stakes.</p><button class="btn" type="button" data-connect>Connect wallet</button>`;
+  const pos = state.positions[f.id];
   if (!pos) return `<p class="hint">Loading…</p>`;
   const rows = [];
-  for (const m of MARKETS) {
-    for (const [o, amt] of Object.entries(pos.stakes[m.key] || {})) {
-      rows.push(`<li><span>${m.title}: ${esc(OUTCOME_LABEL[o] || o.replace("-", "–"))}</span><span>${fmtGen(amt)} GEN</span></li>`);
-    }
-  }
-  const list = rows.length ? `<ul class="pos-list">${rows.join("")}</ul>` : `<p class="hint">No stakes on this fixture.</p>`;
+  for (const m of MARKETS) for (const [o, amt] of Object.entries(pos.stakes[m.key] || {})) rows.push(`<div class="mybet"><div class="row"><span>${m.title}</span><b>${esc(outLabel(m.key, o))}</b></div><div class="row"><span>Stake</span><span class="num">${fmtGen(amt)} GEN</span></div></div>`);
   const settled = f.status === "FINAL" || f.status === "VOID";
   let claim = "";
   if (settled && pos.claimed) claim = `<p class="hint">Collected.</p>`;
-  else if (settled && BigInt(pos.claimable) > 0n) claim = `<div class="claim-amt">${fmtGen(pos.claimable)} GEN</div><p class="hint">Ready to collect across all four markets.</p><div class="actions"><button class="btn" type="button" id="claimBtn">Collect ${fmtGen(pos.claimable)} GEN</button></div>`;
-  else if (settled && rows.length) claim = `<p class="hint">Nothing to collect on this fixture.</p>`;
-  return list + claim;
+  else if (settled && BigInt(pos.claimable) > 0n) claim = `<div class="claim-amt num">${fmtGen(pos.claimable)} GEN</div><button class="btn green block" type="button" data-claim="${f.id}">Collect ${fmtGen(pos.claimable)} GEN</button>`;
+  else if (settled && rows.length) claim = `<p class="hint">Nothing to collect on this match.</p>`;
+  return (rows.length ? rows.join("") : `<p class="hint">No stakes on this match yet.</p>`) + claim;
 }
 
-function select(id) {
-  state.selected = id;
-  state.picks = {};
-  history.replaceState(null, "", `#fixture-${id}`);
-  renderList();
-  renderDetail();
-  loadPosition().then(renderDetail);
+function renderSlip() {
+  const n = state.slip.length;
+  $("slipCount").hidden = !n; $("slipCount").textContent = n; $("fabCount").textContent = n;
+  document.querySelectorAll("[data-slip]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.slip === state.slipTab)));
+  document.querySelectorAll("[data-nav]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.nav === (state.slipTab === "mybets" ? "mybets" : "matches"))));
+  if (state.slipTab === "mybets") return renderMyBets();
+  if (!n) {
+    $("slipBody").innerHTML = `<div class="slip-empty"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="5" width="28" height="34" rx="4" fill="none" stroke="#8fa89a" stroke-width="2.5"/><path d="M14 15h16M14 22h16M14 29h9" stroke="#8fa89a" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <b>Your bet slip is empty</b><span>Tap any odds to add a pick. Each pick is placed as its own single bet.</span></div>`;
+    $("slipSum").innerHTML = "";
+    return;
+  }
+  let total = 0n, ret = 0n, ok = true;
+  $("slipBody").innerHTML = state.slip.map((p, i) => {
+    const f = fixtureById(p.fid);
+    const m = marketDef(p.market);
+    const closed = !f || phase(f) !== "open";
+    let v = 0n; try { v = parseGen(p.amount || "0"); } catch { v = 0n; }
+    let r = 0n;
+    if (f && v > 0n) { const mk = f.markets[p.market]; const T = BigInt(mk.total) + v, P = BigInt(mk.pools?.[p.outcome] || 0) + v; r = v * T / P; }
+    total += v; ret += r; if (closed || v <= 0n) ok = false;
+    const x = f ? oddsOf(f.markets[p.market], p.outcome) : null;
+    return `<div class="pick">
+      <div class="pick-top"><div><small>${f ? `${esc(f.home)} v ${esc(f.away)}` : "Match"} · ${m.title}</small><b>${esc(outLabel(p.market, p.outcome))}</b></div>
+        <div style="display:flex;gap:8px;align-items:center"><span class="pick-odd num">${fmtOdds(x)}</span><button class="pick-x" type="button" data-unpick="${i}" aria-label="Remove pick">&times;</button></div></div>
+      ${closed ? `<p class="hint" style="color:#ff9a86">Staking has closed for this match.</p>` : `
+      <div class="pick-row"><input type="text" inputmode="decimal" placeholder="Stake in GEN" value="${esc(p.amount || "")}" data-amt="${i}" aria-label="Stake for ${esc(outLabel(p.market, p.outcome))}"></div>
+      <div class="quick">${["0.5", "1", "5", "10"].map((q) => `<button type="button" data-quick="${i}|${q}">${q}</button>`).join("")}</div>
+      <div class="pick-ret" data-ret="${i}">${v > 0n ? `Returns <b class="num">${fmtGen(r)} GEN</b> if it wins${r === v ? " (your stake back until others bet against you)" : ""}` : "Enter a stake to see your return."}</div>`}
+    </div>`;
+  }).join("");
+  $("slipSum").innerHTML = `
+    <div class="sum-row"><span>Total stake</span><b class="num">${fmtGen(total)} GEN</b></div>
+    <div class="sum-row"><span>Possible return</span><b class="num">${fmtGen(ret)} GEN</b></div>
+    <button class="btn block" type="button" id="placeBtn" ${ok ? "" : "disabled"}>${state.account ? `Place ${n === 1 ? "bet" : `${n} bets`}` : "Connect wallet to bet"}</button>
+    <p class="hint">Odds are pool-based and move until kickoff. Your wallet asks you to confirm each pick.</p>`;
+  if (!state.account) $("placeBtn").disabled = false;
 }
+
+function renderMyBets() {
+  $("slipSum").innerHTML = "";
+  if (!state.account) { $("slipBody").innerHTML = `<div class="slip-empty"><b>Connect your wallet</b><span>Your stakes and winnings show here.</span><button class="btn" type="button" data-connect>Connect wallet</button></div>`; return; }
+  const items = state.fixtures.map((f) => ({ f, pos: state.positions[f.id] })).filter(({ pos }) => pos && MARKETS.some((m) => Object.keys(pos.stakes[m.key] || {}).length));
+  if (!items.length) { $("slipBody").innerHTML = `<div class="slip-empty"><b>No bets yet</b><span>${posLoading ? "Loading your positions…" : "Place a bet and it appears here."}</span></div>`; return; }
+  $("slipBody").innerHTML = items.map(({ f, pos }) => {
+    const lines = [];
+    for (const m of MARKETS) for (const [o, amt] of Object.entries(pos.stakes[m.key] || {})) {
+      const w = f.markets[m.key].winner;
+      const res = !w ? "" : w === "VOID" ? " · refunded" : w === o ? " · won" : " · lost";
+      lines.push(`<div class="row"><span>${m.title}: ${esc(outLabel(m.key, o))}${res}</span><span class="num">${fmtGen(amt)} GEN</span></div>`);
+    }
+    const settled = f.status === "FINAL" || f.status === "VOID";
+    const can = settled && !pos.claimed && BigInt(pos.claimable) > 0n;
+    return `<div class="mybet">
+      <div class="mybet-h"><button class="back" type="button" data-open="${f.id}" style="color:var(--fg)">${esc(f.home)} v ${esc(f.away)}</button>${tagFor(f)}</div>
+      ${f.status === "FINAL" ? `<div class="row"><span>Final score</span><b class="num">${f.home_goals}–${f.away_goals}</b></div>` : ""}
+      ${lines.join("")}
+      ${can ? `<button class="btn green" type="button" data-claim="${f.id}">Collect ${fmtGen(pos.claimable)} GEN</button>` : settled && pos.claimed ? `<span class="hint">Collected</span>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function openMatch(id) {
+  state.view = "match"; state.selected = id;
+  history.replaceState(null, "", `#fixture-${id}`);
+  renderBoard();
+  window.scrollTo({ top: 0 });
+  loadPosition().then(() => { if (state.view === "match") renderBoard(); });
+}
+function backToList() {
+  state.view = "list"; state.selected = null;
+  history.replaceState(null, "", location.pathname + location.search);
+  renderBoard();
+}
+function select(id) { openMatch(id); }
 
 /* ------------------------------------------------------------------ *
  * Events
  * ------------------------------------------------------------------ */
-$("fixtureList").addEventListener("click", (e) => {
-  const b = e.target.closest(".fx");
-  if (b) select(Number(b.dataset.id));
-});
-document.querySelector(".filters").addEventListener("click", (e) => {
-  const c = e.target.closest(".chip");
-  if (!c) return;
-  state.filter = c.dataset.filter;
-  document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
-  renderList();
-});
-$("refreshBtn").addEventListener("click", () => loadFixtures());
-$("connectBtn").addEventListener("click", () => {
-  if (state.account) { localSet(WALLET_KEY, ""); state.account = null; state.writer = null; $("connectBtn").textContent = "Connect wallet"; renderDetail(); }
-  connect();
-});
-$("contractInput").addEventListener("change", (e) => {
-  CONTRACT = e.target.value.trim();
-  localSet("ninety.contract", CONTRACT);
-  state.selected = null;
-  loadFixtures();
-});
+function togglePick(fid, market, outcome) {
+  const i = state.slip.findIndex((p) => p.fid === fid && p.market === market && p.outcome === outcome);
+  if (i >= 0) state.slip.splice(i, 1);
+  else {
+    // one pick per market per match: replace an earlier pick in the same market
+    const j = state.slip.findIndex((p) => p.fid === fid && p.market === market);
+    if (j >= 0) state.slip.splice(j, 1);
+    state.slip.push({ fid, market, outcome, amount: "" });
+    state.slipTab = "slip";
+    if (matchMedia("(max-width: 980px)").matches && state.slip.length === 1) $("slip").classList.add("open");
+  }
+  saveSlip();
+  renderSlip();
+  renderBoard();
+}
 
-$("detail").addEventListener("click", async (e) => {
+document.addEventListener("click", async (e) => {
   const t = e.target;
   if (t.closest("[data-connect]")) return connect();
-
-  const oc = t.closest(".oc");
-  if (oc && !oc.disabled) {
-    state.picks[oc.dataset.market] = oc.dataset.outcome;
-    document.querySelectorAll(`.oc[data-market="${oc.dataset.market}"]`).forEach((x) => x.setAttribute("aria-pressed", String(x === oc)));
-    const si = document.querySelector("[data-score-input]");
-    if (oc.dataset.market === "SCORE" && si) si.value = "";
-    document.querySelector(`[data-amount="${oc.dataset.market}"]`)?.dispatchEvent(new Event("input", { bubbles: true }));
+  const st = t.closest("[data-status]");
+  if (st) { state.status = st.dataset.status; state.comp = state.comp; backToList(); renderRail(); return; }
+  const cp = t.closest("[data-comp]");
+  if (cp) { state.comp = cp.dataset.comp; if (state.comp) state.status = "all"; backToList(); renderRail(); return; }
+  const pk = t.closest("[data-pick]");
+  if (pk && !pk.disabled) { const [fid, m, o] = pk.dataset.pick.split("|"); return togglePick(Number(fid), m, o); }
+  const op = t.closest("[data-open]");
+  if (op) { $("slip").classList.remove("open"); return openMatch(Number(op.dataset.open)); }
+  if (t.closest("#backBtn")) return backToList();
+  const un = t.closest("[data-unpick]");
+  if (un) { state.slip.splice(Number(un.dataset.unpick), 1); saveSlip(); renderSlip(); renderBoard(); return; }
+  const qk = t.closest("[data-quick]");
+  if (qk) { const [i, v] = qk.dataset.quick.split("|"); state.slip[Number(i)].amount = v; saveSlip(); renderSlip(); return; }
+  const sl = t.closest("[data-slip]");
+  if (sl) { state.slipTab = sl.dataset.slip; if (state.slipTab === "mybets") loadAllPositions(); renderSlip(); return; }
+  const nv = t.closest("[data-nav]");
+  if (nv) {
+    state.slipTab = nv.dataset.nav === "mybets" ? "mybets" : "slip";
+    if (state.slipTab === "mybets") { loadAllPositions(); if (matchMedia("(max-width: 980px)").matches) $("slip").classList.add("open"); }
+    else backToList();
+    renderSlip(); return;
+  }
+  if (t.closest("#scoreAdd")) {
+    const v = $("scoreIn").value.trim();
+    if (!/^\d{1,2}\s*[-:–]\s*\d{1,2}$/.test(v)) return toast("Write the score like 2-1.", "err");
+    return togglePick(state.selected, "SCORE", v.replace(/\s/g, "").replace(/[:–]/, "-"));
+  }
+  const cl = t.closest("[data-claim]");
+  if (cl) {
+    cl.disabled = true;
+    const f = fixtureById(Number(cl.dataset.claim));
+    const job = await send("claim", [Number(cl.dataset.claim)], { title: `Collect · ${f ? `${f.home} v ${f.away}` : "winnings"}`, fixture: Number(cl.dataset.claim) });
+    if (!job) cl.disabled = false;
     return;
   }
-
-  const st = t.closest("[data-stake]");
-  if (st) {
-    const key = st.dataset.stake;
-    let outcome = state.picks[key];
-    if (key === "SCORE") {
-      const typed = document.querySelector("[data-score-input]")?.value.trim();
-      if (typed) outcome = typed;
-      if (outcome && !/^\d{1,2}\s*[-:–]\s*\d{1,2}$/.test(outcome)) return toast("Write the score like 2-1.", "err");
-      if (outcome) outcome = outcome.replace(/\s/g, "").replace(/[:–]/, "-");
-    }
-    if (!outcome) return toast("Choose an outcome first.", "err");
-    let value;
-    try { value = parseGen(document.querySelector(`[data-amount="${key}"]`).value); }
-    catch (err) { return toast(esc(err.message), "err"); }
-    st.disabled = true;
-    const label = OUTCOME_LABEL[outcome] || outcome;
-    const job = await send("stake", [state.selected, key, outcome], { value, title: `Stake ${fmtGen(value)} GEN · ${label}`, fixture: state.selected });
-    st.disabled = false;
-    if (job) document.querySelector(`[data-amount="${key}"]`).value = "";
-    return;
-  }
-
   if (t.id === "settleBtn") {
     t.disabled = true;
-    const f = state.fixtures.find((x) => x.id === state.selected);
-    const job = await send("settle", [state.selected], { title: `Read result · ${f ? `${f.home} v ${f.away}` : ""}`, fixture: state.selected });
+    const f = fixtureById(state.selected);
+    const job = await send("settle", [state.selected], { title: `Read result · ${f.home} v ${f.away}`, fixture: state.selected });
     if (!job) t.disabled = false;
     return;
   }
   if (t.id === "expireBtn") {
     t.disabled = true;
-    const job = await send("expire", [state.selected], { title: "Refund expired fixture", fixture: state.selected });
+    const job = await send("expire", [state.selected], { title: "Refund expired match", fixture: state.selected });
     if (!job) t.disabled = false;
     return;
   }
-  if (t.id === "claimBtn") {
-    t.disabled = true;
-    const job = await send("claim", [state.selected], { title: "Collect winnings", fixture: state.selected });
-    if (!job) t.disabled = false;
-  }
+  if (t.id === "placeBtn") return placeBets(t);
+  if (t.closest("#slipClose")) { $("slip").classList.remove("open"); return; }
+  if (t.closest("#slipFab")) { $("slip").classList.toggle("open"); return; }
+  if (t.closest("#homeLink")) { e.preventDefault(); state.comp = ""; state.status = "open"; backToList(); renderRail(); $("slip").classList.remove("open"); }
 });
 
-$("detail").addEventListener("input", (e) => {
-  const inp = e.target.closest("[data-amount]");
-  if (!inp) return;
-  const key = inp.dataset.amount;
-  const out = document.querySelector(`[data-ret="${key}"]`);
-  const f = state.fixtures.find((x) => x.id === state.selected);
-  let pick = state.picks[key];
-  if (key === "SCORE") { const t = document.querySelector("[data-score-input]")?.value.trim(); if (t) pick = t.replace(/\s/g, "").replace(/[:–]/, "-"); }
-  if (!out || !f) return;
-  let v; try { v = parseGen(inp.value); } catch { out.textContent = ""; return; }
-  if (!pick) { out.textContent = "Pick an outcome to see your return."; return; }
-  const mk = f.markets[key];
-  const total = BigInt(mk.total) + v, pool = BigInt(mk.pools[pick] || 0) + v;
-  const ret = v * total / pool;
-  out.innerHTML = `If ${esc(OUTCOME_LABEL[pick] || pick)} wins you get <b>${fmtGen(ret)} GEN</b> at today's pot${ret === v ? " (your stake back until others bet against you)" : ""}.`;
+document.addEventListener("input", (e) => {
+  const a = e.target.closest("[data-amt]");
+  if (a) {
+    const i = Number(a.dataset.amt);
+    state.slip[i].amount = a.value.trim();
+    saveSlip();
+    // update only the return line and the summary, keep focus in the input
+    const p = state.slip[i], f = fixtureById(p.fid);
+    let v = 0n; try { v = parseGen(p.amount || "0"); } catch {}
+    const out = document.querySelector(`[data-ret="${i}"]`);
+    if (out && f) {
+      if (v > 0n) { const mk = f.markets[p.market]; const r = v * (BigInt(mk.total) + v) / (BigInt(mk.pools?.[p.outcome] || 0) + v); out.innerHTML = `Returns <b class="num">${fmtGen(r)} GEN</b> if it wins${r === v ? " (your stake back until others bet against you)" : ""}`; }
+      else out.textContent = "Enter a stake to see your return.";
+    }
+    clearTimeout(a._t); a._t = setTimeout(() => { const pos = a.selectionStart; renderSlip(); const n = document.querySelector(`[data-amt="${i}"]`); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch {} } }, 600);
+    return;
+  }
+  if (e.target.id === "q") { state.q = e.target.value; if (state.view !== "list") state.view = "list"; renderBoard(); }
+});
+
+async function placeBets(btn) {
+  if (!state.writer) { await connect(); renderSlip(); if (!state.writer) return; }
+  const picks = [...state.slip];
+  for (const p of picks) {
+    let v; try { v = parseGen(p.amount); } catch (err) { return toast(esc(err.message), "err"); }
+    const f = fixtureById(p.fid);
+    if (!f || phase(f) !== "open") return toast("One of your picks has closed. Remove it to continue.", "err");
+  }
+  btn.disabled = true;
+  for (const p of picks) {
+    const v = parseGen(p.amount);
+    const job = await send("stake", [p.fid, p.market, p.outcome], { value: v, title: `Stake ${fmtGen(v)} GEN · ${outLabel(p.market, p.outcome)}`, fixture: p.fid });
+    if (!job) break;
+    const i = state.slip.indexOf(p);
+    if (i >= 0) state.slip.splice(i, 1);
+    saveSlip();
+    renderSlip(); renderBoard();
+  }
+  if (!state.slip.length) toast("Bets sent. Validators are confirming them now.", "ok");
+}
+
+$("connectBtn").addEventListener("click", () => {
+  if (state.account) { localSet(WALLET_KEY, ""); state.account = null; state.writer = null; state.positions = {}; $("connectBtn").textContent = "Connect wallet"; render(); }
+  connect().then(() => { if (state.account) loadAllPositions(); renderSlip(); });
+});
+$("contractInput").addEventListener("change", (e) => {
+  CONTRACT = e.target.value.trim();
+  localSet("ninety.contract", CONTRACT);
+  state.selected = null; state.view = "list";
+  loadFixtures();
 });
 
 $("listBtn").addEventListener("click", () => {
@@ -1001,7 +1269,7 @@ $("listForm").addEventListener("submit", async (e) => {
   const kickoff = Math.floor(new Date($("fKick").value).getTime() / 1000);
   if (!kickoff || kickoff < nowSec() + 600) return toast("Kickoff must be at least 10 minutes from now.", "err");
   const args = [$("fHome").value.trim(), $("fAway").value.trim(), $("fComp").value.trim(), kickoff, $("fSrcA").value.trim(), $("fSrcB").value.trim()];
-  if (args[5] && args[5].toLowerCase() !== "none" && args[5] === args[4]) return toast("The second page must be a different link.", "err");
+  if (args[5] && args[5] === args[4]) return toast("The second page must be a different link.", "err");
   $("listSubmit").disabled = true;
   const before = state.fixtures.length ? Math.max(...state.fixtures.map((f) => f.id)) : -1;
   const job = await send("create_fixture", args, { kind: "list", title: `List ${args[0]} v ${args[1]}` });
@@ -1009,15 +1277,13 @@ $("listForm").addEventListener("submit", async (e) => {
   if (!job) return;
   $("listDlg").close();
   $("listForm").reset();
-  state.filter = "all";
-  document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.filter === "all")));
-  renderList();
-  toast("Signed. Validators are opening the match page now — it appears in the list when they agree.", "ok", 8000);
+  state.status = "open"; state.comp = ""; backToList(); renderRail();
+  toast("Signed. Validators are opening the match page now. It appears in the list when they agree.", "ok", 8000);
   const tx = await job.done;
   const created = state.fixtures.find((f) => f.id > before);
   if (tx && created) {
-    select(created.id);
-    if (created.status === "REJECTED") toast("Validators didn't accept this listing. Their note is on the fixture.", "err", 10000);
+    if (created.status === "REJECTED") toast("Validators didn't accept this listing. Their note is on the match.", "err", 10000);
+    else openMatch(created.id);
   }
 });
 
@@ -1026,6 +1292,7 @@ $("listForm").addEventListener("submit", async (e) => {
  * ------------------------------------------------------------------ */
 (async function boot() {
   $("contractInput").value = CONTRACT;
+  renderRail(); renderSlip();
   try {
     state.sdk = (await loadSdk());
     const { sdk, chains } = state.sdk;
@@ -1035,10 +1302,12 @@ $("listForm").addEventListener("submit", async (e) => {
     state.reader = sdk.createClient({ chain: state.chain });
     $("netLabel").textContent = { testnetBradbury: "Bradbury testnet", studionet: "Studionet", testnetAsimov: "Asimov testnet", localnet: "Localnet" }[NETWORK] || NETWORK;
   } catch (e) {
-    $("fixtureList").innerHTML = `<li class="empty">Couldn't load the GenLayer SDK: ${esc(errText(e))}</li>`;
+    $("board").innerHTML = `<div class="empty">Couldn't load the GenLayer SDK: ${esc(errText(e))}</div>`;
     return;
   }
   await loadFixtures();
+  const hashId = Number(location.hash.replace("#fixture-", ""));
+  if (location.hash.startsWith("#fixture-") && fixtureById(hashId)) openMatch(hashId);
   resumeJobs();
   setInterval(() => { if (!document.hidden) loadFixtures({ auto: true }); }, 20000);
 })();
