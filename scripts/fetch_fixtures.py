@@ -16,7 +16,6 @@ LEAGUES = [
     ("por.1", "Primeira Liga"), ("eng.2", "Championship"),
 ]
 DAYS_AHEAD = 10
-URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{code}/scoreboard?dates={start}-{end}"
 
 
 def parse(feed, comp, now):
@@ -42,18 +41,55 @@ def parse(feed, comp, now):
     return out
 
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json,text/plain,*/*",
+    "Accept-Language": "en-GB,en;q=0.9",
+}
+BASE = "https://site.api.espn.com/apis/site/v2/sports/soccer/{code}/scoreboard"
+
+
+def get(url):
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=20) as r:
+        return json.load(r)
+
+
+def fetch_league(code, name, now):
+    """Try a date range first; if ESPN refuses it, ask one day at a time."""
+    start = datetime.now(timezone.utc)
+    days = [(start + timedelta(days=i)).strftime("%Y%m%d") for i in range(DAYS_AHEAD + 1)]
+    try:
+        return parse(get(f"{BASE.format(code=code)}?dates={days[0]}-{days[-1]}"), name, now), "range"
+    except Exception as first:
+        found, ok = {}, 0
+        for d in days:
+            try:
+                for m in parse(get(f"{BASE.format(code=code)}?dates={d}"), name, now):
+                    found[m["id"]] = m
+                ok += 1
+            except Exception:
+                pass
+        if not ok:
+            try:  # last resort: the default "this week" view
+                for m in parse(get(BASE.format(code=code)), name, now):
+                    found[m["id"]] = m
+                ok = 1
+            except Exception:
+                raise first
+        return list(found.values()), "per-day"
+
+
 def main(path):
     now = int(time.time())
-    start = datetime.now(timezone.utc)
-    end = start + timedelta(days=DAYS_AHEAD)
-    matches = []
+    matches, seen = [], set()
     for code, name in LEAGUES:
-        url = URL.format(code=code, start=start.strftime("%Y%m%d"), end=end.strftime("%Y%m%d"))
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "ninety-fixtures/1.0"})
-            with urllib.request.urlopen(req, timeout=20) as r:
-                matches += parse(json.load(r), name, now)
-            print(f"{name}: ok")
+            got, how = fetch_league(code, name, now)
+            for m in got:
+                if m["id"] not in seen:
+                    seen.add(m["id"]); matches.append(m)
+            print(f"{name}: {len(got)} matches ({how})")
         except Exception as e:  # one league failing must not stop the rest
             print(f"{name}: skipped ({e})")
     matches.sort(key=lambda m: m["kickoff"])
