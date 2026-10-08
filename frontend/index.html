@@ -984,29 +984,44 @@ function alreadyListed(home, away, ko) {
     (norm(f.home).includes(norm(home).slice(0, 5)) || norm(home).includes(norm(f.home).slice(0, 5))) &&
     (norm(f.away).includes(norm(away).slice(0, 5)) || norm(away).includes(norm(f.away).slice(0, 5))));
 }
+async function fetchJson(url, ms = 8000) {
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), ms);
+  try { const r = await fetch(url, { signal: ctl.signal, cache: "no-store" }); if (!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json(); }
+  finally { clearTimeout(tm); }
+}
 async function loadSuggestions() {
+  // 1) fixtures.json kept fresh by the GitHub Action (same site, no blocking)
+  for (const url of ["fixtures.json", "https://raw.githubusercontent.com/Kingkanzi0/ninety/main/frontend/fixtures.json"]) {
+    try {
+      const j = await fetchJson(url);
+      if (Array.isArray(j.matches)) {
+        state.sugg = j.matches.filter((m) => m.kickoff > nowSec() + 1800);
+        state.suggErr = "";
+        if (state.view === "list") renderBoard();
+        return;
+      }
+    } catch { /* try the next source */ }
+  }
+  // 2) fall back to reading ESPN directly from the browser
   const ymd = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
   const from = new Date(), to = new Date(Date.now() + 7 * 86400e3);
-  const out = [];
+  const out = []; let okCount = 0;
   await Promise.all(SUGG_LEAGUES.map(async ([code, name]) => {
     try {
-      const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 8000);
-      const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${code}/scoreboard?dates=${ymd(from)}-${ymd(to)}`, { signal: ctl.signal });
-      clearTimeout(tm);
-      if (!r.ok) return;
-      const j = await r.json();
+      const j = await fetchJson(`https://site.api.espn.com/apis/site/v2/sports/soccer/${code}/scoreboard?dates=${ymd(from)}-${ymd(to)}`);
+      okCount++;
       for (const ev of j.events || []) {
         const c = ev.competitions?.[0]; if (!c) continue;
         const h = c.competitors?.find((x) => x.homeAway === "home"), a = c.competitors?.find((x) => x.homeAway === "away");
         const ko = Math.floor(new Date(ev.date).getTime() / 1000);
-        if (!h || !a || ev.status?.type?.state !== "pre") continue;
-        if (ko < nowSec() + 1800) continue;
+        if (!h || !a || ev.status?.type?.state !== "pre" || ko < nowSec() + 1800) continue;
         out.push({ id: ev.id, home: h.team.displayName, away: a.team.displayName, comp: name, kickoff: ko });
       }
-    } catch { /* league feed unavailable: skip it */ }
+    } catch { /* league feed unavailable */ }
   }));
   out.sort((x, y) => x.kickoff - y.kickoff);
   state.sugg = out;
+  state.suggErr = okCount ? "" : "Couldn't load this week's fixtures right now. Use + List match to add one.";
   if (state.view === "list") renderBoard();
 }
 function renderSuggestions() {
@@ -1014,7 +1029,7 @@ function renderSuggestions() {
   const list = state.sugg.filter((m) => !alreadyListed(m.home, m.away, m.kickoff)
     && (!state.comp || state.comp === m.comp)
     && (!state.q || `${m.home} ${m.away} ${m.comp}`.toLowerCase().includes(state.q.toLowerCase()))).slice(0, 12);
-  if (!list.length) return "";
+  if (!list.length) return `<div class="sugg-head"><h2>Suggested matches</h2><p>${esc(state.suggErr || "No new fixtures right now. Check back later.")}</p></div>`;
   return `<div class="sugg-head"><h2>Suggested matches</h2><p>Upcoming fixtures not on Ninety yet. Open a market in one click.</p></div>
     <div class="sugg">${list.map((m) => `<div class="sg">
       <span class="ev-meta"><span class="comp">${esc(m.comp)}</span><span>${fmtTime(m.kickoff)}</span></span>
