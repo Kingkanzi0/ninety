@@ -290,6 +290,8 @@ details.more-src[open] summary { margin-bottom: 8px; }
 .steps li.bad::before { background: var(--red); border-color: var(--red); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .job-foot { display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px 10px; font-size: 12.5px; color: var(--soft); }
+.job.min .steps, .job.min .job-foot { display: none; }
+.job-head button + button { margin-left: 2px; }
 .job.ok .job-head { background: #14472d; }
 .job.fail .job-head { background: #4a1d15; }
 .config { font-size: 12px; color: var(--mute); }
@@ -653,9 +655,11 @@ async function connect() {
  * ------------------------------------------------------------------ */
 const JOBS_KEY = "ninety.jobs";
 const jobs = new Map();               // hash -> job
-const STAGES = ["Signed in your wallet", "Leader validator reads the page", "Other validators re-check on their own", "Consensus reached"];
-const STAGE_OF = { PENDING: 1, UNINITIALIZED: 1, PROPOSING: 1, LEADER_REVEALING: 1, COMMITTING: 2, REVEALING: 2,
-  APPEAL_COMMITTING: 2, APPEAL_REVEALING: 2, ACCEPTED: 4, FINALIZED: 4, READY_TO_FINALIZE: 4 };
+const stagesFor = (kind) => ["Signed in your wallet", "Waiting in the network queue",
+  kind === "list" || kind === "settle" ? "Leader validator reads the match page" : "Leader validator runs it",
+  kind === "list" || kind === "settle" ? "Other validators re-check on their own" : "Other validators check it", "Consensus reached"];
+const STAGE_OF = { PENDING: 1, UNINITIALIZED: 1, PROPOSING: 2, LEADER_REVEALING: 2, COMMITTING: 3, REVEALING: 3,
+  APPEAL_COMMITTING: 3, APPEAL_REVEALING: 3, ACCEPTED: 5, FINALIZED: 5, READY_TO_FINALIZE: 5 };
 const STATUS_BY_NUM = { 0: "UNINITIALIZED", 1: "PENDING", 2: "PROPOSING", 3: "COMMITTING", 4: "REVEALING", 5: "ACCEPTED",
   6: "UNDETERMINED", 7: "FINALIZED", 8: "CANCELED", 9: "APPEAL_REVEALING", 10: "APPEAL_COMMITTING", 11: "READY_TO_FINALIZE",
   12: "VALIDATORS_TIMEOUT", 13: "LEADER_TIMEOUT", 14: "LEADER_REVEALING" };
@@ -675,8 +679,8 @@ function drawJob(j) {
     $("tray").prepend(el);
   }
   const link = explorerTx(j.hash);
-  const stage = j.final ? (j.ok ? 4 : j.stage) : j.stage;
-  const steps = STAGES.map((label, i) => {
+  const stage = j.final ? (j.ok ? 5 : j.stage) : j.stage;
+  const steps = stagesFor(j.kind).map((label, i) => {
     let cls = i < stage ? "done" : i === stage && !j.final ? "now" : "";
     if (j.final && !j.ok && i === stage) cls = "bad";
     if (j.final && j.ok) cls = "done";
@@ -685,9 +689,11 @@ function drawJob(j) {
   const secs = ((j.ended || Date.now()) - j.started) / 1000;
   const foot = j.final
     ? (j.ok ? `Done in ${mmss(secs)}` : esc(j.error || "Not accepted"))
-    : esc(j.statusName ? j.statusName.replace(/_/g, " ").toLowerCase() : "waiting for the network");
-  el.className = `job ${j.final ? (j.ok ? "ok" : "fail") : ""}`;
+    : (j.stage <= 1 && secs > 90 ? "Bradbury is busy. It runs after earlier transactions on this contract."
+      : esc(j.statusName ? j.statusName.replace(/_/g, " ").toLowerCase() : "waiting for the network"));
+  el.className = `job ${j.final ? (j.ok ? "ok" : "fail") : ""}${j.min ? " min" : ""}`;
   el.innerHTML = `<div class="job-head"><b>${esc(j.title)}</b><span class="clock">${mmss(secs)}</span>
+      <button type="button" data-min="${j.hash}" aria-label="${j.min ? "Expand" : "Minimise"}">${j.min ? "+" : "–"}</button>
       <button type="button" data-dismiss="${j.hash}" aria-label="Hide">&times;</button></div>
     <ul class="steps">${steps}</ul>
     <div class="job-foot"><span>${foot}</span>${link ? `<a href="${link}" target="_blank" rel="noopener">Explorer</a>` : ""}</div>`;
@@ -695,6 +701,8 @@ function drawJob(j) {
 
 setInterval(() => { for (const j of jobs.values()) if (!j.final) drawJob(j); }, 1000);
 $("tray").addEventListener("click", (e) => {
+  const mn = e.target.closest("[data-min]");
+  if (mn) { const j = jobs.get(mn.dataset.min); if (j) { j.min = !j.min; drawJob(j); } return; }
   const b = e.target.closest("[data-dismiss]");
   if (!b) return;
   const j = jobs.get(b.dataset.dismiss);
@@ -709,7 +717,7 @@ async function pollStage(j) {
       const name = tx?.statusName || STATUS_BY_NUM[Number(tx?.status)] || String(tx?.status || "");
       if (name) {
         j.statusName = name;
-        if (STAGE_OF[name] != null) j.stage = Math.max(j.stage, Math.min(STAGE_OF[name], 3));
+        if (STAGE_OF[name] != null) j.stage = Math.max(j.stage, Math.min(STAGE_OF[name], 4));
       }
       drawJob(j);
     } catch (e) { /* transient RPC hiccup; keep going */ }
