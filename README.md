@@ -1,5 +1,23 @@
 # Ninety
 
+
+## Milestone 2: sportsbook interface and auto-updating fixtures (Oct 2026)
+
+Ninety's first version was accepted on Oct 7, 2026. This milestone adds the following, all live at https://kingkanzi0.github.io/ninety/frontend/
+
+| Area | Before (accepted version) | After (this milestone) |
+| --- | --- | --- |
+| Interface | Single fixture list and detail page | Sportsbook layout: competitions rail, match list with 1/X/2 odds, match page with all four markets |
+| Betting | One stake at a time inside a market card | Bet slip with several picks, pool-based odds and possible return before staking |
+| History | Position shown per match only | "My bets": every stake across all matches marked won, lost or refunded, with one-click Collect |
+| Consensus visibility | Generic "sending" message | Live tracker showing each GenLayer stage: network queue, leader validator, validators re-checking, consensus reached |
+| Finding matches | Every match typed in by hand | Suggested matches: a GitHub Action (`.github/workflows/fixtures.yml`, `scripts/fetch_fixtures.py`) fetches 10 days of fixtures from 11 leagues every 6 hours (236 on the first run). One click opens the listing form pre-filled |
+| Wallets | One injected wallet | Wallet chooser (OKX Wallet, MetaMask), remembered between visits |
+| Mobile | Basic | Phone layout with slide-up bet slip |
+
+The Intelligent Contract is unchanged (`0xF94F652d77249feE167d888F2a7AE14858FeD2eb`). Validators still decide only the facts, and payouts stay plain code. A second match, French Guiana v Belize, has settled on Bradbury through validator consensus.
+
+
 Soccer prediction markets settled by GenLayer validators reading the match pages.
 
 Every fixture opens four pari-mutuel markets:
