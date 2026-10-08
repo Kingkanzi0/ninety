@@ -174,6 +174,17 @@ button { cursor: pointer; }
 .t-chk { background: #3a3110; color: #ffd75e; }
 .empty { padding: 28px 16px; text-align: center; color: var(--soft); background: var(--panel); border: 1px dashed var(--line); border-radius: 12px; }
 
+/* ---------- suggested matches ---------- */
+.sugg-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.sugg-head h2 { margin: 0; font: 800 24px/1 var(--display); }
+.sugg-head p { margin: 0; font-size: 13px; color: var(--soft); }
+.sugg { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.sg { background: var(--panel); border: 1px dashed #2f5640; border-radius: 12px; padding: 12px; display: grid; gap: 6px; align-content: start; }
+.sg .ev-meta { font-size: 12px; }
+.sg .ev-team { font-size: 15px; }
+.sg .btn { margin-top: 4px; }
+.find { font-size: 13px; font-weight: 700; }
+
 /* ---------- match view ---------- */
 .back { background: none; border: 0; color: var(--soft); font-weight: 700; padding: 0; display: inline-flex; gap: 6px; align-items: center; }
 .back:hover { color: var(--fg); }
@@ -430,6 +441,7 @@ details.more-src[open] summary { margin-bottom: 8px; }
       <div>
         <label for="fSrcA">Match page (Flashscore works well)</label>
         <input type="url" id="fSrcA" required placeholder="https://www.flashscore.com/match/football/…">
+        <p class="hint" id="findWrap" hidden><a class="find" id="findLink" href="#" target="_blank" rel="noopener">Find this match on Flashscore</a>, open it, then copy the link from your browser bar and paste it here.</p>
       </div>
       <details class="more-src">
         <summary>Add a second match page (optional)</summary>
@@ -960,6 +972,71 @@ function renderEvents() {
   }).join("");
 }
 
+/* ---------- suggested matches (ESPN public fixtures feed) ---------- */
+const SUGG_LEAGUES = [
+  ["eng.1", "Premier League"], ["esp.1", "LaLiga"], ["ita.1", "Serie A"], ["ger.1", "Bundesliga"],
+  ["fra.1", "Ligue 1"], ["uefa.champions", "Champions League"], ["uefa.europa", "Europa League"], ["usa.1", "MLS"],
+];
+state.sugg = null;   // null = not loaded, [] = none
+const norm = (t) => String(t).toLowerCase().replace(/[^a-z0-9]/g, "");
+function alreadyListed(home, away, ko) {
+  return state.fixtures.some((f) => f.status !== "REJECTED" && Math.abs(f.kickoff - ko) < 6 * 3600 &&
+    (norm(f.home).includes(norm(home).slice(0, 5)) || norm(home).includes(norm(f.home).slice(0, 5))) &&
+    (norm(f.away).includes(norm(away).slice(0, 5)) || norm(away).includes(norm(f.away).slice(0, 5))));
+}
+async function loadSuggestions() {
+  const ymd = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
+  const from = new Date(), to = new Date(Date.now() + 7 * 86400e3);
+  const out = [];
+  await Promise.all(SUGG_LEAGUES.map(async ([code, name]) => {
+    try {
+      const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 8000);
+      const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${code}/scoreboard?dates=${ymd(from)}-${ymd(to)}`, { signal: ctl.signal });
+      clearTimeout(tm);
+      if (!r.ok) return;
+      const j = await r.json();
+      for (const ev of j.events || []) {
+        const c = ev.competitions?.[0]; if (!c) continue;
+        const h = c.competitors?.find((x) => x.homeAway === "home"), a = c.competitors?.find((x) => x.homeAway === "away");
+        const ko = Math.floor(new Date(ev.date).getTime() / 1000);
+        if (!h || !a || ev.status?.type?.state !== "pre") continue;
+        if (ko < nowSec() + 1800) continue;
+        out.push({ id: ev.id, home: h.team.displayName, away: a.team.displayName, comp: name, kickoff: ko });
+      }
+    } catch { /* league feed unavailable: skip it */ }
+  }));
+  out.sort((x, y) => x.kickoff - y.kickoff);
+  state.sugg = out;
+  if (state.view === "list") renderBoard();
+}
+function renderSuggestions() {
+  if (state.sugg === null) return `<div class="sugg-head"><h2>Suggested matches</h2><p>Loading this week's fixtures…</p></div>`;
+  const list = state.sugg.filter((m) => !alreadyListed(m.home, m.away, m.kickoff)
+    && (!state.comp || state.comp === m.comp)
+    && (!state.q || `${m.home} ${m.away} ${m.comp}`.toLowerCase().includes(state.q.toLowerCase()))).slice(0, 12);
+  if (!list.length) return "";
+  return `<div class="sugg-head"><h2>Suggested matches</h2><p>Upcoming fixtures not on Ninety yet. Open a market in one click.</p></div>
+    <div class="sugg">${list.map((m) => `<div class="sg">
+      <span class="ev-meta"><span class="comp">${esc(m.comp)}</span><span>${fmtTime(m.kickoff)}</span></span>
+      <span class="ev-team">${crest(m.home)}<span class="nm">${esc(m.home)}</span></span>
+      <span class="ev-team">${crest(m.away)}<span class="nm">${esc(m.away)}</span></span>
+      <button class="btn small" type="button" data-suggest="${esc(m.id)}">Open market</button></div>`).join("")}</div>`;
+}
+function openListDialog(m) {
+  if (!CONTRACT) return toast("Set the contract address first.", "err");
+  const pad = (n) => String(n).padStart(2, "0");
+  const d = m ? new Date(m.kickoff * 1000) : new Date(Date.now() + 2 * 3600e3);
+  if (!m) d.setMinutes(0, 0, 0);
+  if (m || !$("fKick").value) $("fKick").value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (m) {
+    $("fHome").value = m.home; $("fAway").value = m.away; $("fComp").value = m.comp; $("fSrcA").value = "";
+    $("findLink").href = `https://www.google.com/search?q=${encodeURIComponent(`flashscore ${m.home} ${m.away}`)}`;
+    $("findWrap").hidden = false;
+  } else $("findWrap").hidden = true;
+  $("listDlg").showModal();
+  if (m) $("fSrcA").focus();
+}
+
 function renderBoard() {
   if (state.view === "match" && fixtureById(state.selected)) return renderMatch();
   state.view = "list";
@@ -982,7 +1059,8 @@ function renderBoard() {
       <div class="chips" role="group" aria-label="Status">${STATUS_TABS.map((t) => `<button class="chip" type="button" data-status="${t.key}" aria-pressed="${state.status === t.key}">${t.label}</button>`).join("")}</div>
     </div>
     <div class="odds-head" aria-hidden="true" style="margin:-4px 68px -6px auto;width:min(330px,40%)"><span>1</span><span>X</span><span>2</span></div>
-    <div class="events">${renderEvents()}</div>`;
+    <div class="events">${renderEvents()}</div>
+    ${state.status === "open" || state.status === "all" ? renderSuggestions() : ""}`;
 }
 
 function renderMarket(f, m) {
@@ -1161,6 +1239,8 @@ document.addEventListener("click", async (e) => {
   if (st) { state.status = st.dataset.status; state.comp = state.comp; backToList(); renderRail(); return; }
   const cp = t.closest("[data-comp]");
   if (cp) { state.comp = cp.dataset.comp; if (state.comp) state.status = "all"; backToList(); renderRail(); return; }
+  const sg = t.closest("[data-suggest]");
+  if (sg) { const m = (state.sugg || []).find((x) => String(x.id) === sg.dataset.suggest); if (m) openListDialog(m); return; }
   const pk = t.closest("[data-pick]");
   if (pk && !pk.disabled) { const [fid, m, o] = pk.dataset.pick.split("|"); return togglePick(Number(fid), m, o); }
   const op = t.closest("[data-open]");
@@ -1263,14 +1343,7 @@ $("contractInput").addEventListener("change", (e) => {
   loadFixtures();
 });
 
-$("listBtn").addEventListener("click", () => {
-  if (!CONTRACT) return toast("Set the contract address first.", "err");
-  const d = new Date(Date.now() + 2 * 3600e3);
-  d.setMinutes(0, 0, 0);
-  const pad = (n) => String(n).padStart(2, "0");
-  if (!$("fKick").value) $("fKick").value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:00`;
-  $("listDlg").showModal();
-});
+$("listBtn").addEventListener("click", () => openListDialog(null));
 $("listForm").addEventListener("submit", async (e) => {
   if (e.submitter?.value === "cancel") return;
   e.preventDefault();
@@ -1314,6 +1387,8 @@ $("listForm").addEventListener("submit", async (e) => {
     return;
   }
   await loadFixtures();
+  loadSuggestions();
+  setInterval(loadSuggestions, 30 * 60e3);
   const hashId = Number(location.hash.replace("#fixture-", ""));
   if (location.hash.startsWith("#fixture-") && fixtureById(hashId)) openMatch(hashId);
   resumeJobs();
