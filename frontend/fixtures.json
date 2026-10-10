@@ -1,48 +1,6 @@
 {
- "updated": 1791611847,
+ "updated": 1791635836,
  "matches": [
-  {
-   "id": "401879268",
-   "home": "Arsenal",
-   "away": "Leeds United",
-   "comp": "Premier League",
-   "kickoff": 1791631800
-  },
-  {
-   "id": "401880242",
-   "home": "Charlton Athletic",
-   "away": "Bristol City",
-   "comp": "Championship",
-   "kickoff": 1791631800
-  },
-  {
-   "id": "401880236",
-   "home": "Swansea City",
-   "away": "Norwich City",
-   "comp": "Championship",
-   "kickoff": 1791631800
-  },
-  {
-   "id": "401880234",
-   "home": "West Bromwich Albion",
-   "away": "Birmingham City",
-   "comp": "Championship",
-   "kickoff": 1791631800
-  },
-  {
-   "id": "401882849",
-   "home": "Rayo Vallecano",
-   "away": "Athletic Club",
-   "comp": "LaLiga",
-   "kickoff": 1791633600
-  },
-  {
-   "id": "401874947",
-   "home": "Genoa",
-   "away": "Fiorentina",
-   "comp": "Serie A",
-   "kickoff": 1791637200
-  },
   {
    "id": "401884775",
    "home": "1. FC Union Berlin",
@@ -170,13 +128,6 @@
    "kickoff": 1791642600
   },
   {
-   "id": "401885426",
-   "home": "Casa Pia",
-   "away": "Santa Clara",
-   "comp": "Primeira Liga",
-   "kickoff": 1791642600
-  },
-  {
    "id": "401876446",
    "home": "Lille",
    "away": "Le Havre AC",
@@ -299,6 +250,13 @@
    "id": "401885429",
    "home": "Acad\u00e9mico de Viseu",
    "away": "Estoril",
+   "comp": "Primeira Liga",
+   "kickoff": 1791660600
+  },
+  {
+   "id": "401885426",
+   "home": "Casa Pia",
+   "away": "Santa Clara",
    "comp": "Primeira Liga",
    "kickoff": 1791660600
   },
