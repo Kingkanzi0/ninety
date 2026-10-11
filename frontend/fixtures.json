@@ -1,90 +1,6 @@
 {
- "updated": 1791668881,
+ "updated": 1791697947,
  "matches": [
-  {
-   "id": "761850",
-   "home": "Atlanta United FC",
-   "away": "FC Cincinnati",
-   "comp": "MLS",
-   "kickoff": 1791675000
-  },
-  {
-   "id": "761852",
-   "home": "Charlotte FC",
-   "away": "FC Dallas",
-   "comp": "MLS",
-   "kickoff": 1791675000
-  },
-  {
-   "id": "761847",
-   "home": "Inter Miami CF",
-   "away": "D.C. United",
-   "comp": "MLS",
-   "kickoff": 1791675000
-  },
-  {
-   "id": "761851",
-   "home": "New England Revolution",
-   "away": "Seattle Sounders FC",
-   "comp": "MLS",
-   "kickoff": 1791675000
-  },
-  {
-   "id": "761848",
-   "home": "Orlando City SC",
-   "away": "Columbus Crew",
-   "comp": "MLS",
-   "kickoff": 1791675000
-  },
-  {
-   "id": "761849",
-   "home": "Philadelphia Union",
-   "away": "Real Salt Lake",
-   "comp": "MLS",
-   "kickoff": 1791675000
-  },
-  {
-   "id": "761853",
-   "home": "Red Bull New York",
-   "away": "San Diego FC",
-   "comp": "MLS",
-   "kickoff": 1791675000
-  },
-  {
-   "id": "761856",
-   "home": "Austin FC",
-   "away": "Nashville SC",
-   "comp": "MLS",
-   "kickoff": 1791678600
-  },
-  {
-   "id": "761854",
-   "home": "Minnesota United FC",
-   "away": "Houston Dynamo FC",
-   "comp": "MLS",
-   "kickoff": 1791678600
-  },
-  {
-   "id": "761855",
-   "home": "Sporting Kansas City",
-   "away": "Portland Timbers",
-   "comp": "MLS",
-   "kickoff": 1791678600
-  },
-  {
-   "id": "761857",
-   "home": "Colorado Rapids",
-   "away": "San Jose Earthquakes",
-   "comp": "MLS",
-   "kickoff": 1791682200
-  },
-  {
-   "id": "761858",
-   "home": "LAFC",
-   "away": "Vancouver Whitecaps",
-   "comp": "MLS",
-   "kickoff": 1791685800
-  },
   {
    "id": "401875587",
    "home": "FC Utrecht",
@@ -1407,6 +1323,83 @@
    "away": "Atl\u00e9tico Madrid",
    "comp": "Champions League",
    "kickoff": 1792522800
+  },
+  {
+   "id": "401915395",
+   "home": "Como",
+   "away": "Manchester United",
+   "comp": "Champions League",
+   "kickoff": 1792601100
+  },
+  {
+   "id": "401915396",
+   "home": "Lille",
+   "away": "Galatasaray",
+   "comp": "Champions League",
+   "kickoff": 1792601100
+  },
+  {
+   "id": "401882870",
+   "home": "Levante",
+   "away": "Athletic Club",
+   "comp": "LaLiga",
+   "kickoff": 1792605600
+  },
+  {
+   "id": "401915394",
+   "home": "Aston Villa",
+   "away": "Viking FK",
+   "comp": "Champions League",
+   "kickoff": 1792609200
+  },
+  {
+   "id": "401915312",
+   "home": "Bayern Munich",
+   "away": "Arsenal",
+   "comp": "Champions League",
+   "kickoff": 1792609200
+  },
+  {
+   "id": "401915388",
+   "home": "Club Brugge",
+   "away": "Lens",
+   "comp": "Champions League",
+   "kickoff": 1792609200
+  },
+  {
+   "id": "401915390",
+   "home": "Internazionale",
+   "away": "Shakhtar Donetsk",
+   "comp": "Champions League",
+   "kickoff": 1792609200
+  },
+  {
+   "id": "401915389",
+   "home": "Real Betis",
+   "away": "Feyenoord Rotterdam",
+   "comp": "Champions League",
+   "kickoff": 1792609200
+  },
+  {
+   "id": "401915313",
+   "home": "Real Madrid",
+   "away": "RB Leipzig",
+   "comp": "Champions League",
+   "kickoff": 1792609200
+  },
+  {
+   "id": "401915391",
+   "home": "Sporting CP",
+   "away": "LASK Linz",
+   "comp": "Champions League",
+   "kickoff": 1792609200
+  },
+  {
+   "id": "761773",
+   "home": "FC Cincinnati",
+   "away": "D.C. United",
+   "comp": "MLS",
+   "kickoff": 1792623600
   }
  ]
 }
