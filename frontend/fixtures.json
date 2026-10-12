@@ -1,13 +1,6 @@
 {
- "updated": 1791756084,
+ "updated": 1791785030,
  "matches": [
-  {
-   "id": "761859",
-   "home": "St. Louis CITY SC",
-   "away": "LA Galaxy",
-   "comp": "MLS",
-   "kickoff": 1791759600
-  },
   {
    "id": "401875005",
    "home": "Atalanta",
@@ -1225,6 +1218,132 @@
    "away": "D.C. United",
    "comp": "MLS",
    "kickoff": 1792623600
+  },
+  {
+   "id": "401915548",
+   "home": "Ararat-Armenia",
+   "away": "AZ Alkmaar",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915556",
+   "home": "Dinamo Zagreb",
+   "away": "NEC Nijmegen",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915558",
+   "home": "Ferencvaros",
+   "away": "Torreense",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915547",
+   "home": "Juventus",
+   "away": "Stade Rennais",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915546",
+   "home": "Lech Poznan",
+   "away": "Sunderland",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915559",
+   "home": "OFI Crete",
+   "away": "Bayer Leverkusen",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915557",
+   "home": "SK Sturm Graz",
+   "away": "Marseille",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915545",
+   "home": "Union St.-Gilloise",
+   "away": "Hapoel Be'er",
+   "comp": "Europa League",
+   "kickoff": 1792687500
+  },
+  {
+   "id": "401915552",
+   "home": "AFC Bournemouth",
+   "away": "AC Milan",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915553",
+   "home": "Besiktas",
+   "away": "Crystal Palace",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915555",
+   "home": "Celtic",
+   "away": "Celta Vigo",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915542",
+   "home": "Jagiellonia Bialystok",
+   "away": "Anderlecht",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915540",
+   "home": "Lillestrom",
+   "away": "Real Sociedad",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915541",
+   "home": "NK Celje",
+   "away": "RB Salzburg",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915554",
+   "home": "Olympiacos",
+   "away": "Sparta Prague",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915544",
+   "home": "Omonia Nicosia",
+   "away": "Benfica",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915543",
+   "home": "TSG Hoffenheim",
+   "away": "Lyon",
+   "comp": "Europa League",
+   "kickoff": 1792695600
+  },
+  {
+   "id": "401915539",
+   "home": "Viktoria Plzen",
+   "away": "Levski Sofia",
+   "comp": "Europa League",
+   "kickoff": 1792695600
   }
  ]
 }
