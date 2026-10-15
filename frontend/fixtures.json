@@ -1,62 +1,6 @@
 {
- "updated": 1792064122,
+ "updated": 1792083916,
  "matches": [
-  {
-   "id": "401915573",
-   "home": "AZ Alkmaar",
-   "away": "Hapoel Be'er",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
-  {
-   "id": "401915576",
-   "home": "Lech Poznan",
-   "away": "Bayer Leverkusen",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
-  {
-   "id": "401915566",
-   "home": "Lyon",
-   "away": "Crystal Palace",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
-  {
-   "id": "401915577",
-   "home": "NK Celje",
-   "away": "Omonia Nicosia",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
-  {
-   "id": "401915568",
-   "home": "RB Salzburg",
-   "away": "AC Milan",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
-  {
-   "id": "401915567",
-   "home": "Sparta Prague",
-   "away": "Lillestrom",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
-  {
-   "id": "401915575",
-   "home": "Torreense",
-   "away": "Sunderland",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
-  {
-   "id": "401915574",
-   "home": "Union St.-Gilloise",
-   "away": "Real Sociedad",
-   "comp": "Europa League",
-   "kickoff": 1792082700
-  },
   {
    "id": "401915571",
    "home": "AFC Bournemouth",
@@ -345,6 +289,13 @@
    "kickoff": 1792250100
   },
   {
+   "id": "401882846",
+   "home": "Real Betis",
+   "away": "Barcelona",
+   "comp": "LaLiga",
+   "kickoff": 1792252800
+  },
+  {
    "id": "401874953",
    "home": "Bologna",
    "away": "Internazionale",
@@ -356,13 +307,6 @@
    "home": "Newcastle United",
    "away": "Aston Villa",
    "comp": "Premier League",
-   "kickoff": 1792254600
-  },
-  {
-   "id": "401882846",
-   "home": "Real Betis",
-   "away": "Barcelona",
-   "comp": "LaLiga",
    "kickoff": 1792254600
   },
   {
