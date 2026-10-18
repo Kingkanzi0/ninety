@@ -1,55 +1,6 @@
 {
- "updated": 1792338899,
+ "updated": 1792356515,
  "matches": [
-  {
-   "id": "401882841",
-   "home": "M\u00e1laga",
-   "away": "Real Sociedad",
-   "comp": "LaLiga",
-   "kickoff": 1792341000
-  },
-  {
-   "id": "401875577",
-   "home": "FC Twente",
-   "away": "FC Utrecht",
-   "comp": "Eredivisie",
-   "kickoff": 1792346400
-  },
-  {
-   "id": "401875581",
-   "home": "NEC Nijmegen",
-   "away": "Fortuna Sittard",
-   "comp": "Eredivisie",
-   "kickoff": 1792346400
-  },
-  {
-   "id": "401874765",
-   "home": "Juventus",
-   "away": "Lazio",
-   "comp": "Serie A",
-   "kickoff": 1792349100
-  },
-  {
-   "id": "401876434",
-   "home": "Lyon",
-   "away": "Nice",
-   "comp": "Ligue 1",
-   "kickoff": 1792349100
-  },
-  {
-   "id": "401882839",
-   "home": "Real Madrid",
-   "away": "Sevilla",
-   "comp": "LaLiga",
-   "kickoff": 1792350000
-  },
-  {
-   "id": "761889",
-   "home": "FC Cincinnati",
-   "away": "Columbus Crew",
-   "comp": "MLS",
-   "kickoff": 1792357200
-  },
   {
    "id": "401874762",
    "home": "Monza",
@@ -179,7 +130,7 @@
   {
    "id": "401915394",
    "home": "Aston Villa",
-   "away": "VIKING FK",
+   "away": "Viking FK",
    "comp": "Champions League",
    "kickoff": 1792609200
   },
