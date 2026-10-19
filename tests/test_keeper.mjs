@@ -30,7 +30,7 @@ const tickets = [
 ];
 const q = planMore({ now, fixtures, positions, probsByKey, tickets, house: { free: String(GEN) } });
 const seededGames = [...new Set(q.seeds.map((x) => x.fid))];
-assert(JSON.stringify(seededGames) === "[0,1]", "seed games " + seededGames);
+assert(JSON.stringify(seededGames) === "[0,1,2]", "seed games " + seededGames);
 assert(q.seeds.filter((x) => x.fid === 0).length === 6, "fixture 0 skips HOME already staked");
 assert(q.seeds.find((x) => x.fid === 1 && x.outcome === "HOME").value === 18n * GEN / 100n, "uses feed probs");
 assert(JSON.stringify(q.claims) === "[4]", "claims " + q.claims);
