@@ -18,7 +18,7 @@ LEAGUES = [
 DAYS_AHEAD = 10
 
 
-def parse(feed, comp, now):
+def parse(feed, comp, now, code=""):
     out = []
     for ev in feed.get("events", []):
         comps = ev.get("competitions") or []
@@ -37,7 +37,7 @@ def parse(feed, comp, now):
         if ko < now + 1800:
             continue
         out.append({"id": str(ev.get("id")), "home": home["team"]["displayName"],
-                    "away": away["team"]["displayName"], "comp": comp, "kickoff": ko})
+                    "away": away["team"]["displayName"], "comp": comp, "league": code, "kickoff": ko})
     return out
 
 
@@ -60,19 +60,19 @@ def fetch_league(code, name, now):
     start = datetime.now(timezone.utc)
     days = [(start + timedelta(days=i)).strftime("%Y%m%d") for i in range(DAYS_AHEAD + 1)]
     try:
-        return parse(get(f"{BASE.format(code=code)}?dates={days[0]}-{days[-1]}"), name, now), "range"
+        return parse(get(f"{BASE.format(code=code)}?dates={days[0]}-{days[-1]}"), name, now, code), "range"
     except Exception as first:
         found, ok = {}, 0
         for d in days:
             try:
-                for m in parse(get(f"{BASE.format(code=code)}?dates={d}"), name, now):
+                for m in parse(get(f"{BASE.format(code=code)}?dates={d}"), name, now, code):
                     found[m["id"]] = m
                 ok += 1
             except Exception:
                 pass
         if not ok:
             try:  # last resort: the default "this week" view
-                for m in parse(get(BASE.format(code=code)), name, now):
+                for m in parse(get(BASE.format(code=code)), name, now, code):
                     found[m["id"]] = m
                 ok = 1
             except Exception:
