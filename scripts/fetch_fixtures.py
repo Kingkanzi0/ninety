@@ -76,6 +76,16 @@ def probs_from(comp):
     return out
 
 
+def league_logo(feed, name):
+    """Remember the competition badge the feed ships with (leagues[0].logos[0].href)."""
+    try:
+        href = feed["leagues"][0]["logos"][0]["href"]
+        if str(href).startswith("https://"):
+            LOGOS[f"league:{name}"] = href
+    except (KeyError, IndexError, TypeError):
+        pass
+
+
 def parse(feed, comp, now, code=""):
     out = []
     for ev in feed.get("events", []):
@@ -123,12 +133,16 @@ def fetch_league(code, name, now):
     start = datetime.now(timezone.utc)
     days = [(start + timedelta(days=i)).strftime("%Y%m%d") for i in range(DAYS_AHEAD + 1)]
     try:
-        return parse(get(f"{BASE.format(code=code)}?dates={days[0]}-{days[-1]}"), name, now, code), "range"
+        feed = get(f"{BASE.format(code=code)}?dates={days[0]}-{days[-1]}")
+        league_logo(feed, name)
+        return parse(feed, name, now, code), "range"
     except Exception as first:
         found, ok = {}, 0
         for d in days:
             try:
-                for m in parse(get(f"{BASE.format(code=code)}?dates={d}"), name, now, code):
+                feed = get(f"{BASE.format(code=code)}?dates={d}")
+                league_logo(feed, name)
+                for m in parse(feed, name, now, code):
                     found[m["id"]] = m
                 ok += 1
             except Exception:
