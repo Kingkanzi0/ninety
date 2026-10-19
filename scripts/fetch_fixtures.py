@@ -1,7 +1,9 @@
-"""Fetch upcoming fixtures for Ninety's "Suggested matches".
+"""Fetch upcoming fixtures for Ninety.
 
 Runs on GitHub Actions (server side, so no browser CORS limits) and writes
-frontend/fixtures.json, which the app reads. Source: ESPN's public scoreboard feed.
+frontend/fixtures.json (matches + starting probabilities used by the keeper to
+seed odds) and frontend/logos.json (team name -> badge URL, merged over time).
+Source: ESPN's public scoreboard feed.
 """
 import json
 import sys
@@ -16,6 +18,62 @@ LEAGUES = [
     ("por.1", "Primeira Liga"), ("eng.2", "Championship"),
 ]
 DAYS_AHEAD = 10
+LOGOS = {}
+# Used when the feed has no bookmaker odds for a match.
+DEFAULT_PROBS = {"RESULT": {"HOME": 0.45, "DRAW": 0.27, "AWAY": 0.28},
+                 "GOALS": {"OVER": 0.52, "UNDER": 0.48}, "BTTS": {"YES": 0.52, "NO": 0.48}}
+
+
+def implied(price):
+    """American odds (-150, +240, 'EVEN') -> probability, or None."""
+    try:
+        s = str(price).strip().upper()
+        v = 100.0 if s == "EVEN" else float(s)
+    except (TypeError, ValueError):
+        return None
+    if v == 0:
+        return None
+    return 100 / (v + 100) if v > 0 else -v / (-v + 100)
+
+
+def _pick(o, *paths):
+    for path in paths:
+        cur = o
+        for k in path:
+            cur = cur.get(k) if isinstance(cur, dict) else None
+        p = implied(cur)
+        if p:
+            return p
+    return None
+
+
+def _norm(d):
+    t = sum(d.values())
+    return {k: round(min(max(v / t, 0.05), 0.9), 3) for k, v in d.items()}
+
+
+def probs_from(comp):
+    """Starting probabilities from the feed's bookmaker odds, else defaults."""
+    out = {k: dict(v) for k, v in DEFAULT_PROBS.items()}
+    src = "default"
+    odds = (comp.get("odds") or [None])[0]
+    if isinstance(odds, dict):
+        h = _pick(odds, ("homeTeamOdds", "moneyLine"), ("moneyline", "home", "close", "odds"), ("moneyline", "home", "open", "odds"))
+        a = _pick(odds, ("awayTeamOdds", "moneyLine"), ("moneyline", "away", "close", "odds"), ("moneyline", "away", "open", "odds"))
+        d = _pick(odds, ("drawOdds", "moneyLine"), ("moneyline", "draw", "close", "odds"), ("moneyline", "draw", "open", "odds"))
+        if h and a and d:
+            out["RESULT"], src = _norm({"HOME": h, "DRAW": d, "AWAY": a}), "feed"
+        try:
+            line = float(odds.get("overUnder"))
+        except (TypeError, ValueError):
+            line = None
+        if line == 2.5:
+            ov = _pick(odds, ("overOdds",), ("total", "over", "close", "odds"), ("total", "over", "open", "odds"))
+            un = _pick(odds, ("underOdds",), ("total", "under", "close", "odds"), ("total", "under", "open", "odds"))
+            if ov and un:
+                out["GOALS"] = _norm({"OVER": ov, "UNDER": un})
+    out["source"] = src
+    return out
 
 
 def parse(feed, comp, now, code=""):
@@ -27,6 +85,10 @@ def parse(feed, comp, now, code=""):
         teams = comps[0].get("competitors") or []
         home = next((t for t in teams if t.get("homeAway") == "home"), None)
         away = next((t for t in teams if t.get("homeAway") == "away"), None)
+        for t in (home, away):
+            team = (t or {}).get("team") or {}
+            if team.get("displayName") and str(team.get("logo", "")).startswith("https://"):
+                LOGOS[team["displayName"]] = team["logo"]
         state = ((ev.get("status") or {}).get("type") or {}).get("state")
         if not home or not away or state != "pre":
             continue
@@ -37,7 +99,8 @@ def parse(feed, comp, now, code=""):
         if ko < now + 1800:
             continue
         out.append({"id": str(ev.get("id")), "home": home["team"]["displayName"],
-                    "away": away["team"]["displayName"], "comp": comp, "league": code, "kickoff": ko})
+                    "away": away["team"]["displayName"], "comp": comp, "league": code, "kickoff": ko,
+                    "probs": probs_from(comps[0])})
     return out
 
 
@@ -95,7 +158,17 @@ def main(path):
     matches.sort(key=lambda m: m["kickoff"])
     with open(path, "w") as f:
         json.dump({"updated": now, "matches": matches}, f, indent=1)
-    print(f"wrote {len(matches)} matches to {path}")
+    print(f"wrote {len(matches)} matches to {path} ({sum(m['probs']['source'] == 'feed' for m in matches)} with bookmaker odds)")
+    logo_path = path.replace("fixtures.json", "logos.json")
+    try:
+        with open(logo_path) as f:
+            known = json.load(f)
+    except (OSError, ValueError):
+        known = {}
+    known.update(LOGOS)
+    with open(logo_path, "w") as f:
+        json.dump(dict(sorted(known.items())), f, indent=0)
+    print(f"wrote {len(known)} team logos to {logo_path}")
 
 
 if __name__ == "__main__":
