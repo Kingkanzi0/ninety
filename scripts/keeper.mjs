@@ -139,7 +139,8 @@ async function main() {
   if (!ZERO.test(combos)) {
     try {
       house = JSON.parse(await client.readContract({ address: combos, functionName: "get_house", args: [] }));
-      tickets = JSON.parse(await client.readContract({ address: combos, functionName: "get_open_tickets", args: [0, 50] }));
+      // the deployed get_open_tickets fails while no ticket exists yet, so only ask once there is one
+      if (Number(house.tickets) > 0) tickets = JSON.parse(await client.readContract({ address: combos, functionName: "get_open_tickets", args: [0, 50] }));
     } catch (e) { console.log(`combos read failed (${String(e?.message || e).slice(0, 120)})`); }
   }
   const q = planMore({ now, fixtures, positions, probsByKey, tickets, house });
