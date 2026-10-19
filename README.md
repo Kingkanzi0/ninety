@@ -82,6 +82,8 @@ A second, small contract adds accumulators without touching the Ninety contract.
 | `withdraw(amount)` | write | owner only, free bankroll only |
 | `get_ticket`, `get_tickets_of(user)`, `get_open_tickets(offset, limit)`, `get_house()` | view | JSON strings |
 
+Known issue in the deployed version: `get_open_tickets` raises while no ticket has been placed yet (it reads ticket 0 when the count is 0). It works once a ticket exists, and the keeper only calls it when `get_house().tickets > 0`.
+
 ## Starting odds and team badges
 
 Ninety is a shared pot, so a market only has odds once someone has backed it. The keeper therefore seeds every new game: a small stake (0.3 GEN per market) spread across all outcomes in proportion to bookmaker probabilities from the ESPN feed (or neutral defaults when the feed has none). The pot then starts at fair odds, real bets move them, and the keeper collects its seed back after the match. Team badges come from the same feed (`frontend/logos.json`); the lettered badge is the fallback.
