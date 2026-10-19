@@ -175,6 +175,9 @@ button { cursor: pointer; }
 .empty { padding: 28px 16px; text-align: center; color: var(--soft); background: var(--panel); border: 1px dashed var(--line); border-radius: 12px; }
 
 /* ---------- suggested matches ---------- */
+.backup { margin-top: 12px; display: grid; gap: 6px; font-size: 13px; color: var(--soft); }
+.backup .actions { display: flex; gap: 8px; }
+.backup input { flex: 1; min-width: 0; }
 .sugg-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .sugg-head h2 { margin: 0; font: 800 24px/1 var(--display); }
 .sugg-head p { margin: 0; font-size: 13px; color: var(--soft); }
@@ -372,7 +375,7 @@ details.more-src[open] summary { margin-bottom: 8px; }
   </nav>
   <span class="spacer"></span>
   <span class="net" id="netLabel">Bradbury testnet</span>
-  <button class="btn ghost" id="listBtn" type="button" aria-label="List a match">+<span class="lbl"> List match</span></button>
+  <button class="btn ghost" id="listBtn" type="button" aria-label="Open more games">+<span class="lbl"> More games</span></button>
   <button class="btn" id="connectBtn" type="button">Connect wallet</button>
 </header>
 
@@ -394,10 +397,10 @@ details.more-src[open] summary { margin-bottom: 8px; }
     <div class="how">
       <b>How settling works</b>
       <ol>
-        <li>Matches open with a link to the match page.</li>
+        <li>Top-league games open automatically, a few days ahead.</li>
         <li>Stakes close at kickoff.</li>
-        <li>From 2 hours after kickoff anyone can ask validators to read the result.</li>
-        <li>Validators must agree on the 90-minute score. Payouts follow automatically.</li>
+        <li>After full time, validators read the result from the match feed and must agree on the 90-minute score.</li>
+        <li>If the feed is silent for 6 hours, they can read a match page with AI instead. Then collect your winnings.</li>
       </ol>
     </div>
     <div class="config">
@@ -423,41 +426,6 @@ details.more-src[open] summary { margin-bottom: 8px; }
 
 <button class="btn slip-fab" id="slipFab" type="button">Bet slip <span class="num" id="fabCount">0</span></button>
 
-<dialog id="listDlg" aria-labelledby="listTitle">
-  <form method="dialog" id="listForm">
-    <div class="dlg-head">
-      <h3 id="listTitle">List a match</h3>
-      <button class="close-x" value="cancel" formnovalidate aria-label="Close">&times;</button>
-    </div>
-    <div class="dlg-body">
-      <div class="two">
-        <div><label for="fHome">Home team</label><input type="text" id="fHome" required minlength="2" maxlength="60" placeholder="Arsenal"></div>
-        <div><label for="fAway">Away team</label><input type="text" id="fAway" required minlength="2" maxlength="60" placeholder="Chelsea"></div>
-      </div>
-      <div class="two">
-        <div><label for="fComp">Competition</label><input type="text" id="fComp" maxlength="60" placeholder="Premier League"></div>
-        <div><label for="fKick">Kickoff (your local time)</label><input type="datetime-local" id="fKick" required></div>
-      </div>
-      <div>
-        <label for="fSrcA">Match page (Flashscore works well)</label>
-        <input type="url" id="fSrcA" required placeholder="https://www.flashscore.com/match/football/…">
-        <p class="hint" id="findWrap" hidden><a class="find" id="findLink" href="#" target="_blank" rel="noopener">Find this match on Flashscore</a>, open it, then copy the link from your browser bar and paste it here.</p>
-      </div>
-      <details class="more-src">
-        <summary>Add a second match page (optional)</summary>
-        <label for="fSrcB">Second match page</label>
-        <input type="url" id="fSrcB" placeholder="https://www.espn.com/soccer/match/_/gameId/…">
-        <p class="hint">An independent site that must show the same score. Safer, but settling takes longer.</p>
-      </details>
-      <p class="hint">Validators open the page to confirm the match. This takes a few minutes on Bradbury; you can keep browsing while they work.</p>
-      <div class="actions">
-        <button class="btn" type="submit" value="default" id="listSubmit">List match</button>
-        <button class="btn ghost" value="cancel" formnovalidate type="submit">Cancel</button>
-      </div>
-    </div>
-  </form>
-</dialog>
-
 <dialog id="walletDlg" aria-labelledby="walletTitle">
   <div class="dlg-head"><h3 id="walletTitle">Choose a wallet</h3><button class="close-x" type="button" data-cancel aria-label="Close">&times;</button></div>
   <div class="dlg-body"><div id="walletList" class="wallet-list"></div><p class="hint">Pick the wallet that holds your Bradbury GEN. Click your address later to switch.</p></div>
@@ -470,13 +438,13 @@ details.more-src[open] summary { margin-bottom: 8px; }
 /* ------------------------------------------------------------------ *
  * Configuration. Override with ?contract=0x…&network=studionet
  * ------------------------------------------------------------------ */
-const DEFAULT_CONTRACT = "0xF94F652d77249feE167d888F2a7AE14858FeD2eb";                 // paste your deployed address here
+const DEFAULT_CONTRACT = "0xD4807A5EBeBc9fb8aD071364Db452dd809a09129";                 // paste your deployed address here
 const DEFAULT_NETWORK = "testnetBradbury";   // or "studionet"
 const SDK_VERSION = "1.1.8";
 
 const params = new URLSearchParams(location.search);
 const NETWORK = params.get("network") || DEFAULT_NETWORK;
-let CONTRACT = params.get("contract") || localGet("ninety.contract") || DEFAULT_CONTRACT;
+let CONTRACT = params.get("contract") || localGet("ninety.contract.v3") || DEFAULT_CONTRACT;
 
 const MARKETS = [
   { key: "RESULT", title: "Match result", rule: "90 minutes plus stoppage time.", outcomes: ["HOME", "DRAW", "AWAY"] },
@@ -668,8 +636,8 @@ async function connect() {
 const JOBS_KEY = "ninety.jobs";
 const jobs = new Map();               // hash -> job
 const stagesFor = (kind) => ["Signed in your wallet", "Waiting in the network queue",
-  kind === "list" || kind === "settle" ? "Leader validator reads the match page" : "Leader validator runs it",
-  kind === "list" || kind === "settle" ? "Other validators re-check on their own" : "Other validators check it", "Consensus reached"];
+  kind === "list" || kind === "settle" ? "Leader validator reads the match feed" : kind === "backup" ? "Leader validator reads the page with AI" : "Leader validator runs it",
+  kind === "list" || kind === "settle" || kind === "backup" ? "Other validators re-check on their own" : "Other validators check it", "Consensus reached"];
 const STAGE_OF = { PENDING: 1, UNINITIALIZED: 1, PROPOSING: 2, LEADER_REVEALING: 2, COMMITTING: 3, REVEALING: 3,
   APPEAL_COMMITTING: 3, APPEAL_REVEALING: 3, ACCEPTED: 5, FINALIZED: 5, READY_TO_FINALIZE: 5 };
 const STATUS_BY_NUM = { 0: "UNINITIALIZED", 1: "PENDING", 2: "PROPOSING", 3: "COMMITTING", 4: "REVEALING", 5: "ACCEPTED",
@@ -678,7 +646,7 @@ const STATUS_BY_NUM = { 0: "UNINITIALIZED", 1: "PENDING", 2: "PROPOSING", 3: "CO
 const BAD = new Set(["UNDETERMINED", "CANCELED", "VALIDATORS_TIMEOUT", "LEADER_TIMEOUT"]);
 
 function saveJobs() {
-  const keep = [...jobs.values()].filter((j) => !j.final).map(({ hash, kind, title, fixture, args, started }) => ({ hash, kind, title, fixture, args, started }));
+  const keep = [...jobs.values()].filter((j) => !j.final).map(({ hash, kind, title, fixture, args, key, started }) => ({ hash, kind, title, fixture, args, key, started }));
   localSet(JOBS_KEY, JSON.stringify(keep));
 }
 function mmss(sec) { sec = Math.max(0, Math.floor(sec)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`; }
@@ -773,7 +741,7 @@ function resumeJobs() {
   for (const m of saved) if (m?.hash && Date.now() - m.started < 3 * 3600e3) track(m.hash, m);
 }
 
-async function send(functionName, args, { value, title, kind, fixture } = {}) {
+async function send(functionName, args, { value, title, kind, fixture, ghost, key } = {}) {
   if (!state.writer) { await connect(); if (!state.writer) return null; }
   const write = { address: CONTRACT, functionName, args };
   if (value != null) write.value = value;
@@ -785,7 +753,7 @@ async function send(functionName, args, { value, title, kind, fixture } = {}) {
       console.warn("Fee estimate unavailable, sending without explicit fees", e);
     }
     const hash = await state.writer.writeContract(write);
-    return track(hash, { kind: kind || functionName, title: title || "Transaction", fixture, args: kind === "list" ? args.slice(0, 4) : undefined });
+    return track(hash, { kind: kind || functionName, title: title || "Transaction", fixture, args: ghost, key });
   } catch (e) {
     toast(esc(errText(e)), "err", 12000);
     return null;
@@ -949,11 +917,11 @@ function renderEvents() {
   const rows = visibleFixtures();
   const ghosts = [...jobs.values()].filter((j) => j.kind === "list" && !j.final && j.args).map((j) => `
     <div class="ev"><div class="ev-main">
-      <div class="ev-meta"><span class="tag t-chk">Validators checking the match page…</span><span>${esc(j.args[2] || "Friendly")} · ${fmtTime(j.args[3])}</span></div>
+      <div class="ev-meta"><span class="tag t-chk">Opening this game…</span><span>${esc(j.args[2] || "Friendly")} · ${fmtTime(j.args[3])}</span></div>
       <div class="ev-team">${crest(j.args[0])}<span class="nm">${esc(j.args[0])}</span></div>
       <div class="ev-team">${crest(j.args[1])}<span class="nm">${esc(j.args[1])}</span></div></div></div>`).join("");
   if (!rows.length) {
-    const msg = { open: "No upcoming matches. List one to open new markets.", live: "No matches in play right now.", settle: "No matches waiting for a result.", done: "Nothing settled yet.", all: "No matches yet. List the first one." }[state.status];
+    const msg = { open: "New games are added every hour. Open one from the list below.", live: "No matches in play right now.", settle: "No matches waiting for a result.", done: "Nothing settled yet.", all: "No matches yet. Open one from the list below." }[state.status];
     return ghosts + `<div class="empty">${msg}</div>`;
   }
   return ghosts + rows.map((f) => {
@@ -976,11 +944,12 @@ function renderEvents() {
 const SUGG_LEAGUES = [
   ["eng.1", "Premier League"], ["esp.1", "LaLiga"], ["ita.1", "Serie A"], ["ger.1", "Bundesliga"],
   ["fra.1", "Ligue 1"], ["uefa.champions", "Champions League"], ["uefa.europa", "Europa League"], ["usa.1", "MLS"],
+  ["ned.1", "Eredivisie"], ["por.1", "Primeira Liga"], ["eng.2", "Championship"],
 ];
 state.sugg = null;   // null = not loaded, [] = none
 const norm = (t) => String(t).toLowerCase().replace(/[^a-z0-9]/g, "");
-function alreadyListed(home, away, ko) {
-  return state.fixtures.some((f) => f.status !== "REJECTED" && Math.abs(f.kickoff - ko) < 6 * 3600 &&
+function alreadyListed(home, away, ko, key) {
+  return state.fixtures.some((f) => (key && f.feed === key) || f.status !== "REJECTED" && Math.abs(f.kickoff - ko) < 6 * 3600 &&
     (norm(f.home).includes(norm(home).slice(0, 5)) || norm(home).includes(norm(f.home).slice(0, 5))) &&
     (norm(f.away).includes(norm(away).slice(0, 5)) || norm(away).includes(norm(f.away).slice(0, 5))));
 }
@@ -1015,41 +984,42 @@ async function loadSuggestions() {
         const h = c.competitors?.find((x) => x.homeAway === "home"), a = c.competitors?.find((x) => x.homeAway === "away");
         const ko = Math.floor(new Date(ev.date).getTime() / 1000);
         if (!h || !a || ev.status?.type?.state !== "pre" || ko < nowSec() + 1800) continue;
-        out.push({ id: ev.id, home: h.team.displayName, away: a.team.displayName, comp: name, kickoff: ko });
+        out.push({ id: ev.id, home: h.team.displayName, away: a.team.displayName, comp: name, league: code, kickoff: ko });
       }
     } catch { /* league feed unavailable */ }
   }));
   out.sort((x, y) => x.kickoff - y.kickoff);
   state.sugg = out;
-  state.suggErr = okCount ? "" : "Couldn't load this week's fixtures right now. Use + List match to add one.";
+  state.suggErr = okCount ? "" : "Couldn't load this week's fixtures right now. New games are still added every hour.";
   if (state.view === "list") renderBoard();
 }
 function renderSuggestions() {
-  if (state.sugg === null) return `<div class="sugg-head"><h2>Suggested matches</h2><p>Loading this week's fixtures…</p></div>`;
-  const list = state.sugg.filter((m) => !alreadyListed(m.home, m.away, m.kickoff)
+  if (state.sugg === null) return `<div class="sugg-head" id="moreGames"><h2>More games</h2><p>Loading this week's fixtures…</p></div>`;
+  const list = state.sugg.filter((m) => m.league && !alreadyListed(m.home, m.away, m.kickoff, `${m.league}/${m.id}`)
+    && ![...jobs.values()].some((j) => j.kind === "list" && !j.final && j.key === `${m.league}/${m.id}`)
     && (!state.comp || state.comp === m.comp)
     && (!state.q || `${m.home} ${m.away} ${m.comp}`.toLowerCase().includes(state.q.toLowerCase()))).slice(0, 12);
-  if (!list.length) return `<div class="sugg-head"><h2>Suggested matches</h2><p>${esc(state.suggErr || "No new fixtures right now. Check back later.")}</p></div>`;
-  return `<div class="sugg-head"><h2>Suggested matches</h2><p>Upcoming fixtures not on Ninety yet. Open a market in one click.</p></div>
+  if (!list.length) return `<div class="sugg-head" id="moreGames"><h2>More games</h2><p>${esc(state.suggErr || "Every upcoming game is already open above.")}</p></div>`;
+  return `<div class="sugg-head" id="moreGames"><h2>More games</h2><p>Games further ahead open automatically. Can't wait? Open one now in one click, no links needed.</p></div>
     <div class="sugg">${list.map((m) => `<div class="sg">
       <span class="ev-meta"><span class="comp">${esc(m.comp)}</span><span>${fmtTime(m.kickoff)}</span></span>
       <span class="ev-team">${crest(m.home)}<span class="nm">${esc(m.home)}</span></span>
       <span class="ev-team">${crest(m.away)}<span class="nm">${esc(m.away)}</span></span>
-      <button class="btn small" type="button" data-suggest="${esc(m.id)}">Open market</button></div>`).join("")}</div>`;
+      <button class="btn small" type="button" data-suggest="${esc(m.league)}/${esc(m.id)}">Open this game</button></div>`).join("")}</div>`;
 }
-function openListDialog(m) {
+async function openGame(m, btn) {
   if (!CONTRACT) return toast("Set the contract address first.", "err");
-  const pad = (n) => String(n).padStart(2, "0");
-  const d = m ? new Date(m.kickoff * 1000) : new Date(Date.now() + 2 * 3600e3);
-  if (!m) d.setMinutes(0, 0, 0);
-  if (m || !$("fKick").value) $("fKick").value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  if (m) {
-    $("fHome").value = m.home; $("fAway").value = m.away; $("fComp").value = m.comp; $("fSrcA").value = "";
-    $("findLink").href = `https://www.google.com/search?q=${encodeURIComponent(`flashscore ${m.home} ${m.away}`)}`;
-    $("findWrap").hidden = false;
-  } else $("findWrap").hidden = true;
-  $("listDlg").showModal();
-  if (m) $("fSrcA").focus();
+  if (m.kickoff < nowSec() + 900) return toast("This game starts too soon to open now.", "err");
+  if (btn) btn.disabled = true;
+  const key = `${m.league}/${m.id}`;
+  const job = await send("list_match", [m.league, Number(m.id)], { kind: "list", title: `Open ${m.home} v ${m.away}`, ghost: [m.home, m.away, m.comp, m.kickoff], key });
+  if (btn) btn.disabled = false;
+  if (!job) return;
+  state.status = "open"; state.comp = ""; backToList(); renderRail();
+  toast("Signed. Validators are checking the match feed. The game appears in the list in a minute or two.", "ok", 8000);
+  const tx = await job.done;
+  const created = state.fixtures.find((f) => f.feed === key);
+  if (tx && created) openMatch(created.id);
 }
 
 function renderBoard() {
@@ -1062,7 +1032,7 @@ function renderBoard() {
   $("board").innerHTML = `
     <section class="hero">
       <div><h1>Soccer markets settled by <span>AI validators</span></h1>
-      <p>Back the result, goals, both teams to score or the exact score. After full time GenLayer validators read the match page and must agree on the score. No oracle, no admin.</p></div>
+      <p>Pick a game, back the result, goals, both teams to score or the exact score. After full time GenLayer validators check the result and must agree on the score before anyone is paid. No admin, no links to paste.</p></div>
       <div class="stats">
         <div class="stat"><b class="num">${live.length}</b><small>matches</small></div>
         <div class="stat"><b class="num">${fmtGen(pot)}</b><small>GEN staked</small></div>
@@ -1107,13 +1077,15 @@ function renderMatch() {
   const stripMsg = {
     open: `Staking closes <b>${fmtIn(f.kickoff)}</b>`,
     playing: `In play · result can be read <b>${fmtIn(f.settle_opens)}</b>`,
-    settle: `<b>Ready to settle.</b> Anyone can ask validators to read the result`,
+    settle: `<b>Waiting for the result.</b> Checked automatically every hour`,
     settled: f.status === "FINAL" ? `Settled ${fmtIn(f.settled_ts)}` : `Voided ${fmtIn(f.settled_ts)}`,
     rejected: `Validators did not accept this listing`,
   }[p];
-  const sources = [f.source_a, f.source_b].filter(Boolean).map((u, i) => `<dt>Source ${"AB"[i]}</dt><dd><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https:\/\//, "").slice(0, 70))}…</a></dd>`).join("");
-  const verdictLine = f.last_verdict ? `<dt>Last check</dt><dd>${esc({ FINAL: "Score agreed", PENDING: "Result not published yet", CONFLICT: "Sources disagreed", VOID: "Postponed or abandoned" }[f.last_verdict] || f.last_verdict)}</dd>` : "";
-  const settleBtn = p === "settle" ? `<button class="btn block" type="button" id="settleBtn">Settle with validators</button>` : "";
+  const sources = (f.feed ? `<dt>Result source</dt><dd>ESPN match feed</dd>` : "") + [f.source_a, f.source_b].filter(Boolean).map((u) => `<dt>Match page (AI check)</dt><dd><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https:\/\//, "").slice(0, 70))}…</a></dd>`).join("");
+  const verdictLine = f.last_verdict ? `<dt>Last check</dt><dd>${esc({ FINAL: "Score agreed", PENDING: "Result not published yet", CONFLICT: "Page was unclear", VOID: "Postponed or abandoned" }[f.last_verdict] || f.last_verdict)}</dd>` : "";
+  const settleBtn = p === "settle" ? `<button class="btn block" type="button" id="settleBtn">Check result now</button>` : "";
+  const backup = p === "settle" && nowSec() >= (f.backup_opens || Infinity) ? `<div class="backup"><label for="bkUrl">Result still missing? Paste a match page and validators read it with AI.</label>
+      <div class="actions"><input type="url" id="bkUrl" placeholder="https://www.flashscore.com/match/football/…"><button class="btn ghost" type="button" id="backupBtn">AI check</button></div></div>` : "";
   const expireBtn = f.status === "SCHEDULED" && nowSec() >= f.expires ? `<button class="btn ghost" type="button" id="expireBtn">Refund (expired)</button>` : "";
   $("board").innerHTML = `
     <button class="back" type="button" id="backBtn">← All matches</button>
@@ -1131,8 +1103,8 @@ function renderMatch() {
       <section class="panel"><h3>How this match is settled</h3>
         <dl>${sources}${verdictLine}<dt>Listing check</dt><dd>${esc(f.listing_note || "—")}</dd></dl>
         ${f.settle_note ? `<div class="note">${esc(f.settle_note)}</div>` : ""}
-        <p class="hint">Validators read ${f.source_b ? "both pages" : "the page"} independently and must agree on the 90-minute score. Extra time and penalties don't count.</p>
-        ${settleBtn || expireBtn ? `<div class="actions">${settleBtn}${expireBtn}</div>` : ""}
+        <p class="hint">Results are checked automatically about every hour after full time. Validators each read the match feed and must agree on the 90-minute score; extra time and penalties don't count. If the feed stays silent for 6 hours, anyone can ask them to read a match page with AI instead.</p>
+        ${settleBtn || expireBtn ? `<div class="actions">${settleBtn}${expireBtn}</div>` : ""}${backup}
       </section>
       <section class="panel"><h3>Your position</h3>${renderPosition(f)}</section>
     </div>`;
@@ -1255,7 +1227,7 @@ document.addEventListener("click", async (e) => {
   const cp = t.closest("[data-comp]");
   if (cp) { state.comp = cp.dataset.comp; if (state.comp) state.status = "all"; backToList(); renderRail(); return; }
   const sg = t.closest("[data-suggest]");
-  if (sg) { const m = (state.sugg || []).find((x) => String(x.id) === sg.dataset.suggest); if (m) openListDialog(m); return; }
+  if (sg) { const m = (state.sugg || []).find((x) => `${x.league}/${x.id}` === sg.dataset.suggest); if (m) openGame(m, sg); return; }
   const pk = t.closest("[data-pick]");
   if (pk && !pk.disabled) { const [fid, m, o] = pk.dataset.pick.split("|"); return togglePick(Number(fid), m, o); }
   const op = t.closest("[data-open]");
@@ -1291,6 +1263,15 @@ document.addEventListener("click", async (e) => {
     t.disabled = true;
     const f = fixtureById(state.selected);
     const job = await send("settle", [state.selected], { title: `Read result · ${f.home} v ${f.away}`, fixture: state.selected });
+    if (!job) t.disabled = false;
+    return;
+  }
+  if (t.id === "backupBtn") {
+    const url = $("bkUrl").value.trim();
+    if (!/^https:\/\/\S+$/.test(url)) return toast("Paste a full https:// match page link.", "err");
+    t.disabled = true;
+    const f = fixtureById(state.selected);
+    const job = await send("settle_with_page", [state.selected, url], { kind: "backup", title: `AI check · ${f.home} v ${f.away}`, fixture: state.selected });
     if (!job) t.disabled = false;
     return;
   }
@@ -1353,34 +1334,14 @@ $("connectBtn").addEventListener("click", () => {
 });
 $("contractInput").addEventListener("change", (e) => {
   CONTRACT = e.target.value.trim();
-  localSet("ninety.contract", CONTRACT);
+  localSet("ninety.contract.v3", CONTRACT);
   state.selected = null; state.view = "list";
   loadFixtures();
 });
 
-$("listBtn").addEventListener("click", () => openListDialog(null));
-$("listForm").addEventListener("submit", async (e) => {
-  if (e.submitter?.value === "cancel") return;
-  e.preventDefault();
-  const kickoff = Math.floor(new Date($("fKick").value).getTime() / 1000);
-  if (!kickoff || kickoff < nowSec() + 600) return toast("Kickoff must be at least 10 minutes from now.", "err");
-  const args = [$("fHome").value.trim(), $("fAway").value.trim(), $("fComp").value.trim(), kickoff, $("fSrcA").value.trim(), $("fSrcB").value.trim()];
-  if (args[5] && args[5] === args[4]) return toast("The second page must be a different link.", "err");
-  $("listSubmit").disabled = true;
-  const before = state.fixtures.length ? Math.max(...state.fixtures.map((f) => f.id)) : -1;
-  const job = await send("create_fixture", args, { kind: "list", title: `List ${args[0]} v ${args[1]}` });
-  $("listSubmit").disabled = false;
-  if (!job) return;
-  $("listDlg").close();
-  $("listForm").reset();
+$("listBtn").addEventListener("click", () => {
   state.status = "open"; state.comp = ""; backToList(); renderRail();
-  toast("Signed. Validators are opening the match page now. It appears in the list when they agree.", "ok", 8000);
-  const tx = await job.done;
-  const created = state.fixtures.find((f) => f.id > before);
-  if (tx && created) {
-    if (created.status === "REJECTED") toast("Validators didn't accept this listing. Their note is on the match.", "err", 10000);
-    else openMatch(created.id);
-  }
+  setTimeout(() => $("moreGames")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
 });
 
 /* ------------------------------------------------------------------ *
