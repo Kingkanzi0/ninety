@@ -115,7 +115,7 @@ world = World()
 
 
 def _render(url, mode="text", **kw):
-    world.nondet_calls.append(("render", world.role, url, mode))
+    world.nondet_calls.append(("render", world.role, url, mode, kw.get("wait_after_loaded")))
     if mode not in ("text", "html", "screenshot"):
         raise ValueError("bad mode")
     page = world.web[world.role].get(url)
@@ -154,8 +154,22 @@ def _run_nondet_unsafe(leader_fn, validator_fn):
     return leader_res.calldata
 
 
-def _forbidden(*a, **k):
-    raise AssertionError("gl.nondet.web.get must not be used (reviewer requirement)")
+class Response:
+    def __init__(self, status, body=b""):
+        self.status, self.headers, self.body = status, {}, body
+
+
+def _get(url, headers=None, **kw):
+    """HTTP GET for JSON APIs. world.web values: str -> 200, int -> that status, Exception -> raised."""
+    world.nondet_calls.append(("get", world.role, url, dict(headers or {})))
+    page = world.web[world.role].get(url)
+    if page is None:
+        return Response(404)
+    if isinstance(page, Exception):
+        raise page
+    if isinstance(page, int):
+        return Response(page)
+    return Response(200, page.encode())
 
 
 def _identity_decorator(fn):
@@ -209,7 +223,7 @@ gl = types.SimpleNamespace(
     message=_Message(),
     public=types.SimpleNamespace(write=_Write(), view=_identity_decorator),
     nondet=types.SimpleNamespace(
-        web=types.SimpleNamespace(render=_render, get=_forbidden),
+        web=types.SimpleNamespace(render=_render, get=_get),
         exec_prompt=_exec_prompt,
     ),
     vm=types.SimpleNamespace(UserError=UserError, Return=Return, run_nondet_unsafe=_run_nondet_unsafe),
