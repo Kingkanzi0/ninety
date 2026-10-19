@@ -145,8 +145,18 @@ button { cursor: pointer; }
 .ev-team .g { margin-left: auto; font: 900 20px/1 var(--display); color: var(--yellow); }
 .crest {
   width: 24px; height: 24px; border-radius: 50%; flex: none; display: grid; place-items: center;
-  font: 800 11px/1 var(--body); color: #fff;
+  font: 800 11px/1 var(--body); color: #fff; position: relative; overflow: hidden;
 }
+.crest.has-logo { background: #fff !important; }
+.crest img { position: absolute; inset: 12%; width: 76%; height: 76%; object-fit: contain; }
+@keyframes bump { 50% { transform: scale(1.12); } }
+.slip-fab.bump { animation: bump .35s ease; }
+.mode { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--panel-2); border-radius: 10px; padding: 4px; margin-bottom: 10px; }
+.mode button { border: 0; border-radius: 7px; padding: 8px; font: 700 13px var(--body); background: none; color: var(--soft); }
+.mode button[aria-pressed="true"] { background: var(--yellow); color: #1c1600; }
+.combo-sum { display: grid; gap: 6px; }
+.leg { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.leg .st-win { color: #6fd39a; } .leg .st-lose { color: #ff9a86; } .leg .st-void { color: var(--soft); }
 .odds-head { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; font-size: 11px; color: var(--mute); font-weight: 700; letter-spacing: .06em; }
 .odds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--panel-2); border-radius: var(--r); overflow: hidden; }
 .odd {
@@ -438,11 +448,13 @@ details.more-src[open] summary { margin-bottom: 8px; }
 /* ------------------------------------------------------------------ *
  * Configuration. Override with ?contract=0x…&network=studionet
  * ------------------------------------------------------------------ */
-const DEFAULT_CONTRACT = "0xD4807A5EBeBc9fb8aD071364Db452dd809a09129";                 // paste your deployed address here
+const DEFAULT_CONTRACT = "0xD4807A5EBeBc9fb8aD071364Db452dd809a09129";
+const DEFAULT_COMBOS = "0x2CF0247D078C738acac807025Df1F60e9057C02C";   // Ninety Combos contract (accumulators); empty hides combos
 const DEFAULT_NETWORK = "testnetBradbury";   // or "studionet"
 const SDK_VERSION = "1.1.8";
 
 const params = new URLSearchParams(location.search);
+const COMBOS = params.get("combos") || DEFAULT_COMBOS;
 const NETWORK = params.get("network") || DEFAULT_NETWORK;
 let CONTRACT = params.get("contract") || localGet("ninety.contract.v3") || DEFAULT_CONTRACT;
 
@@ -636,7 +648,7 @@ async function connect() {
 const JOBS_KEY = "ninety.jobs";
 const jobs = new Map();               // hash -> job
 const stagesFor = (kind) => ["Signed in your wallet", "Waiting in the network queue",
-  kind === "list" || kind === "settle" ? "Leader validator reads the match feed" : kind === "backup" ? "Leader validator reads the page with AI" : "Leader validator runs it",
+  kind === "combo" ? "Leader validator prices every leg" : kind === "list" || kind === "settle" ? "Leader validator reads the match feed" : kind === "backup" ? "Leader validator reads the page with AI" : "Leader validator runs it",
   kind === "list" || kind === "settle" || kind === "backup" ? "Other validators re-check on their own" : "Other validators check it", "Consensus reached"];
 const STAGE_OF = { PENDING: 1, UNINITIALIZED: 1, PROPOSING: 2, LEADER_REVEALING: 2, COMMITTING: 3, REVEALING: 3,
   APPEAL_COMMITTING: 3, APPEAL_REVEALING: 3, ACCEPTED: 5, FINALIZED: 5, READY_TO_FINALIZE: 5 };
@@ -741,9 +753,9 @@ function resumeJobs() {
   for (const m of saved) if (m?.hash && Date.now() - m.started < 3 * 3600e3) track(m.hash, m);
 }
 
-async function send(functionName, args, { value, title, kind, fixture, ghost, key } = {}) {
+async function send(functionName, args, { value, title, kind, fixture, ghost, key, to } = {}) {
   if (!state.writer) { await connect(); if (!state.writer) return null; }
-  const write = { address: CONTRACT, functionName, args };
+  const write = { address: to || CONTRACT, functionName, args };
   if (value != null) write.value = value;
   try {
     try {
@@ -798,9 +810,17 @@ function crestColor(name) {
   for (const c of String(name)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return `hsl(${h % 360} 55% 38%)`;
 }
+state.logos = {};
 function crest(name) {
   const letters = String(name).split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
-  return `<span class="crest" style="background:${crestColor(name)}" aria-hidden="true">${esc(letters)}</span>`;
+  const url = state.logos[name];
+  const img = url ? `<img src="${esc(url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.remove('has-logo');this.remove()">` : "";
+  return `<span class="crest${url ? " has-logo" : ""}" style="background:${crestColor(name)}" aria-hidden="true">${esc(letters)}${img}</span>`;
+}
+async function loadLogos() {
+  for (const url of ["logos.json", "https://raw.githubusercontent.com/Kingkanzi0/ninety/main/frontend/logos.json"]) {
+    try { state.logos = await fetchJson(url); render(); return; } catch { /* try the next source; letters stay */ }
+  }
 }
 function oddsOf(mk, o) {
   const total = BigInt(mk.total || 0), pool = BigInt(mk.pools?.[o] || 0);
@@ -844,6 +864,7 @@ async function loadAllPositions() {
     await Promise.all(state.fixtures.filter((f) => f.status !== "REJECTED").map(async (f) => {
       try { state.positions[f.id] = JSON.parse(await read("get_position", [f.id, state.account])); } catch {}
     }));
+    await loadCombos();
   } finally { posLoading = false; }
   renderSlip();
   if (state.view === "match") renderBoard();
@@ -1124,6 +1145,74 @@ function renderPosition(f) {
   return (rows.length ? rows.join("") : `<p class="hint">No stakes on this match yet.</p>`) + claim;
 }
 
+state.slipMode = (localGet("ninety.slipMode") === "combo" && COMBOS) ? "combo" : "single";
+state.comboAmount = "";
+state.tickets = [];
+state.house = null;
+const MAX_LEG_X = 15, MAX_COMBO_X = 100, MAX_COMBO_PAYOUT = 20n * 10n ** 18n;
+function comboQuote() {
+  const picks = state.slip;
+  const fids = new Set(picks.map((p) => p.fid));
+  let x = 1, err = "";
+  if (picks.length < 2) err = "Add at least 2 picks from different matches.";
+  else if (picks.length > 6) err = "A combo can have up to 6 picks.";
+  else if (fids.size !== picks.length) err = "Only one pick per match in a combo.";
+  for (const p of picks) {
+    const f = fixtureById(p.fid);
+    const o = f ? oddsOf(f.markets[p.market], p.outcome) : null;
+    if (!f || phase(f) !== "open") err = err || "One of your picks has closed.";
+    else if (!o || o <= 1) err = err || `${outLabel(p.market, p.outcome)} has no odds yet.`;
+    else x *= Math.min(o, MAX_LEG_X);
+  }
+  x = Math.min(x, MAX_COMBO_X);
+  let stake = 0n; try { stake = parseGen(state.comboAmount || "0"); } catch { stake = 0n; }
+  let payout = stake > 0n ? stake * BigInt(Math.floor(x * 100)) / 100n : 0n;
+  if (payout > MAX_COMBO_PAYOUT) payout = MAX_COMBO_PAYOUT;
+  const free = state.house ? BigInt(state.house.free) : null;
+  if (!err && stake > 0n && free != null && payout - stake > free) err = `The house can cover up to ${fmtGen(free)} GEN of winnings right now. Try a smaller stake.`;
+  return { x, stake, payout, err };
+}
+async function loadCombos() {
+  if (!COMBOS || !state.reader) return;
+  try { state.house = JSON.parse(await state.reader.readContract({ address: COMBOS, functionName: "get_house", args: [] })); } catch {}
+  if (state.account) {
+    try { state.tickets = JSON.parse(await state.reader.readContract({ address: COMBOS, functionName: "get_tickets_of", args: [state.account] })); } catch {}
+  }
+}
+function legState(fid, m, o) {
+  const f = fixtureById(fid);
+  if (!f) return "";
+  if (f.status === "VOID") return "void";
+  if (f.status !== "FINAL") return "";
+  const w = f.markets[m]?.winner;
+  return w === "VOID" ? "void" : w === o ? "win" : "lose";
+}
+function ticketReady(t) {
+  const st = t.legs.map(([fid, m, o]) => legState(fid, m, o));
+  return st.includes("lose") || st.every((x) => x === "win" || x === "void");
+}
+function renderComboSlip() {
+  const q = comboQuote();
+  $("slipBody").innerHTML = modeBar() + state.slip.map((p, i) => {
+    const f = fixtureById(p.fid);
+    const x = f ? oddsOf(f.markets[p.market], p.outcome) : null;
+    return `<div class="pick"><div class="pick-top"><div><small>${f ? `${esc(f.home)} v ${esc(f.away)}` : "Match"} · ${marketDef(p.market).title}</small><b>${esc(outLabel(p.market, p.outcome))}</b></div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="pick-odd num">${fmtOdds(x)}</span><button class="pick-x" type="button" data-unpick="${i}" aria-label="Remove pick">&times;</button></div></div></div>`;
+  }).join("");
+  $("slipSum").innerHTML = `<div class="combo-sum">
+    <div class="sum-row"><span>Combo odds</span><b class="num">×${q.x.toFixed(2)}</b></div>
+    <input type="text" inputmode="decimal" placeholder="Combo stake in GEN" value="${esc(state.comboAmount)}" id="comboAmt" aria-label="Combo stake">
+    <div class="quick">${["0.1", "0.5", "1", "2"].map((v) => `<button type="button" data-cquick="${v}">${v}</button>`).join("")}</div>
+    <div class="sum-row"><span>Returns if every pick wins</span><b class="num">${fmtGen(q.payout)} GEN</b></div>
+    ${q.err ? `<p class="hint" style="color:#ff9a86">${esc(q.err)}</p>` : ""}
+    <button class="btn block" type="button" id="comboBtn" ${!q.err && q.stake > 0n || !state.account ? "" : "disabled"}>${state.account ? "Place combo" : "Connect wallet to bet"}</button>
+    <p class="hint">Every pick must win. Odds are locked at the live price when you place it. A postponed match counts as ×1.00.</p></div>`;
+}
+function modeBar() {
+  if (!COMBOS) return "";
+  return `<div class="mode" role="group" aria-label="Bet type"><button type="button" data-mode="single" aria-pressed="${state.slipMode === "single"}">Singles</button><button type="button" data-mode="combo" aria-pressed="${state.slipMode === "combo"}">Combo</button></div>`;
+}
+
 function renderSlip() {
   const n = state.slip.length;
   $("slipCount").hidden = !n; $("slipCount").textContent = n; $("fabCount").textContent = n;
@@ -1132,12 +1221,13 @@ function renderSlip() {
   if (state.slipTab === "mybets") return renderMyBets();
   if (!n) {
     $("slipBody").innerHTML = `<div class="slip-empty"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="5" width="28" height="34" rx="4" fill="none" stroke="#8fa89a" stroke-width="2.5"/><path d="M14 15h16M14 22h16M14 29h9" stroke="#8fa89a" stroke-width="2.5" stroke-linecap="round"/></svg>
-      <b>Your bet slip is empty</b><span>Tap any odds to add a pick. Each pick is placed as its own single bet.</span></div>`;
+      <b>Your bet slip is empty</b><span>Tap any odds to add a pick. Place picks as singles, or switch to Combo to multiply the odds.</span></div>`;
     $("slipSum").innerHTML = "";
     return;
   }
+  if (state.slipMode === "combo") return renderComboSlip();
   let total = 0n, ret = 0n, ok = true;
-  $("slipBody").innerHTML = state.slip.map((p, i) => {
+  $("slipBody").innerHTML = modeBar() + state.slip.map((p, i) => {
     const f = fixtureById(p.fid);
     const m = marketDef(p.market);
     const closed = !f || phase(f) !== "open";
@@ -1163,12 +1253,28 @@ function renderSlip() {
   if (!state.account) $("placeBtn").disabled = false;
 }
 
+function renderTickets() {
+  return state.tickets.map((t) => {
+    const legs = t.legs.map(([fid, m, o, x]) => {
+      const f = fixtureById(fid), st = legState(fid, m, o);
+      return `<div class="leg"><span>${f ? `${esc(f.home)} v ${esc(f.away)}` : `Match ${fid}`}: ${esc(outLabel(m, o))}</span><span class="num ${st ? `st-${st}` : ""}">×${(x / 100).toFixed(2)}${st ? ` · ${st === "win" ? "won" : st === "lose" ? "lost" : "void"}` : ""}</span></div>`;
+    }).join("");
+    const label = { OPEN: "Open", WON: `Paid ${fmtGen(t.paid)} GEN`, LOST: "Lost", REFUNDED: `Refunded ${fmtGen(t.paid)} GEN` }[t.status] || t.status;
+    const btn = t.status === "OPEN" && ticketReady(t) ? `<button class="btn green" type="button" data-settlecombo="${t.id}">Settle combo</button>` : "";
+    return `<div class="mybet"><div class="mybet-h"><b>Combo · ${t.legs.length} picks</b><span class="tag">${esc(label)}</span></div>
+      ${legs}<div class="row"><span>Stake</span><span class="num">${fmtGen(t.stake)} GEN</span></div>
+      <div class="row"><span>Returns if all win</span><b class="num">${fmtGen(t.payout)} GEN</b></div>${btn}</div>`;
+  }).join("");
+}
+
 function renderMyBets() {
   $("slipSum").innerHTML = "";
   if (!state.account) { $("slipBody").innerHTML = `<div class="slip-empty"><b>Connect your wallet</b><span>Your stakes and winnings show here.</span><button class="btn" type="button" data-connect>Connect wallet</button></div>`; return; }
   const items = state.fixtures.map((f) => ({ f, pos: state.positions[f.id] })).filter(({ pos }) => pos && MARKETS.some((m) => Object.keys(pos.stakes[m.key] || {}).length));
+  const combos = renderTickets();
+  if (!items.length && combos) { $("slipBody").innerHTML = combos; return; }
   if (!items.length) { $("slipBody").innerHTML = `<div class="slip-empty"><b>No bets yet</b><span>${posLoading ? "Loading your positions…" : "Place a bet and it appears here."}</span></div>`; return; }
-  $("slipBody").innerHTML = items.map(({ f, pos }) => {
+  $("slipBody").innerHTML = combos + items.map(({ f, pos }) => {
     const lines = [];
     for (const m of MARKETS) for (const [o, amt] of Object.entries(pos.stakes[m.key] || {})) {
       const w = f.markets[m.key].winner;
@@ -1212,7 +1318,8 @@ function togglePick(fid, market, outcome) {
     if (j >= 0) state.slip.splice(j, 1);
     state.slip.push({ fid, market, outcome, amount: "" });
     state.slipTab = "slip";
-    if (matchMedia("(max-width: 980px)").matches && state.slip.length === 1) $("slip").classList.add("open");
+    // phones: keep the list in view so several picks can be added; the slip button shows the count
+    if (matchMedia("(max-width: 980px)").matches) { const fab = $("slipFab"); fab.classList.remove("bump"); void fab.offsetWidth; fab.classList.add("bump"); }
   }
   saveSlip();
   renderSlip();
@@ -1282,12 +1389,25 @@ document.addEventListener("click", async (e) => {
     return;
   }
   if (t.id === "placeBtn") return placeBets(t);
+  const md = t.closest("[data-mode]");
+  if (md) { state.slipMode = md.dataset.mode; localSet("ninety.slipMode", state.slipMode); if (state.slipMode === "combo") loadCombos().then(renderSlip); renderSlip(); return; }
+  const cq = t.closest("[data-cquick]");
+  if (cq) { state.comboAmount = cq.dataset.cquick; renderSlip(); return; }
+  if (t.id === "comboBtn") return placeCombo(t);
+  const sc = t.closest("[data-settlecombo]");
+  if (sc) {
+    sc.disabled = true;
+    const job = await send("settle_ticket", [Number(sc.dataset.settlecombo)], { to: COMBOS, title: `Settle combo #${sc.dataset.settlecombo}` });
+    if (!job) sc.disabled = false; else job.done.then(() => loadAllPositions());
+    return;
+  }
   if (t.closest("#slipClose")) { $("slip").classList.remove("open"); return; }
   if (t.closest("#slipFab")) { $("slip").classList.toggle("open"); return; }
   if (t.closest("#homeLink")) { e.preventDefault(); state.comp = ""; state.status = "open"; backToList(); renderRail(); $("slip").classList.remove("open"); }
 });
 
 document.addEventListener("input", (e) => {
+  if (e.target.id === "comboAmt") { state.comboAmount = e.target.value; clearTimeout(e.target._t); e.target._t = setTimeout(() => { const pos = e.target.selectionStart; renderSlip(); const n = $("comboAmt"); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch {} } }, 600); return; }
   const a = e.target.closest("[data-amt]");
   if (a) {
     const i = Number(a.dataset.amt);
@@ -1306,6 +1426,21 @@ document.addEventListener("input", (e) => {
   }
   if (e.target.id === "q") { state.q = e.target.value; if (state.view !== "list") state.view = "list"; renderBoard(); }
 });
+
+async function placeCombo(btn) {
+  if (!state.writer) { await connect(); renderSlip(); if (!state.writer) return; }
+  await loadCombos();
+  const q = comboQuote();
+  if (q.err) { renderSlip(); return toast(esc(q.err), "err"); }
+  if (q.stake <= 0n) return toast("Enter a combo stake.", "err");
+  btn.disabled = true;
+  const legs = state.slip.map((p) => `${p.fid}:${p.market}:${p.outcome}`).join(",");
+  const job = await send("place", [legs], { to: COMBOS, value: q.stake, kind: "combo", title: `Combo · ${state.slip.length} picks · ${fmtGen(q.stake)} GEN` });
+  if (!job) { btn.disabled = false; return; }
+  state.slip = []; state.comboAmount = ""; saveSlip(); renderSlip(); renderBoard();
+  toast("Combo sent. Validators are pricing every pick now.", "ok");
+  job.done.then(() => loadAllPositions());
+}
 
 async function placeBets(btn) {
   if (!state.writer) { await connect(); renderSlip(); if (!state.writer) return; }
@@ -1362,8 +1497,10 @@ $("listBtn").addEventListener("click", () => {
     $("board").innerHTML = `<div class="empty">Couldn't load the GenLayer SDK: ${esc(errText(e))}</div>`;
     return;
   }
+  loadLogos();
   await loadFixtures();
   loadSuggestions();
+  loadCombos();
   setInterval(loadSuggestions, 30 * 60e3);
   const hashId = Number(location.hash.replace("#fixture-", ""));
   if (location.hash.startsWith("#fixture-") && fixtureById(hashId)) openMatch(hashId);
