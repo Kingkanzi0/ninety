@@ -100,6 +100,7 @@ class World:
         self.llm = {"leader": None, "validator": None}
         self.validators = 4
         self.transfers = []
+        self.contracts = {}   # address (lower hex) -> contract instance, for view calls
         self.nondet_calls = []
 
     def set_web(self, url, text, role=None):
@@ -172,6 +173,21 @@ def _get(url, headers=None, **kw):
     return Response(200, page.encode())
 
 
+class _ViewProxy:
+    def __init__(self, target):
+        self._t = target
+
+    def view(self):
+        return self._t
+
+
+def _get_contract_at(addr):
+    key = Address(addr).as_hex.lower()
+    if key not in world.contracts:
+        raise RuntimeError(f"no contract at {key}")
+    return _ViewProxy(world.contracts[key])
+
+
 def _identity_decorator(fn):
     return fn
 
@@ -220,6 +236,7 @@ class _Message:
 
 gl = types.SimpleNamespace(
     Contract=Contract,
+    get_contract_at=lambda addr: _get_contract_at(addr),
     message=_Message(),
     public=types.SimpleNamespace(write=_Write(), view=_identity_decorator),
     nondet=types.SimpleNamespace(
