@@ -1,0 +1,35 @@
+# Project: Ninety. Hourly keeper: lists upcoming games and settles finished ones.
+name: Keeper (list and settle matches)
+
+on:
+  schedule:
+    - cron: "41 * * * *"   # every hour
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only print the plan (1) or send transactions (0)"
+        default: "0"
+
+concurrency:
+  group: ninety-keeper
+  cancel-in-progress: false
+
+jobs:
+  keeper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fresh fixtures from the ESPN feed
+        run: python3 scripts/fetch_fixtures.py frontend/fixtures.json
+      - name: Install genlayer-js
+        run: npm install --no-save --no-audit --no-fund genlayer-js@1.1.8
+      - name: Run keeper
+        env:
+          NINETY_KEEPER_KEY: ${{ secrets.NINETY_KEEPER_KEY }}
+          NINETY_CONTRACT: ${{ vars.NINETY_CONTRACT }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || '0' }}
+        run: node scripts/keeper.mjs
