@@ -66,6 +66,26 @@ Prompt-injection hardening (AI backup): page text is passed between explicit mar
 
 Setup: create a wallet key for the keeper, store it as the repository secret `NINETY_KEEPER_KEY`, set `DEFAULT_CONTRACT` in the script, and fund the address printed in the first run's log with a little GEN. Run the workflow by hand with `dry_run = 1` to see the plan without sending anything.
 
+## Combos (accumulators) — `contracts/combos.py`
+
+A second, small contract adds accumulators without touching the Ninety contract. Pick 2 to 6 matches (one pick per match); the odds multiply and every pick must win.
+
+- **Priced on Ninety.** When a ticket is placed, each leg is priced at the live Ninety pool odds for that outcome (read with a cross-contract view call, `gl.get_contract_at(ninety).view().get_fixture(id)`). Legs are capped at ×15.00, tickets at ×100.00 and 20 GEN.
+- **Settled on Ninety.** `settle_ticket` reads each leg's agreed result from Ninety, so combos use exactly the same validator-agreed scores. A ticket settles as soon as one leg loses, or when every leg is decided. A postponed match or a refunded market counts as ×1.00; if every leg is void the stake is refunded.
+- **Always solvent.** Winnings come from a house bankroll (`fund`, open to anyone). A ticket is only accepted if the free bankroll covers its full possible win, which is then locked until the ticket settles. The owner can only withdraw the free part.
+
+| Method | Type | Notes |
+| --- | --- | --- |
+| `place(legs)` | write, payable | `legs` like `3:RESULT:HOME,5:GOALS:OVER` |
+| `settle_ticket(ticket_id)` | write | permissionless; the keeper calls it every hour |
+| `fund()` | write, payable | adds to the house bankroll |
+| `withdraw(amount)` | write | owner only, free bankroll only |
+| `get_ticket`, `get_tickets_of(user)`, `get_open_tickets(offset, limit)`, `get_house()` | view | JSON strings |
+
+## Starting odds and team badges
+
+Ninety is a shared pot, so a market only has odds once someone has backed it. The keeper therefore seeds every new game: a small stake (0.3 GEN per market) spread across all outcomes in proportion to bookmaker probabilities from the ESPN feed (or neutral defaults when the feed has none). The pot then starts at fair odds, real bets move them, and the keeper collects its seed back after the match. Team badges come from the same feed (`frontend/logos.json`); the lettered badge is the fallback.
+
 ## Contract size on Bradbury
 
 Bradbury limits each transaction to 16,777,216 gas. Deploying a Python Intelligent Contract costs roughly 730 gas per byte of source, so source above about 20 KB cannot be deployed ("gas limit too high"). `contracts/ninety.py` is therefore written compactly, at about 19 KB with tab indentation and terse comments (a test fails above 19.6 KB). The full design rationale lives in this README instead of in code comments.
@@ -110,7 +130,8 @@ Payouts to wallets use `@gl.evm.contract_interface` + `emit_transfer`, the docum
 
 ```
 contracts/ninety.py         the Intelligent Contract
-scripts/keeper.mjs          hourly keeper: lists and settles matches
+contracts/combos.py         accumulators on top of Ninety
+scripts/keeper.mjs          hourly keeper: lists, seeds odds, settles, claims, settles combos
 scripts/fetch_fixtures.py   builds frontend/fixtures.json from the ESPN feed
 frontend/index.html         the dApp (single static page, genlayer-js from a CDN)
 tests/test_ninety.py        offline lifecycle tests
@@ -127,7 +148,9 @@ Offline tests cover:
 - guards: source size under the Bradbury gas ceiling, runner header, feed via HTTP GET with a browser User-Agent, pages via render, no `strict_eq` or dataclass storage
 
 ```
-python3 tests/test_ninety.py
+python3 tests/test_ninety.py     # Ninety contract
+python3 tests/test_combos.py     # combos, wired to a real Ninety instance
+node tests/test_keeper.mjs       # keeper planning: listing, seeding, claims, combos
 ```
 
 The mock is not GenVM. Always confirm behaviour live in Studio and on Bradbury, and record the transaction hashes (see below).
@@ -183,11 +206,12 @@ The page uses the `testnetBradbury` chain from genlayer-js. Add `?network=studio
 | Contract | [`0xD4807A5EBeBc9fb8aD071364Db452dd809a09129`](https://explorer-bradbury.genlayer.com/address/0xD4807A5EBeBc9fb8aD071364Db452dd809a09129) |
 | First v3 deploy (superseded) | `0xa6E51375D0893A469494BdeBA2326A94dE95D455`: `list_match` failed with `HTTP 403` because the feed was rendered in a browser |
 | Deploy tx | [`0xfcfbcfbd1a2688e2cc33fa810d9a2c643d1f672ef5ca171cc0409d5463a19741`](https://explorer-bradbury.genlayer.com/tx/0xfcfbcfbd1a2688e2cc33fa810d9a2c643d1f672ef5ca171cc0409d5463a19741) (`ACCEPTED`, `FINISHED_WITH_RETURN`) |
-| `list_match` from the feed | _fill in_ |
+| `list_match` from the feed | Bayern Munich v Arsenal, by CLI (all 5 validators agreed); 6 more by the keeper |
 | `stake` | _fill in_ |
 | `settle` (FINAL from the feed) | _fill in_ |
 | `claim` | _fill in_ |
-| Keeper run (GitHub Actions log) | _fill in_ |
+| Combos contract | [`0x2CF0247D078C738acac807025Df1F60e9057C02C`](https://explorer-bradbury.genlayer.com/address/0x2CF0247D078C738acac807025Df1F60e9057C02C), deploy tx [`0x28cb84b41a9dece3e5049943dc149e5704a466e4c0538c511535429435b38ed3`](https://explorer-bradbury.genlayer.com/tx/0x28cb84b41a9dece3e5049943dc149e5704a466e4c0538c511535429435b38ed3) (`FINISHED_WITH_RETURN`). A first deploy with the Ninety address as a constructor argument failed (`FINISHED_WITH_ERROR`); the address is now a constant. |
+| Keeper run (GitHub Actions log) | [run #2](https://github.com/Kingkanzi0/ninety/actions/runs/39233043004): 6 games listed in 1 min 40 s, each `FINISHED_WITH_RETURN` |
 
 
 ### GenLayer Studio (studionet) — live run, 3 Oct 2026
