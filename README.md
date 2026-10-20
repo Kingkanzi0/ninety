@@ -209,9 +209,9 @@ The page uses the `testnetBradbury` chain from genlayer-js. Add `?network=studio
 | First v3 deploy (superseded) | `0xa6E51375D0893A469494BdeBA2326A94dE95D455`: `list_match` failed with `HTTP 403` because the feed was rendered in a browser |
 | Deploy tx | [`0xfcfbcfbd1a2688e2cc33fa810d9a2c643d1f672ef5ca171cc0409d5463a19741`](https://explorer-bradbury.genlayer.com/tx/0xfcfbcfbd1a2688e2cc33fa810d9a2c643d1f672ef5ca171cc0409d5463a19741) (`ACCEPTED`, `FINISHED_WITH_RETURN`) |
 | `list_match` from the feed | Bayern Munich v Arsenal, by CLI (all 5 validators agreed); 6 more by the keeper |
-| `stake` | _fill in_ |
-| `settle` (FINAL from the feed) | _fill in_ |
-| `claim` | _fill in_ |
+| `stake` | Monza v Cagliari (fixture #1): 0.5 GEN each on Home win, Over 2.5 and Both teams score, placed from the website |
+| `settle` (FINAL from the feed) | Monza 4-0 Cagliari, settled automatically by the keeper from the match feed |
+| `claim` | [`0xb582fe58…92fb055`](https://explorer-bradbury.genlayer.com/tx/0xb582fe588bcfa0f936cb7e1f6ac86757ccf6db10d706f58c9b8a0a80992fb055): `claim(1)`, 1.27 GEN paid back to the wallet (Home win and Over 2.5 won, Both teams score lost) |
 | Combos contract | [`0x2CF0247D078C738acac807025Df1F60e9057C02C`](https://explorer-bradbury.genlayer.com/address/0x2CF0247D078C738acac807025Df1F60e9057C02C), deploy tx [`0x28cb84b41a9dece3e5049943dc149e5704a466e4c0538c511535429435b38ed3`](https://explorer-bradbury.genlayer.com/tx/0x28cb84b41a9dece3e5049943dc149e5704a466e4c0538c511535429435b38ed3) (`FINISHED_WITH_RETURN`). A first deploy with the Ninety address as a constructor argument failed (`FINISHED_WITH_ERROR`); the address is now a constant. |
 | Keeper run (GitHub Actions log) | [run #2](https://github.com/Kingkanzi0/ninety/actions/runs/39233043004): 6 games listed in 1 min 40 s, each `FINISHED_WITH_RETURN` |
 
