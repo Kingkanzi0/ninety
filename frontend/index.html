@@ -122,6 +122,8 @@ button { cursor: pointer; }
 .hero h1 span { color: var(--yellow); }
 .hero p { margin: 6px 0 0; color: #cfe3d7; max-width: 60ch; }
 .stats { display: flex; gap: 10px; }
+.stat { border: 0; color: inherit; cursor: pointer; font: inherit; }
+.stat:hover { background: rgba(0,0,0,.4); }
 .stat { background: rgba(0,0,0,.25); border-radius: var(--r); padding: 8px 14px; text-align: center; min-width: 88px; }
 .stat b { display: block; font: 900 24px/1.1 var(--display); }
 .stat small { color: #cfe3d7; font-size: 12px; }
@@ -151,6 +153,15 @@ button { cursor: pointer; }
 .crest img { position: absolute; inset: 12%; width: 76%; height: 76%; object-fit: contain; }
 @keyframes bump { 50% { transform: scale(1.12); } }
 .slip-fab.bump { animation: bump .35s ease; }
+.timeline { display: grid; gap: 4px; margin: 8px 0; }
+.tl-head { display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; color: var(--soft); }
+.tl { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.tl.a { flex-direction: row-reverse; text-align: right; }
+.tl .min { color: var(--yellow); min-width: 40px; }
+.tl.a .min { text-align: right; }
+.mstats { display: grid; gap: 6px; margin-top: 10px; }
+.st-row { display: grid; grid-template-columns: 60px 1fr 60px; text-align: center; font-size: 13px; color: var(--soft); }
+.st-row b { color: var(--fg); }
 .mode { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--panel-2); border-radius: 10px; padding: 4px; margin-bottom: 10px; }
 .mode button { border: 0; border-radius: 7px; padding: 8px; font: 700 13px var(--body); background: none; color: var(--soft); }
 .mode button[aria-pressed="true"] { background: var(--yellow); color: #1c1600; }
@@ -554,7 +565,18 @@ function phase(f) {
  * ------------------------------------------------------------------ */
 async function read(functionName, args = []) {
   if (!CONTRACT) throw new Error("No contract address set");
-  return state.reader.readContract({ address: CONTRACT, functionName, args });
+  for (let i = 0; ; i++) {
+    try { return await state.reader.readContract({ address: CONTRACT, functionName, args }); }
+    catch (e) {
+      // the public RPC rate-limits bursts; wait and retry instead of showing an error
+      if (i >= 2 || /revert|invalid|unknown fixture|EXPECTED/i.test(String(e?.message || e))) throw e;
+      await new Promise((r) => setTimeout(r, 800 * (i + 1)));
+    }
+  }
+}
+async function pool(items, n, fn) {
+  const q = [...items];
+  await Promise.all(Array.from({ length: Math.min(n, q.length) }, async () => { while (q.length) await fn(q.shift()); }));
 }
 
 /* Wallet discovery (EIP-6963). Browsers like Brave inject their own wallet as
@@ -611,6 +633,28 @@ async function ensureChain(eth) {
       }],
     });
   }
+}
+
+async function reconnect() {
+  // restore the last wallet without a popup (eth_accounts never prompts)
+  const saved = localGet(WALLET_KEY);
+  if (!saved || !state.chain) return;
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+  await new Promise((r) => setTimeout(r, 300));
+  const w = walletChoices().find((x) => x.id === saved);
+  if (!w) return;
+  try {
+    const [acct] = await w.provider.request({ method: "eth_accounts" });
+    if (!acct) return;
+    const chain = await w.provider.request({ method: "eth_chainId" });
+    if (String(chain).toLowerCase() !== "0x" + state.chain.id.toString(16)) return;   // wrong network: let the user connect
+    state.account = acct; state.provider = w.provider;
+    state.writer = state.sdk.createClient({ chain: state.chain, account: acct, provider: w.provider });
+    $("connectBtn").textContent = short(acct);
+    w.provider.on?.("accountsChanged", () => location.reload());
+    w.provider.on?.("chainChanged", () => location.reload());
+    loadAllPositions(true);
+  } catch { /* stay disconnected */ }
 }
 
 async function connect() {
@@ -767,7 +811,11 @@ async function send(functionName, args, { value, title, kind, fixture, ghost, ke
     const hash = await state.writer.writeContract(write);
     return track(hash, { kind: kind || functionName, title: title || "Transaction", fixture, args: ghost, key });
   } catch (e) {
-    toast(esc(errText(e)), "err", 12000);
+    const m = errText(e);
+    const help = /insufficient funds|gas required exceeds/i.test(m) ? "Your wallet has no GEN for the fee. Get free testnet GEN at testnet-faucet.genlayer.foundation and try again."
+      : /rpc|fetch|network|timeout|internal json|-32603|-32000/i.test(m) ? `Your wallet could not reach Bradbury. In your wallet's network settings use RPC <b>https://rpc-bradbury.genlayer.com</b> and chain ID <b>4221</b>, then try again.`
+      : "";
+    toast(`${esc(m)}${help ? `<br><br>${help}` : ""}`, "err", 16000);
     return null;
   }
 }
@@ -854,8 +902,13 @@ function marketDef(key) { return MARKETS.find((m) => m.key === key); }
 async function loadFixtures({ auto = false } = {}) {
   if (!CONTRACT) { $("board").innerHTML = `<div class="empty">Set the contract address in the left panel to load matches.</div>`; return; }
   try {
-    const raw = await read("get_fixtures", [0, 50]);
-    state.fixtures = JSON.parse(raw).fixtures;
+    const all = [];
+    for (let off = 0; ; off += 50) {
+      const page = JSON.parse(await read("get_fixtures", [off, 50]));
+      all.push(...page.fixtures);
+      if (off + 50 >= page.total) break;
+    }
+    state.fixtures = all;
     if (!auto || !userIsTyping()) render();
     else { renderRail(); renderSlip(); }
     if (state.account) loadAllPositions();
@@ -873,13 +926,23 @@ async function loadPosition() {
   catch (e) { console.warn(e); }
 }
 let posLoading = false;
-async function loadAllPositions() {
+let posAt = 0;
+async function loadAllPositions(force = false) {
   if (!state.account || posLoading) return;
-  posLoading = true;
+  if (!force && Date.now() - posAt < 90e3) return;   // background refresh at most every 90 s
+  posLoading = true; posAt = Date.now();
   try {
-    await Promise.all(state.fixtures.filter((f) => f.status !== "REJECTED").map(async (f) => {
+    // skip finished matches that are already collected or where this wallet never bet
+    const todo = state.fixtures.filter((f) => {
+      if (f.status === "REJECTED") return false;
+      const pos = state.positions[f.id];
+      if (!pos || f.status === "SCHEDULED") return true;
+      if (pos.claimed) return false;
+      return MARKETS.some((m) => Object.keys(pos.stakes[m.key] || {}).length);
+    });
+    await pool(todo, 4, async (f) => {
       try { state.positions[f.id] = JSON.parse(await read("get_position", [f.id, state.account])); } catch {}
-    }));
+    });
     await loadCombos();
   } finally { posLoading = false; }
   renderSlip();
@@ -1072,9 +1135,9 @@ function renderBoard() {
       <div><h1>Soccer markets settled by <span>AI validators</span></h1>
       <p>Pick a game, back the result, goals, both teams to score or the exact score. After full time GenLayer validators check the result and must agree on the score before anyone is paid. No admin, no links to paste.</p></div>
       <div class="stats">
-        <div class="stat"><b class="num">${live.length}</b><small>matches</small></div>
-        <div class="stat"><b class="num">${fmtGen(pot)}</b><small>GEN staked</small></div>
-        <div class="stat"><b class="num">${settled}</b><small>settled</small></div>
+        <button class="stat" type="button" data-status="all"><b class="num">${live.length}</b><small>matches</small></button>
+        <button class="stat" type="button" data-nav="mybets"><b class="num">${fmtGen(pot)}</b><small>GEN staked</small></button>
+        <button class="stat" type="button" data-status="done"><b class="num">${settled}</b><small>settled</small></button>
       </div>
     </section>
     <div class="board-head">
@@ -1135,6 +1198,8 @@ function renderMatch() {
       </div>
       <div class="strip"><span>${esc(f.competition || "Friendly")}</span><span>${fmtTime(f.kickoff)}</span><span>${stripMsg}</span></div>
     </section>
+    ${(f.status === "FINAL" || f.status === "VOID") ? `<section class="panel"><h3>Your position</h3>${renderPosition(f)}</section>` : ""}
+    <section class="panel" id="events">${renderEvents2(f)}</section>
     ${f.status === "REJECTED" ? `<div class="note">${esc(f.listing_note || "The match page did not show this fixture.")}</div>` :
       `<div class="mk-grid">${MARKETS.map((m) => renderMarket(f, m)).join("")}</div>`}
     <div class="info-grid">
@@ -1144,8 +1209,48 @@ function renderMatch() {
         <p class="hint">Results are checked automatically about every hour after full time. Validators each read the match feed and must agree on the 90-minute score; extra time and penalties don't count. If the feed stays silent for 6 hours, anyone can ask them to read a match page with AI instead.</p>
         ${settleBtn || expireBtn ? `<div class="actions">${settleBtn}${expireBtn}</div>` : ""}${backup}
       </section>
-      <section class="panel"><h3>Your position</h3>${renderPosition(f)}</section>
+      ${(f.status === "FINAL" || f.status === "VOID") ? "" : `<section class="panel"><h3>Your position</h3>${renderPosition(f)}</section>`}
     </div>`;
+  loadEvents(f);
+}
+
+/* ---------- match centre: goals, cards and stats from the ESPN feed ---------- */
+state.events = {};
+function renderEvents2(f) {
+  const e = state.events[f.feed];
+  if (!f.feed) return "";
+  if (nowSec() < f.kickoff) return `<h3>Match centre</h3><p class="hint">Goals, cards and stats appear here once the match starts.</p>`;
+  if (!e) return `<h3>Match centre</h3><p class="hint">Loading goals and stats…</p>`;
+  if (e.err) return `<h3>Match centre</h3><p class="hint">Match details are not available right now.</p>`;
+  const side = (t) => t === f.home || norm(t).includes(norm(f.home).slice(0, 5)) ? "h" : "a";
+  const icon = { goal: "⚽", own: "⚽ (og)", pen: "⚽ (pen)", yellow: "🟨", red: "🟥" };
+  const rows = e.events.map((x) => `<div class="tl ${side(x.team)}"><span class="min num">${esc(x.clock)}</span><span>${icon[x.kind] || ""} ${esc(x.who)}</span></div>`).join("");
+  const stats = e.stats.map((s) => `<div class="st-row"><b class="num">${esc(s.h)}</b><span>${esc(s.label)}</span><b class="num">${esc(s.a)}</b></div>`).join("");
+  return `<h3>Match centre</h3>
+    ${rows ? `<div class="timeline"><div class="tl-head"><span>${esc(f.home)}</span><span>${esc(f.away)}</span></div>${rows}</div>` : `<p class="hint">No goals or cards yet.</p>`}
+    ${stats ? `<div class="mstats">${stats}</div>` : ""}<p class="hint">Live details from ESPN. The result that pays out is the one validators agree on.</p>`;
+}
+async function loadEvents(f) {
+  if (!f.feed || nowSec() < f.kickoff) return;
+  const have = state.events[f.feed];
+  if (have && (have.at > Date.now() - 60e3 || f.status !== "SCHEDULED")) return;
+  const [lg, ev] = f.feed.split("/");
+  try {
+    const j = await fetchJson(`https://site.api.espn.com/apis/site/v2/sports/soccer/${lg}/summary?event=${ev}`, 10000);
+    const events = (j.keyEvents || []).map((k) => {
+      const t = String(k.type?.text || k.type?.type || "").toLowerCase();
+      const kind = /own/.test(t) ? "own" : /penalty/.test(t) && /goal|scored/.test(t) ? "pen" : /goal/.test(t) ? "goal" : /red/.test(t) ? "red" : /yellow/.test(t) ? "yellow" : "";
+      const who = k.participants?.[0]?.athlete?.displayName || k.shortText || k.text || "";
+      return kind ? { kind, clock: k.clock?.displayValue || "", team: k.team?.displayName || "", who } : null;
+    }).filter(Boolean);
+    const teams = j.boxscore?.teams || [];
+    const homeT = teams.find((t) => t.homeAway === "home") || teams[0], awayT = teams.find((t) => t.homeAway === "away") || teams[1];
+    const want = [["possessionPct", "Possession %"], ["totalShots", "Shots"], ["shotsOnTarget", "On target"], ["wonCorners", "Corners"], ["foulsCommitted", "Fouls"]];
+    const val = (t, n) => (t?.statistics || []).find((s) => s.name === n)?.displayValue;
+    const stats = homeT && awayT ? want.map(([n, label]) => ({ label, h: val(homeT, n), a: val(awayT, n) })).filter((s) => s.h != null && s.a != null) : [];
+    state.events[f.feed] = { events, stats, at: Date.now() };
+  } catch { state.events[f.feed] = { err: true, at: Date.now() }; }
+  if (state.view === "match" && state.selected === f.id) { const el = $("events"); if (el) el.innerHTML = renderEvents2(f); }
 }
 
 function renderPosition(f) {
@@ -1363,11 +1468,11 @@ document.addEventListener("click", async (e) => {
   const qk = t.closest("[data-quick]");
   if (qk) { const [i, v] = qk.dataset.quick.split("|"); state.slip[Number(i)].amount = v; saveSlip(); renderSlip(); return; }
   const sl = t.closest("[data-slip]");
-  if (sl) { state.slipTab = sl.dataset.slip; if (state.slipTab === "mybets") loadAllPositions(); renderSlip(); return; }
+  if (sl) { state.slipTab = sl.dataset.slip; if (state.slipTab === "mybets") loadAllPositions(true); renderSlip(); return; }
   const nv = t.closest("[data-nav]");
   if (nv) {
     state.slipTab = nv.dataset.nav === "mybets" ? "mybets" : "slip";
-    if (state.slipTab === "mybets") { loadAllPositions(); if (matchMedia("(max-width: 980px)").matches) $("slip").classList.add("open"); }
+    if (state.slipTab === "mybets") { loadAllPositions(true); if (matchMedia("(max-width: 980px)").matches) $("slip").classList.add("open"); }
     else backToList();
     renderSlip(); return;
   }
@@ -1523,6 +1628,7 @@ $("listBtn").addEventListener("click", () => {
   const hashId = Number(location.hash.replace("#fixture-", ""));
   if (location.hash.startsWith("#fixture-") && fixtureById(hashId)) openMatch(hashId);
   resumeJobs();
+  reconnect();
   setInterval(() => { if (!document.hidden) loadFixtures({ auto: true }); }, 20000);
 })();
 </script>
