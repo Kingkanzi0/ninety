@@ -1,5 +1,5 @@
 {
- "updated": 1792448638,
+ "updated": 1792472155,
  "matches": [
   {
    "id": "401915403",
@@ -10,9 +10,9 @@
    "kickoff": 1792514700,
    "probs": {
     "RESULT": {
-     "HOME": 0.59,
-     "DRAW": 0.218,
-     "AWAY": 0.192
+     "HOME": 0.609,
+     "DRAW": 0.211,
+     "AWAY": 0.18
     },
     "GOALS": {
      "OVER": 0.52,
@@ -58,9 +58,9 @@
    "kickoff": 1792521900,
    "probs": {
     "RESULT": {
-     "HOME": 0.6,
-     "DRAW": 0.227,
-     "AWAY": 0.173
+     "HOME": 0.592,
+     "DRAW": 0.226,
+     "AWAY": 0.181
     },
     "GOALS": {
      "OVER": 0.541,
@@ -82,9 +82,9 @@
    "kickoff": 1792522800,
    "probs": {
     "RESULT": {
-     "HOME": 0.828,
-     "DRAW": 0.112,
-     "AWAY": 0.06
+     "HOME": 0.841,
+     "DRAW": 0.106,
+     "AWAY": 0.053
     },
     "GOALS": {
      "OVER": 0.52,
@@ -130,9 +130,9 @@
    "kickoff": 1792522800,
    "probs": {
     "RESULT": {
-     "HOME": 0.619,
-     "DRAW": 0.207,
-     "AWAY": 0.173
+     "HOME": 0.637,
+     "DRAW": 0.203,
+     "AWAY": 0.159
     },
     "GOALS": {
      "OVER": 0.52,
@@ -154,8 +154,8 @@
    "kickoff": 1792522800,
    "probs": {
     "RESULT": {
-     "HOME": 0.857,
-     "DRAW": 0.095,
+     "HOME": 0.861,
+     "DRAW": 0.091,
      "AWAY": 0.05
     },
     "GOALS": {
@@ -178,9 +178,9 @@
    "kickoff": 1792522800,
    "probs": {
     "RESULT": {
-     "HOME": 0.594,
-     "DRAW": 0.212,
-     "AWAY": 0.195
+     "HOME": 0.565,
+     "DRAW": 0.227,
+     "AWAY": 0.208
     },
     "GOALS": {
      "OVER": 0.52,
@@ -279,8 +279,8 @@
      "AWAY": 0.303
     },
     "GOALS": {
-     "OVER": 0.589,
-     "UNDER": 0.411
+     "OVER": 0.594,
+     "UNDER": 0.406
     },
     "BTTS": {
      "YES": 0.52,
@@ -322,9 +322,9 @@
    "kickoff": 1792609200,
    "probs": {
     "RESULT": {
-     "HOME": 0.768,
-     "DRAW": 0.146,
-     "AWAY": 0.086
+     "HOME": 0.776,
+     "DRAW": 0.137,
+     "AWAY": 0.087
     },
     "GOALS": {
      "OVER": 0.52,
@@ -346,9 +346,9 @@
    "kickoff": 1792609200,
    "probs": {
     "RESULT": {
-     "HOME": 0.465,
-     "DRAW": 0.241,
-     "AWAY": 0.293
+     "HOME": 0.468,
+     "DRAW": 0.246,
+     "AWAY": 0.286
     },
     "GOALS": {
      "OVER": 0.597,
@@ -490,9 +490,9 @@
    "kickoff": 1792623600,
    "probs": {
     "RESULT": {
-     "HOME": 0.561,
-     "DRAW": 0.214,
-     "AWAY": 0.225
+     "HOME": 0.554,
+     "DRAW": 0.215,
+     "AWAY": 0.231
     },
     "GOALS": {
      "OVER": 0.52,
@@ -946,9 +946,9 @@
    "kickoff": 1792778400,
    "probs": {
     "RESULT": {
-     "HOME": 0.591,
-     "DRAW": 0.232,
-     "AWAY": 0.177
+     "HOME": 0.589,
+     "DRAW": 0.226,
+     "AWAY": 0.185
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1018,9 +1018,9 @@
    "kickoff": 1792781100,
    "probs": {
     "RESULT": {
-     "HOME": 0.432,
-     "DRAW": 0.28,
-     "AWAY": 0.288
+     "HOME": 0.428,
+     "DRAW": 0.277,
+     "AWAY": 0.294
     },
     "GOALS": {
      "OVER": 0.554,
@@ -2199,8 +2199,8 @@
      "AWAY": 0.445
     },
     "GOALS": {
-     "OVER": 0.586,
-     "UNDER": 0.414
+     "OVER": 0.575,
+     "UNDER": 0.425
     },
     "BTTS": {
      "YES": 0.52,
@@ -2626,9 +2626,9 @@
    "kickoff": 1792936800,
    "probs": {
     "RESULT": {
-     "HOME": 0.445,
-     "DRAW": 0.283,
-     "AWAY": 0.271
+     "HOME": 0.443,
+     "DRAW": 0.291,
+     "AWAY": 0.266
     },
     "GOALS": {
      "OVER": 0.538,
@@ -2746,9 +2746,9 @@
    "kickoff": 1792944900,
    "probs": {
     "RESULT": {
-     "HOME": 0.443,
-     "DRAW": 0.27,
-     "AWAY": 0.287
+     "HOME": 0.447,
+     "DRAW": 0.264,
+     "AWAY": 0.289
     },
     "GOALS": {
      "OVER": 0.548,
@@ -3743,6 +3743,150 @@
      "NO": 0.48
     },
     "source": "feed"
+   }
+  },
+  {
+   "id": "401876421",
+   "home": "Le Havre AC",
+   "away": "Paris Saint-Germain",
+   "comp": "Ligue 1",
+   "league": "fra.1",
+   "kickoff": 1793383200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.103,
+     "DRAW": 0.143,
+     "AWAY": 0.753
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401884746",
+   "home": "SV Elversberg",
+   "away": "Mainz",
+   "comp": "Bundesliga",
+   "league": "ger.1",
+   "kickoff": 1793388600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.289,
+     "DRAW": 0.256,
+     "AWAY": 0.455
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401882817",
+   "home": "Villarreal",
+   "away": "Espanyol",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1793390400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.6,
+     "DRAW": 0.222,
+     "AWAY": 0.178
+    },
+    "GOALS": {
+     "OVER": 0.586,
+     "UNDER": 0.414
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880190",
+   "home": "Sheffield United",
+   "away": "Wrexham",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1793390400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401876420",
+   "home": "Lille",
+   "away": "Lens",
+   "comp": "Ligue 1",
+   "league": "fra.1",
+   "kickoff": 1793390700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.414,
+     "DRAW": 0.27,
+     "AWAY": 0.316
+    },
+    "GOALS": {
+     "OVER": 0.561,
+     "UNDER": 0.439
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401885408",
+   "home": "Casa Pia",
+   "away": "Sporting CP",
+   "comp": "Primeira Liga",
+   "league": "por.1",
+   "kickoff": 1793391300,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
    }
   }
  ]
