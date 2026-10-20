@@ -384,6 +384,15 @@ details.more-src[open] summary { margin-bottom: 8px; }
   .toasts { bottom: auto; top: 8px; right: 8px; left: 8px; max-width: none; }
 }
 @media (prefers-reduced-motion: reduce) { .steps li.now::before { animation: none; border-top-color: var(--yellow); } .slip { transition: none; } }
+.combo-head{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}.combo-head h2{margin:0 0 6px}
+.combo-stats{display:flex;gap:28px}.combo-stats small{display:block;color:var(--soft);font-size:12px}.combo-stats b{font-size:20px}
+.combo-leg{display:grid;grid-template-columns:1fr 150px auto;gap:16px;align-items:center;padding:14px 0;border-top:1px solid #ffffff14}
+.combo-leg:first-of-type{border-top:0}.cl-teams{display:flex;gap:12px;align-items:center}.cl-teams small{display:block;color:var(--soft);margin-top:3px}
+.cl-mid{text-align:center}.cl-mid small{display:block;color:var(--soft);font-size:12px}.cl-mid b{font-size:18px}
+.cl-end{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+.tag.st-win{color:#36d399}.tag.st-lose{color:#ff6b6b}
+@media (max-width:700px){.combo-leg{grid-template-columns:1fr}.cl-mid{text-align:left}.cl-end{justify-content:flex-start}.combo-stats{gap:16px}}
+.legopen{color:var(--fg);font:inherit;padding:0;text-align:left;text-decoration:underline;text-decoration-color:#ffffff40;text-underline-offset:3px;cursor:pointer}.legopen{display:inline;font-weight:inherit}.legopen:hover{color:var(--yellow)}
 </style>
 </head>
 <body>
@@ -1125,6 +1134,7 @@ async function openGame(m, btn) {
 
 function renderBoard() {
   if (state.view === "match" && fixtureById(state.selected)) return renderMatch();
+  if (state.view === "combo" && state.tickets.some((t) => t.id === state.comboId)) return renderCombo();
   state.view = "list";
   const live = state.fixtures.filter((f) => f.status !== "REJECTED");
   const pot = live.reduce((s, f) => s + Object.values(f.markets).reduce((a, m) => a + BigInt(m.total || 0), 0n), 0n);
@@ -1380,11 +1390,12 @@ function renderTickets() {
   return state.tickets.map((t) => {
     const legs = t.legs.map(([fid, m, o, x]) => {
       const f = fixtureById(fid), st = legState(fid, m, o);
-      return `<div class="leg"><span>${f ? `${esc(f.home)} v ${esc(f.away)}` : `Match ${fid}`}: ${esc(outLabel(m, o))}</span><span class="num ${st ? `st-${st}` : ""}">×${(x / 100).toFixed(2)}${st ? ` · ${st === "win" ? "won" : st === "lose" ? "lost" : "void"}` : ""}</span></div>`;
+      const name = f ? `<button class="back legopen" type="button" data-open="${f.id}" title="Open this match">${esc(f.home)} v ${esc(f.away)}</button>` : `Match ${fid}`;
+      return `<div class="leg"><span>${name}: ${esc(outLabel(m, o))}</span><span class="num ${st ? `st-${st}` : ""}">×${(x / 100).toFixed(2)}${st ? ` · ${st === "win" ? "won" : st === "lose" ? "lost" : "void"}` : ""}</span></div>`;
     }).join("");
     const label = { OPEN: "Open", WON: `Paid ${fmtGen(t.paid)} GEN`, LOST: "Lost", REFUNDED: `Refunded ${fmtGen(t.paid)} GEN` }[t.status] || t.status;
-    const btn = t.status === "OPEN" && ticketReady(t) ? `<button class="btn green" type="button" data-settlecombo="${t.id}">Settle combo</button>` : "";
-    return `<div class="mybet"><div class="mybet-h"><b>Combo · ${t.legs.length} picks</b><span class="tag">${esc(label)}</span></div>
+    const btn = t.status === "OPEN" && ticketReady(t) ? comboButton(t) : "";
+    return `<div class="mybet"><div class="mybet-h"><button class="back legopen" type="button" data-combo="${t.id}" title="Open all games in this combo"><b>Combo · ${t.legs.length} picks</b></button><span class="tag">${esc(label)}</span></div>
       ${legs}<div class="row"><span>Stake</span><span class="num">${fmtGen(t.stake)} GEN</span></div>
       <div class="row"><span>Returns if all win</span><b class="num">${fmtGen(t.payout)} GEN</b></div>${btn}</div>`;
   }).join("");
@@ -1421,6 +1432,61 @@ function openMatch(id) {
   renderBoard();
   window.scrollTo({ top: 0 });
   loadPosition().then(() => { if (state.view === "match") renderBoard(); });
+}
+function comboPay(t) {
+  let x = 100;
+  for (const [fid, m, o, lo] of t.legs) if (legState(fid, m, o) === "win") x = Math.floor(x * lo / 100);
+  const pay = BigInt(t.stake) * BigInt(Math.floor(Math.min(x, 10000))) / 100n;
+  return pay < BigInt(t.payout) ? pay : BigInt(t.payout);
+}
+function comboButton(t) {
+  const lost = t.legs.some(([fid, m, o]) => legState(fid, m, o) === "lose");
+  return lost ? `<button class="btn ghost" type="button" data-settlecombo="${t.id}">Close losing combo</button>`
+    : `<button class="btn green" type="button" data-settlecombo="${t.id}">Collect ${fmtGen(comboPay(t))} GEN</button>`;
+}
+function openCombo(id) {
+  state.view = "combo"; state.comboId = id; state.selected = null;
+  history.replaceState(null, "", `#combo-${id}`);
+  renderBoard();
+  window.scrollTo({ top: 0 });
+}
+function renderCombo() {
+  const t = state.tickets.find((x) => x.id === state.comboId);
+  const odds = t.legs.reduce((a, l) => a * l[3] / 100, 1);
+  const states = t.legs.map(([fid, m, o]) => legState(fid, m, o));
+  const done = states.filter((x) => x).length;
+  const label = { OPEN: "Open", WON: `Won · paid ${fmtGen(t.paid)} GEN`, LOST: "Lost", REFUNDED: `Refunded ${fmtGen(t.paid)} GEN` }[t.status] || t.status;
+  const legs = t.legs.map(([fid, m, o, x], i) => {
+    const f = fixtureById(fid), st = states[i];
+    if (!f) return `<div class="combo-leg"><b>Match ${fid}</b><span>${esc(outLabel(m, o))}</span></div>`;
+    const mid = f.status === "FINAL" ? `<b class="num">${f.home_goals}–${f.away_goals}</b><small>Full time</small>`
+      : f.status === "VOID" ? `<b>Void</b><small>Counts as ×1.00</small>`
+      : nowSec() >= f.kickoff ? `<b>In play</b><small>Result checked after full time</small>`
+      : `<b class="num">${new Date(f.kickoff * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</b><small>${new Date(f.kickoff * 1000).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</small>`;
+    const res = st === "win" ? `<span class="tag st-win">Won</span>` : st === "lose" ? `<span class="tag st-lose">Lost</span>` : st === "void" ? `<span class="tag">Void</span>` : `<span class="tag">Waiting</span>`;
+    return `<div class="combo-leg">
+      <div class="cl-teams">${crest(f.home)}<div><b>${esc(f.home)} v ${esc(f.away)}</b><small>${esc(f.competition || "")} · your pick: <b>${esc(marketDef(m).title)}: ${esc(outLabel(m, o))}</b> · ×${(x / 100).toFixed(2)}</small></div></div>
+      <div class="cl-mid">${mid}</div>
+      <div class="cl-end">${res}<button class="btn ghost" type="button" data-open="${f.id}">Open match</button></div>
+    </div>`;
+  }).join("");
+  let action = "";
+  if (t.status === "OPEN" && ticketReady(t)) action = `${comboButton(t)}<p class="hint">Winnings go straight to your wallet. If you don't collect, it is paid to you automatically within about an hour.</p>`;
+  else if (t.status === "OPEN") action = `<p class="hint">${done} of ${t.legs.length} games decided. Every pick has to win; you can collect as soon as the last game is settled.</p>`;
+  else if (t.status === "WON" || t.status === "REFUNDED") action = `<p class="hint">Paid to your wallet: <b>${fmtGen(t.paid)} GEN</b>.</p>`;
+  else action = `<p class="hint">One pick lost, so this combo is closed.</p>`;
+  $("board").innerHTML = `
+    <button class="back" type="button" id="backBtn">← All matches</button>
+    <section class="panel combo-head">
+      <div><h2>Combo #${t.id} · ${t.legs.length} picks</h2><span class="tag">${esc(label)}</span></div>
+      <div class="combo-stats">
+        <div><small>Stake</small><b class="num">${fmtGen(t.stake)} GEN</b></div>
+        <div><small>Odds</small><b class="num">×${odds.toFixed(2)}</b></div>
+        <div><small>Returns if all win</small><b class="num">${fmtGen(t.payout)} GEN</b></div>
+      </div>
+    </section>
+    <section class="panel"><h3>Games in this combo</h3>${legs}</section>
+    <section class="panel">${action}</section>`;
 }
 function backToList() {
   state.view = "list"; state.selected = null;
@@ -1460,6 +1526,8 @@ document.addEventListener("click", async (e) => {
   if (sg) { const m = (state.sugg || []).find((x) => `${x.league}/${x.id}` === sg.dataset.suggest); if (m) openGame(m, sg); return; }
   const pk = t.closest("[data-pick]");
   if (pk && !pk.disabled) { const [fid, m, o] = pk.dataset.pick.split("|"); return togglePick(Number(fid), m, o); }
+  const cb = t.closest("[data-combo]");
+  if (cb) { $("slip").classList.remove("open"); return openCombo(Number(cb.dataset.combo)); }
   const op = t.closest("[data-open]");
   if (op) { $("slip").classList.remove("open"); return openMatch(Number(op.dataset.open)); }
   if (t.closest("#backBtn")) return backToList();
@@ -1521,7 +1589,7 @@ document.addEventListener("click", async (e) => {
   if (sc) {
     sc.disabled = true;
     const job = await send("settle_ticket", [Number(sc.dataset.settlecombo)], { to: COMBOS, title: `Settle combo #${sc.dataset.settlecombo}` });
-    if (!job) sc.disabled = false; else job.done.then(() => loadAllPositions());
+    if (!job) sc.disabled = false; else job.done.then(() => loadAllPositions(true)).then(() => loadCombos()).then(() => { renderSlip(); renderBoard(); });
     return;
   }
   if (t.closest("#slipClose")) { $("slip").classList.remove("open"); return; }
