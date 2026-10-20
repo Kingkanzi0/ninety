@@ -392,6 +392,7 @@ details.more-src[open] summary { margin-bottom: 8px; }
 .cl-end{display:flex;gap:10px;align-items:center;justify-content:flex-end}
 .tag.st-win{color:#36d399}.tag.st-lose{color:#ff6b6b}
 @media (max-width:700px){.combo-leg{grid-template-columns:1fr}.cl-mid{text-align:left}.cl-end{justify-content:flex-start}.combo-stats{gap:16px}}
+.bet-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:2px}
 .legopen{color:var(--fg);font:inherit;padding:0;text-align:left;text-decoration:underline;text-decoration-color:#ffffff40;text-underline-offset:3px;cursor:pointer}.legopen{display:inline;font-weight:inherit}.legopen:hover{color:var(--yellow)}
 </style>
 </head>
@@ -1386,44 +1387,69 @@ function renderSlip() {
   if (!state.account) $("placeBtn").disabled = false;
 }
 
-function renderTickets() {
-  return state.tickets.map((t) => {
-    const legs = t.legs.map(([fid, m, o, x]) => {
-      const f = fixtureById(fid), st = legState(fid, m, o);
-      const name = f ? `<button class="back legopen" type="button" data-open="${f.id}" title="Open this match">${esc(f.home)} v ${esc(f.away)}</button>` : `Match ${fid}`;
-      return `<div class="leg"><span>${name}: ${esc(outLabel(m, o))}</span><span class="num ${st ? `st-${st}` : ""}">×${(x / 100).toFixed(2)}${st ? ` · ${st === "win" ? "won" : st === "lose" ? "lost" : "void"}` : ""}</span></div>`;
-    }).join("");
-    const label = { OPEN: "Open", WON: `Paid ${fmtGen(t.paid)} GEN`, LOST: "Lost", REFUNDED: `Refunded ${fmtGen(t.paid)} GEN` }[t.status] || t.status;
-    const btn = t.status === "OPEN" && ticketReady(t) ? comboButton(t) : "";
-    return `<div class="mybet"><div class="mybet-h"><button class="back legopen" type="button" data-combo="${t.id}" title="Open all games in this combo"><b>Combo · ${t.legs.length} picks</b></button><span class="tag">${esc(label)}</span></div>
-      ${legs}<div class="row"><span>Stake</span><span class="num">${fmtGen(t.stake)} GEN</span></div>
-      <div class="row"><span>Returns if all win</span><b class="num">${fmtGen(t.payout)} GEN</b></div>${btn}</div>`;
+function comboLost(t) { return t.legs.some(([fid, m, o]) => legState(fid, m, o) === "lose"); }
+function renderTicket(t) {
+  const legs = t.legs.map(([fid, m, o, x]) => {
+    const f = fixtureById(fid), st = legState(fid, m, o);
+    const name = f ? `<button class="back legopen" type="button" data-open="${f.id}" title="Open this match">${esc(f.home)} v ${esc(f.away)}</button>` : `Match ${fid}`;
+    return `<div class="leg"><span>${name}: ${esc(outLabel(m, o))}</span><span class="num ${st ? `st-${st}` : ""}">×${(x / 100).toFixed(2)}${st ? ` · ${st === "win" ? "won" : st === "lose" ? "lost" : "void"}` : ""}</span></div>`;
   }).join("");
+  const label = t.status === "OPEN" && comboLost(t) ? "Lost" : t.status === "OPEN" && ticketReady(t) ? "Won" :
+    ({ OPEN: "Open", WON: `Paid ${fmtGen(t.paid)} GEN`, LOST: "Lost", REFUNDED: `Refunded ${fmtGen(t.paid)} GEN` }[t.status] || t.status);
+  const btn = t.status === "OPEN" && ticketReady(t) && !comboLost(t) ? comboButton(t) : "";
+  return `<div class="mybet"><div class="mybet-h"><button class="back legopen" type="button" data-combo="${t.id}" title="Open all games in this combo"><b>Combo · ${t.legs.length} picks</b></button><span class="tag">${esc(label)}</span></div>
+    ${legs}<div class="row"><span>Stake</span><span class="num">${fmtGen(t.stake)} GEN</span></div>
+    <div class="row"><span>Returns if all win</span><b class="num">${fmtGen(t.payout)} GEN</b></div>${btn}</div>`;
 }
-
+function renderSingle({ f, pos }) {
+  const lines = [];
+  for (const m of MARKETS) for (const [o, amt] of Object.entries(pos.stakes[m.key] || {})) {
+    const w = f.markets[m.key].winner;
+    const res = !w ? "" : w === "VOID" ? " · refunded" : w === o ? " · won" : " · lost";
+    lines.push(`<div class="row"><span>${m.title}: ${esc(outLabel(m.key, o))}${res}</span><span class="num">${fmtGen(amt)} GEN</span></div>`);
+  }
+  const settled = f.status === "FINAL" || f.status === "VOID";
+  const can = settled && !pos.claimed && BigInt(pos.claimable) > 0n;
+  return `<div class="mybet">
+    <div class="mybet-h"><button class="back" type="button" data-open="${f.id}" style="color:var(--fg)">${esc(f.home)} v ${esc(f.away)}</button>${tagFor(f)}</div>
+    ${f.status === "FINAL" ? `<div class="row"><span>Final score</span><b class="num">${f.home_goals}–${f.away_goals}</b></div>` : ""}
+    ${lines.join("")}
+    ${can ? `<button class="btn green" type="button" data-claim="${f.id}">Collect ${fmtGen(pos.claimable)} GEN</button>` : settled && pos.claimed ? `<span class="hint">Collected</span>` : ""}
+  </div>`;
+}
+// Sort every bet into Open (still to play), To collect (winnings waiting) or Settled (finished).
+function groupBets() {
+  const g = { open: [], collect: [], done: [] };
+  for (const t of state.tickets) {
+    const item = { kickoff: Math.min(...t.legs.map(([fid]) => fixtureById(fid)?.kickoff || Infinity)), html: renderTicket(t) };
+    if (t.status !== "OPEN" || comboLost(t)) g.done.push(item);
+    else if (ticketReady(t)) g.collect.push(item);
+    else g.open.push(item);
+  }
+  for (const f of state.fixtures) {
+    const pos = state.positions[f.id];
+    if (!pos || !MARKETS.some((m) => Object.keys(pos.stakes[m.key] || {}).length)) continue;
+    const item = { kickoff: f.kickoff, html: renderSingle({ f, pos }) };
+    const settled = f.status === "FINAL" || f.status === "VOID";
+    if (!settled) g.open.push(item);
+    else if (!pos.claimed && BigInt(pos.claimable) > 0n) g.collect.push(item);
+    else g.done.push(item);
+  }
+  g.open.sort((a, b) => a.kickoff - b.kickoff);
+  g.done.sort((a, b) => b.kickoff - a.kickoff);
+  return g;
+}
+const BET_TABS = [["open", "Open"], ["collect", "To collect"], ["done", "Settled"]];
 function renderMyBets() {
   $("slipSum").innerHTML = "";
   if (!state.account) { $("slipBody").innerHTML = `<div class="slip-empty"><b>Connect your wallet</b><span>Your stakes and winnings show here.</span><button class="btn" type="button" data-connect>Connect wallet</button></div>`; return; }
-  const items = state.fixtures.map((f) => ({ f, pos: state.positions[f.id] })).filter(({ pos }) => pos && MARKETS.some((m) => Object.keys(pos.stakes[m.key] || {}).length));
-  const combos = renderTickets();
-  if (!items.length && combos) { $("slipBody").innerHTML = combos; return; }
-  if (!items.length) { $("slipBody").innerHTML = `<div class="slip-empty"><b>No bets yet</b><span>${posLoading ? "Loading your positions…" : "Place a bet and it appears here."}</span></div>`; return; }
-  $("slipBody").innerHTML = combos + items.map(({ f, pos }) => {
-    const lines = [];
-    for (const m of MARKETS) for (const [o, amt] of Object.entries(pos.stakes[m.key] || {})) {
-      const w = f.markets[m.key].winner;
-      const res = !w ? "" : w === "VOID" ? " · refunded" : w === o ? " · won" : " · lost";
-      lines.push(`<div class="row"><span>${m.title}: ${esc(outLabel(m.key, o))}${res}</span><span class="num">${fmtGen(amt)} GEN</span></div>`);
-    }
-    const settled = f.status === "FINAL" || f.status === "VOID";
-    const can = settled && !pos.claimed && BigInt(pos.claimable) > 0n;
-    return `<div class="mybet">
-      <div class="mybet-h"><button class="back" type="button" data-open="${f.id}" style="color:var(--fg)">${esc(f.home)} v ${esc(f.away)}</button>${tagFor(f)}</div>
-      ${f.status === "FINAL" ? `<div class="row"><span>Final score</span><b class="num">${f.home_goals}–${f.away_goals}</b></div>` : ""}
-      ${lines.join("")}
-      ${can ? `<button class="btn green" type="button" data-claim="${f.id}">Collect ${fmtGen(pos.claimable)} GEN</button>` : settled && pos.claimed ? `<span class="hint">Collected</span>` : ""}
-    </div>`;
-  }).join("");
+  const g = groupBets();
+  if (!g.open.length && !g.collect.length && !g.done.length) { $("slipBody").innerHTML = `<div class="slip-empty"><b>No bets yet</b><span>${posLoading ? "Loading your positions…" : "Place a bet and it appears here."}</span></div>`; return; }
+  if (!state.betsTab) state.betsTab = g.collect.length ? "collect" : "open";
+  const tabs = `<div class="chips bet-tabs" role="group" aria-label="Filter bets">${BET_TABS.map(([k, l]) => `<button class="chip" type="button" data-bets="${k}" aria-pressed="${state.betsTab === k}">${l} · ${g[k].length}</button>`).join("")}</div>`;
+  const empty = { open: "No open bets. Bets on games still to play show here.", collect: "Nothing to collect right now.", done: "No settled bets yet." }[state.betsTab];
+  const list = g[state.betsTab];
+  $("slipBody").innerHTML = tabs + (list.length ? list.map((x) => x.html).join("") : `<div class="slip-empty"><span>${empty}</span></div>`);
 }
 
 function openMatch(id) {
@@ -1526,6 +1552,8 @@ document.addEventListener("click", async (e) => {
   if (sg) { const m = (state.sugg || []).find((x) => `${x.league}/${x.id}` === sg.dataset.suggest); if (m) openGame(m, sg); return; }
   const pk = t.closest("[data-pick]");
   if (pk && !pk.disabled) { const [fid, m, o] = pk.dataset.pick.split("|"); return togglePick(Number(fid), m, o); }
+  const bt = t.closest("[data-bets]");
+  if (bt) { state.betsTab = bt.dataset.bets; renderSlip(); return; }
   const cb = t.closest("[data-combo]");
   if (cb) { $("slip").classList.remove("open"); return openCombo(Number(cb.dataset.combo)); }
   const op = t.closest("[data-open]");
