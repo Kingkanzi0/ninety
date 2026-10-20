@@ -1339,7 +1339,7 @@ function renderComboSlip() {
     <div class="quick">${["0.1", "0.5", "1", "2"].map((v) => `<button type="button" data-cquick="${v}">${v}</button>`).join("")}</div>
     <div class="sum-row"><span>Returns if every pick wins</span><b class="num">${fmtGen(q.payout)} GEN</b></div>
     ${q.err ? `<p class="hint" style="color:#ff9a86">${esc(q.err)}</p>` : ""}
-    <button class="btn block" type="button" id="comboBtn" ${!q.err && q.stake > 0n || !state.account ? "" : "disabled"}>${state.account ? "Place combo" : "Connect wallet to bet"}</button>
+    <button class="btn block" type="button" id="comboBtn" ${!state.placing && (!q.err && q.stake > 0n || !state.account) ? "" : "disabled"}>${state.placing ? "Sending… confirm in your wallet" : state.account ? "Place combo" : "Connect wallet to bet"}</button>
     <p class="hint">Every pick must win. Odds are locked at the live price when you place it. A postponed match counts as ×1.00.</p></div>`;
 }
 function modeBar() {
@@ -1382,9 +1382,9 @@ function renderSlip() {
   $("slipSum").innerHTML = `
     <div class="sum-row"><span>Total stake</span><b class="num">${fmtGen(total)} GEN</b></div>
     <div class="sum-row"><span>Possible return</span><b class="num">${fmtGen(ret)} GEN</b></div>
-    <button class="btn block" type="button" id="placeBtn" ${ok ? "" : "disabled"}>${state.account ? `Place ${n === 1 ? "bet" : `${n} bets`}` : "Connect wallet to bet"}</button>
+    <button class="btn block" type="button" id="placeBtn" ${ok && !state.placing ? "" : "disabled"}>${state.placing ? "Sending… confirm in your wallet" : state.account ? `Place ${n === 1 ? "bet" : `${n} bets`}` : "Connect wallet to bet"}</button>
     <p class="hint">Prices move with every bet until kickoff. Winners split the pot, so a 25¢ pick pays about 4× your stake. Your wallet confirms each pick.</p>`;
-  if (!state.account) $("placeBtn").disabled = false;
+  if (!state.account && !state.placing) $("placeBtn").disabled = false;
 }
 
 function comboLost(t) { return t.legs.some(([fid, m, o]) => legState(fid, m, o) === "lose"); }
@@ -1647,21 +1647,26 @@ document.addEventListener("input", (e) => {
 });
 
 async function placeCombo(btn) {
+  if (state.placing) return;
   if (!state.writer) { await connect(); renderSlip(); if (!state.writer) return; }
   await loadCombos();
   const q = comboQuote();
   if (q.err) { renderSlip(); return toast(esc(q.err), "err"); }
   if (q.stake <= 0n) return toast("Enter a combo stake.", "err");
-  btn.disabled = true;
+  if (state.placing) return;
+  state.placing = true; renderSlip();
   const legs = state.slip.map((p) => `${p.fid}:${p.market}:${p.outcome}`).join(",");
-  const job = await send("place", [legs], { to: COMBOS, value: q.stake, kind: "combo", title: `Combo · ${state.slip.length} picks · ${fmtGen(q.stake)} GEN` });
-  if (!job) { btn.disabled = false; return; }
+  let job;
+  try { job = await send("place", [legs], { to: COMBOS, value: q.stake, kind: "combo", title: `Combo · ${state.slip.length} picks · ${fmtGen(q.stake)} GEN` }); }
+  finally { state.placing = false; }
+  if (!job) { renderSlip(); return; }
   state.slip = []; state.comboAmount = ""; saveSlip(); renderSlip(); renderBoard();
   toast("Combo sent. Validators are pricing every pick now.", "ok");
   job.done.then(() => loadAllPositions());
 }
 
 async function placeBets(btn) {
+  if (state.placing) return;
   if (!state.writer) { await connect(); renderSlip(); if (!state.writer) return; }
   const picks = [...state.slip];
   for (const p of picks) {
@@ -1669,16 +1674,19 @@ async function placeBets(btn) {
     const f = fixtureById(p.fid);
     if (!f || phase(f) !== "open") return toast("One of your picks has closed. Remove it to continue.", "err");
   }
-  btn.disabled = true;
-  for (const p of picks) {
-    const v = parseGen(p.amount);
-    const job = await send("stake", [p.fid, p.market, p.outcome], { value: v, title: `Stake ${fmtGen(v)} GEN · ${outLabel(p.market, p.outcome)}`, fixture: p.fid });
-    if (!job) break;
-    const i = state.slip.indexOf(p);
-    if (i >= 0) state.slip.splice(i, 1);
-    saveSlip();
-    renderSlip(); renderBoard();
-  }
+  state.placing = true; renderSlip();
+  try {
+    for (const p of picks) {
+      const v = parseGen(p.amount);
+      const job = await send("stake", [p.fid, p.market, p.outcome], { value: v, title: `Stake ${fmtGen(v)} GEN · ${outLabel(p.market, p.outcome)}`, fixture: p.fid });
+      if (!job) break;
+      const i = state.slip.indexOf(p);
+      if (i >= 0) state.slip.splice(i, 1);   // sent: take it off the slip so it can never be sent twice
+      saveSlip();
+      renderSlip(); renderBoard();
+    }
+  } finally { state.placing = false; }
+  renderSlip();
   if (!state.slip.length) toast("Bets sent. Validators are confirming them now.", "ok");
 }
 
