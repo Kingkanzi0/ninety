@@ -392,6 +392,10 @@ details.more-src[open] summary { margin-bottom: 8px; }
 .cl-end{display:flex;gap:10px;align-items:center;justify-content:flex-end}
 .tag.st-win{color:#36d399}.tag.st-lose{color:#ff6b6b}
 @media (max-width:700px){.combo-leg{grid-template-columns:1fr}.cl-mid{text-align:left}.cl-end{justify-content:flex-start}.combo-stats{gap:16px}}
+.tag.t-live{color:#ff6b6b;background:#ff6b6b1f;display:inline-flex;align-items:center;gap:5px}.tag.t-live i,.live-dot{width:7px;height:7px;border-radius:50%;background:#ff4d4d;display:inline-block;animation:livepulse 1.2s infinite}
+.live-dot{margin-right:6px;vertical-align:middle}.live-g{color:#ff8a8a}
+@keyframes livepulse{50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){.tag.t-live i,.live-dot{animation:none}}
 .bet-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:12px 12px 0}.bet-tabs:empty{display:none}
 .legopen{color:var(--fg);font:inherit;padding:0;text-align:left;text-decoration:underline;text-decoration-color:#ffffff40;text-underline-offset:3px;cursor:pointer}.legopen{display:inline;font-weight:inherit}.legopen:hover{color:var(--yellow)}
 </style>
@@ -1013,6 +1017,9 @@ function tagFor(f) {
   return `<span class="tag t-open">Open · closes ${fmtIn(f.kickoff)}</span>`;
 }
 
+function liveTag(l) {
+  return l.st === "in" ? `<span class="tag t-live"><i></i>Live ${esc(l.clock)}</span>` : `<span class="tag t-wait">Ended ${l.h}–${l.a} · result being confirmed</span>`;
+}
 function oddButton(f, market, o, label) {
   const mk = f.markets[market];
   const c = chanceOf(f, market, o);
@@ -1037,12 +1044,13 @@ function renderEvents() {
   }
   return ghosts + rows.map((f) => {
     const final = f.status === "FINAL";
+    const lv = liveOf(f);
     const r = f.markets.RESULT;
     return `<div class="ev">
       <button class="ev-main" type="button" data-open="${f.id}">
-        <span class="ev-meta">${tagFor(f)}<span class="comp">${esc(f.competition || "Friendly")}</span><span>${fmtTime(f.kickoff)}</span></span>
-        <span class="ev-team">${crest(f.home)}<span class="nm">${esc(f.home)}</span>${final ? `<span class="g num">${f.home_goals}</span>` : ""}</span>
-        <span class="ev-team">${crest(f.away)}<span class="nm">${esc(f.away)}</span>${final ? `<span class="g num">${f.away_goals}</span>` : ""}</span>
+        <span class="ev-meta">${tagFor(f)}${lv ? liveTag(lv) : ""}<span class="comp">${esc(f.competition || "Friendly")}</span><span>${fmtTime(f.kickoff)}</span></span>
+        <span class="ev-team">${crest(f.home)}<span class="nm">${esc(f.home)}</span>${final ? `<span class="g num">${f.home_goals}</span>` : lv ? `<span class="g num live-g">${lv.h}</span>` : ""}</span>
+        <span class="ev-team">${crest(f.away)}<span class="nm">${esc(f.away)}</span>${final ? `<span class="g num">${f.away_goals}</span>` : lv ? `<span class="g num live-g">${lv.a}</span>` : ""}</span>
       </button>
       ${f.status === "REJECTED" ? `<div class="odds" style="place-items:center;font-size:13px;color:var(--soft)">Not listed</div>` :
         `<div class="odds">${oddButton(f, "RESULT", "HOME", short(f.home))}${oddButton(f, "RESULT", "DRAW", "Draw")}${oddButton(f, "RESULT", "AWAY", short(f.away))}</div>`}
@@ -1186,6 +1194,7 @@ function renderMatch() {
   if (f.status === "FINAL") mid = `<div class="big num">${f.home_goals}–${f.away_goals}</div><small>Full time · agreed by validators</small>`;
   else if (f.status === "VOID") mid = `<div class="big t">Void</div><small>All stakes refunded</small>`;
   else if (f.status === "REJECTED") mid = `<div class="big t">Not listed</div><small>Match page didn't match</small>`;
+  else if (liveOf(f)) { const l = liveOf(f); mid = `<div class="big num">${l.h}–${l.a}</div><small>${l.st === "in" ? `<span class="live-dot"></span>Live · ${esc(l.clock)}` : "Ended · result being confirmed on-chain"}</small>`; }
   else mid = `<div class="big t num">${new Date(f.kickoff * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</div><small>${new Date(f.kickoff * 1000).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</small>`;
   const stripMsg = {
     open: `Staking closes <b>${fmtIn(f.kickoff)}</b>`,
@@ -1228,6 +1237,39 @@ function renderMatch() {
 
 /* ---------- match centre: goals, cards and stats from the ESPN feed ---------- */
 state.events = {};
+/* ---------- live scores (ESPN scoreboard, read-only, for display) ---------- */
+state.live = {};   // feed "lg/id" -> { h, a, clock, st: "pre" | "in" | "post" }
+const ymd = (t) => new Date(t * 1000).toISOString().slice(0, 10).replace(/-/g, "");
+async function loadLive() {
+  const now = nowSec();
+  const want = state.fixtures.filter((f) => f.feed && f.status === "SCHEDULED" && now >= f.kickoff - 300 && now < f.kickoff + 2 * 86400);
+  if (!want.length) return;
+  const byLg = {};
+  for (const f of want) (byLg[f.feed.split("/")[0]] ||= []).push(f);
+  let changed = false;
+  await Promise.all(Object.entries(byLg).map(async ([lg, list]) => {
+    const lo = Math.min(...list.map((f) => f.kickoff)) - 86400, hi = Math.max(...list.map((f) => f.kickoff)) + 86400;
+    try {
+      const j = await fetchJson(`https://site.api.espn.com/apis/site/v2/sports/soccer/${lg}/scoreboard?dates=${ymd(lo)}-${ymd(hi)}`, 10000);
+      for (const e of j.events || []) {
+        const c = e.competitions?.[0];
+        const h = c?.competitors?.find((x) => x.homeAway === "home"), a = c?.competitors?.find((x) => x.homeAway === "away");
+        if (!h || !a) continue;
+        const t = e.status?.type || {};
+        const row = { h: Number(h.score ?? 0), a: Number(a.score ?? 0), st: t.state || "pre", clock: t.state === "in" ? (t.shortDetail || e.status?.displayClock || "Live") : t.shortDetail || "" };
+        const key = `${lg}/${e.id}`, old = state.live[key];
+        if (!old || old.h !== row.h || old.a !== row.a || old.clock !== row.clock || old.st !== row.st) changed = true;
+        state.live[key] = row;
+      }
+    } catch { /* live scores are a nice-to-have; settlement never depends on them */ }
+  }));
+  if (changed && !userIsTyping()) renderBoard();
+}
+function liveOf(f) {
+  if (!f.feed || f.status !== "SCHEDULED") return null;
+  const l = state.live[f.feed];
+  return l && l.st !== "pre" ? l : null;
+}
 function renderEvents2(f) {
   const e = state.events[f.feed];
   if (!f.feed) return "";
@@ -1736,6 +1778,8 @@ $("listBtn").addEventListener("click", () => {
   resumeJobs();
   reconnect();
   setInterval(() => { if (!document.hidden) loadFixtures({ auto: true }); }, 20000);
+  loadLive();
+  setInterval(() => { if (!document.hidden) loadLive(); }, 60000);
 })();
 </script>
 </body>
