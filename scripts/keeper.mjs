@@ -20,7 +20,7 @@ export const DEFAULT_CONTRACT = "0xD4807A5EBeBc9fb8aD071364Db452dd809a09129"; //
 export const LIST_AHEAD_DAYS = 4;    // keep the next 4 days of games open
 export const MIN_LEAD_SEC = 45 * 60; // contract needs 10 min; leave room for consensus
 export const MAX_LIST = 6;           // per run, keeps each run short
-export const MAX_SETTLE = 6;
+export const MAX_SETTLE = 12;
 export const DEFAULT_COMBOS = "0x2CF0247D078C738acac807025Df1F60e9057C02C"; // set after deploy
 export const GEN = 10n ** 18n;
 export const SEED_PER_MARKET = 3n * GEN / 10n;   // 0.3 GEN spread across a market's outcomes
@@ -28,6 +28,8 @@ export const MAX_SEED_GAMES = 4;                 // per run (7 stakes per game)
 export const MAX_CLAIM = 6;
 export const MAX_COMBO_SETTLE = 6;
 export const HOUSE_MIN = 2n * GEN, HOUSE_TOPUP = 3n * GEN;
+export const FEE_RESERVE = 2n * GEN;              // always keep this much for settle/claim fees
+const RUN_BUDGET_MS = 40 * 60e3;                 // stop starting new transactions after 40 min (job limit is 50)
 export const DEFAULT_PROBS = { RESULT: { HOME: 0.45, DRAW: 0.27, AWAY: 0.28 }, GOALS: { OVER: 0.52, UNDER: 0.48 }, BTTS: { YES: 0.52, NO: 0.48 } };
 const SETTLE_RETRY_SEC = 50 * 60;    // a PENDING match is retried next run
 const ZERO = /^0x0{40}$/;
@@ -148,7 +150,20 @@ async function main() {
   console.log(`plan: list ${p.toList.length}, settle ${p.toSettle.length}, expire ${p.toExpire.length}, seed ${q.seeds.length}, claim ${q.claims.length}, combos ${q.comboSettles.length}, house top-up ${q.topUp > 0n ? "yes" : "no"}`);
   if (dry) { console.log(JSON.stringify({ ...p, ...q }, (k, v) => (typeof v === "bigint" ? v.toString() : v), 1)); return; }
 
+  const t0 = Date.now();
+  let balance = null;
+  async function refreshBalance() {
+    try { balance = await client.getBalance({ address: account.address }); } catch { balance = null; }
+    return balance;
+  }
+  await refreshBalance();
+  console.log(`keeper balance: ${balance == null ? "unknown" : (Number(balance) / 1e18).toFixed(3) + " GEN"}`);
+  if (balance != null && balance < FEE_RESERVE) console.log("WARNING: keeper wallet is low on GEN. Fund it so matches keep settling.");
+  // spending GEN (seeds, house top-ups) only while the fee reserve stays untouched
+  const canSpend = async (value) => { await refreshBalance(); return balance == null || balance - value >= FEE_RESERVE; };
+
   async function send(functionName, args, label, value = 0n, to = address) {
+    if (Date.now() - t0 > RUN_BUDGET_MS) { console.log(`${label}: skipped, out of time this run`); return; }
     try {
       const hash = await client.writeContract({ address: to, functionName, args, value });
       console.log(`${label}: sent ${hash}`);
@@ -159,15 +174,24 @@ async function main() {
       console.log(`${label}: failed (${String(e?.shortMessage || e?.message || e).slice(0, 160)}), will retry next run`);
     }
   }
-  for (const m of p.toList) await send("list_match", [m.league, Number(m.id)], `list ${m.home} v ${m.away}`);
+  // 1. results first: players are waiting on these
   for (const f of p.toSettle) await send("settle", [f.id], `settle #${f.id} ${f.home} v ${f.away}`);
   for (const f of p.toExpire) await send("expire", [f.id], `expire #${f.id}`);
-  for (const sd of q.seeds) await send("stake", [sd.fid, sd.market, sd.outcome], `seed #${sd.fid} ${sd.market} ${sd.outcome}`, sd.value);
+  if (!ZERO.test(combos)) for (const tid of q.comboSettles) await send("settle_ticket", [tid], `settle combo #${tid}`, 0n, combos);
   for (const fid of q.claims) await send("claim", [fid], `claim seed #${fid}`);
-  if (!ZERO.test(combos)) {
-    for (const tid of q.comboSettles) await send("settle_ticket", [tid], `settle combo #${tid}`, 0n, combos);
-    if (q.topUp > 0n) await send("fund", [], "top up combo house", q.topUp, combos);
+  // 2. then open new games
+  for (const m of p.toList) await send("list_match", [m.league, Number(m.id)], `list ${m.home} v ${m.away}`);
+  // 3. spending last, and never below the fee reserve
+  if (!ZERO.test(combos) && q.topUp > 0n) {
+    if (await canSpend(q.topUp)) await send("fund", [], "top up combo house", q.topUp, combos);
+    else console.log("top up combo house: skipped, keeper balance too low");
   }
+  for (const sd of q.seeds) {
+    if (!(await canSpend(sd.value))) { console.log("seeding: stopped, keeper balance too low"); break; }
+    await send("stake", [sd.fid, sd.market, sd.outcome], `seed #${sd.fid} ${sd.market} ${sd.outcome}`, sd.value);
+  }
+  await refreshBalance();
+  console.log(`done in ${Math.round((Date.now() - t0) / 60e3)} min, keeper balance ${balance == null ? "unknown" : (Number(balance) / 1e18).toFixed(3) + " GEN"}`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
