@@ -66,6 +66,10 @@ button { cursor: pointer; }
 .spacer { flex: 1; }
 .net { font-size: 12px; font-weight: 700; color: var(--soft); padding: 6px 10px; border: 1px solid var(--line); border-radius: 99px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .net::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(34,167,100,.25); }
+.net.warn::before { background: #f5a524; box-shadow: 0 0 0 3px rgba(245,165,36,.25); }
+.net.down::before { background: #ff5b5b; box-shadow: 0 0 0 3px rgba(255,91,91,.25); }
+.net-banner { background: #2b2108; color: #ffe2a3; border-bottom: 1px solid #5a4410; padding: 10px 20px; font-size: 14px; line-height: 1.45; text-align: center; }
+.net-banner b { color: #fff; }
 .btn {
   border: 0; border-radius: var(--r); padding: 10px 16px; font-weight: 800;
   background: var(--yellow); color: var(--yellow-ink); white-space: nowrap;
@@ -413,6 +417,7 @@ details.more-src[open] summary { margin-bottom: 8px; }
   <button class="btn ghost" id="listBtn" type="button" aria-label="Open more games">+<span class="lbl"> More games</span></button>
   <button class="btn" id="connectBtn" type="button">Connect wallet</button>
 </header>
+<div class="net-banner" id="netBanner" role="status" hidden></div>
 
 <div class="shell">
   <aside class="rail card" aria-label="Filters">
@@ -841,6 +846,38 @@ function resumeJobs() {
   for (const m of saved) if (m?.hash && Date.now() - m.started < 3 * 3600e3) track(m.hash, m);
 }
 
+/* ---------- network health: tell players when Bradbury itself is struggling ---------- */
+state.netIssue = "";
+async function rpcPing(method, params = []) {
+  const url = state.chain?.rpcUrls?.default?.http?.[0];
+  if (!url) throw new Error("no rpc");
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }), signal: ctl.signal });
+    const j = await r.json();
+    if (j.error) throw new Error(j.error.message || "rpc error");
+    return j.result;
+  } finally { clearTimeout(t); }
+}
+async function checkNetwork() {
+  let ok = true;
+  try { await rpcPing("eth_blockNumber"); await rpcPing("eth_gasPrice"); } catch { ok = false; }
+  const stuck = [...jobs.values()].some((j) => !j.final && Date.now() - j.started > 10 * 60e3);
+  const waiting = state.fixtures.filter((f) => f.status === "SCHEDULED" && nowSec() > f.kickoff + 4 * 3600).length;
+  state.netIssue = !ok ? "down" : stuck || waiting >= 6 ? "slow" : "";
+  const b = $("netBanner"), lbl = $("netLabel");
+  lbl.classList.toggle("down", state.netIssue === "down");
+  lbl.classList.toggle("warn", state.netIssue === "slow");
+  if (!state.netIssue) { b.hidden = true; return; }
+  b.innerHTML = state.netIssue === "down"
+    ? `<b>Bradbury testnet isn't answering right now.</b> You can browse games and live scores, but wallets can't send transactions until the network is back. Nothing you've staked is lost.`
+    : `<b>Bradbury testnet is processing transactions slowly right now.</b> Bets and results may take longer than usual to confirm; finished games settle as soon as the network catches up. Nothing you've staked is lost.`;
+  b.hidden = false;
+}
+function netHint() {
+  return state.netIssue ? "<br><br>Bradbury testnet is having trouble processing transactions right now, so wallets may not be able to confirm. Try again a bit later." : "";
+}
+
 async function send(functionName, args, { value, title, kind, fixture, ghost, key, to } = {}) {
   if (!state.writer) { await connect(); if (!state.writer) return null; }
   const write = { address: to || CONTRACT, functionName, args };
@@ -859,7 +896,7 @@ async function send(functionName, args, { value, title, kind, fixture, ghost, ke
     const help = /insufficient funds|gas required exceeds/i.test(m) ? "Your wallet has no GEN for the fee. Get free testnet GEN at testnet-faucet.genlayer.foundation and try again."
       : /rpc|fetch|network|timeout|internal json|-32603|-32000/i.test(m) ? `Your wallet could not reach Bradbury. In your wallet's network settings use RPC <b>https://rpc-bradbury.genlayer.com</b> and chain ID <b>4221</b>, then try again.`
       : "";
-    toast(`${esc(m)}${help ? `<br><br>${help}` : ""}`, "err", 16000);
+    toast(`${esc(m)}${help ? `<br><br>${help}` : ""}${help ? "" : netHint()}`, "err", 16000);
     return null;
   }
 }
@@ -1366,7 +1403,7 @@ function comboQuote() {
     const f = fixtureById(p.fid);
     const o = f ? oddsOf(f.markets[p.market], p.outcome) : null;
     if (!f || phase(f) !== "open") err = err || "One of your picks has closed.";
-    else if (!o || o <= 1) err = err || `${outLabel(p.market, p.outcome)} has no live price yet. Pick a game that shows a price without "est."`;
+    else if (!o || o <= 1) err = err || `${outLabel(p.market, p.outcome)} doesn't have live odds yet (prices marked "est." are only estimates). A combo needs live odds on every pick, so choose games without "est." or place this pick as a single bet.`;
     else x *= Math.min(o, MAX_LEG_X);
   }
   x = Math.min(x, MAX_COMBO_X);
@@ -1804,6 +1841,8 @@ $("listBtn").addEventListener("click", () => {
   setInterval(() => { if (!document.hidden) loadFixtures({ auto: true }); }, 20000);
   loadLive();
   setInterval(() => { if (!document.hidden) loadLive(); }, 60000);
+  checkNetwork();
+  setInterval(() => { if (!document.hidden) checkNetwork(); }, 120000);
 })();
 </script>
 </body>
