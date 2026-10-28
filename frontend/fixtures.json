@@ -1,5 +1,5 @@
 {
- "updated": 1793139517,
+ "updated": 1793166475,
  "matches": [
   {
    "id": "401874993",
@@ -15,8 +15,8 @@
      "AWAY": 0.197
     },
     "GOALS": {
-     "OVER": 0.526,
-     "UNDER": 0.474
+     "OVER": 0.516,
+     "UNDER": 0.484
     },
     "BTTS": {
      "YES": 0.52,
@@ -34,13 +34,13 @@
    "kickoff": 1793208600,
    "probs": {
     "RESULT": {
-     "HOME": 0.336,
-     "DRAW": 0.303,
-     "AWAY": 0.362
+     "HOME": 0.34,
+     "DRAW": 0.306,
+     "AWAY": 0.353
     },
     "GOALS": {
-     "OVER": 0.431,
-     "UNDER": 0.569
+     "OVER": 0.453,
+     "UNDER": 0.547
     },
     "BTTS": {
      "YES": 0.52,
@@ -58,9 +58,9 @@
    "kickoff": 1793208600,
    "probs": {
     "RESULT": {
-     "HOME": 0.132,
-     "DRAW": 0.176,
-     "AWAY": 0.692
+     "HOME": 0.133,
+     "DRAW": 0.177,
+     "AWAY": 0.69
     },
     "GOALS": {
      "OVER": 0.52,
@@ -82,13 +82,13 @@
    "kickoff": 1793216700,
    "probs": {
     "RESULT": {
-     "HOME": 0.184,
-     "DRAW": 0.256,
-     "AWAY": 0.56
+     "HOME": 0.186,
+     "DRAW": 0.273,
+     "AWAY": 0.541
     },
     "GOALS": {
-     "OVER": 0.453,
-     "UNDER": 0.547
+     "OVER": 0.401,
+     "UNDER": 0.599
     },
     "BTTS": {
      "YES": 0.52,
@@ -130,9 +130,9 @@
    "kickoff": 1793230200,
    "probs": {
     "RESULT": {
-     "HOME": 0.629,
-     "DRAW": 0.194,
-     "AWAY": 0.177
+     "HOME": 0.598,
+     "DRAW": 0.21,
+     "AWAY": 0.192
     },
     "GOALS": {
      "OVER": 0.52,
@@ -154,9 +154,9 @@
    "kickoff": 1793230200,
    "probs": {
     "RESULT": {
-     "HOME": 0.635,
-     "DRAW": 0.189,
-     "AWAY": 0.176
+     "HOME": 0.622,
+     "DRAW": 0.193,
+     "AWAY": 0.185
     },
     "GOALS": {
      "OVER": 0.52,
@@ -178,9 +178,9 @@
    "kickoff": 1793230200,
    "probs": {
     "RESULT": {
-     "HOME": 0.482,
-     "DRAW": 0.23,
-     "AWAY": 0.288
+     "HOME": 0.484,
+     "DRAW": 0.237,
+     "AWAY": 0.28
     },
     "GOALS": {
      "OVER": 0.52,
@@ -250,9 +250,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.357,
-     "DRAW": 0.248,
-     "AWAY": 0.395
+     "HOME": 0.329,
+     "DRAW": 0.252,
+     "AWAY": 0.419
     },
     "GOALS": {
      "OVER": 0.597,
@@ -274,9 +274,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.594,
-     "DRAW": 0.196,
-     "AWAY": 0.21
+     "HOME": 0.611,
+     "DRAW": 0.189,
+     "AWAY": 0.201
     },
     "GOALS": {
      "OVER": 0.52,
@@ -298,9 +298,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.452,
-     "DRAW": 0.244,
-     "AWAY": 0.304
+     "HOME": 0.441,
+     "DRAW": 0.25,
+     "AWAY": 0.309
     },
     "GOALS": {
      "OVER": 0.52,
@@ -322,9 +322,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.662,
-     "DRAW": 0.184,
-     "AWAY": 0.154
+     "HOME": 0.65,
+     "DRAW": 0.189,
+     "AWAY": 0.161
     },
     "GOALS": {
      "OVER": 0.52,
@@ -346,13 +346,13 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.523,
-     "DRAW": 0.237,
-     "AWAY": 0.24
+     "HOME": 0.53,
+     "DRAW": 0.234,
+     "AWAY": 0.237
     },
     "GOALS": {
-     "OVER": 0.52,
-     "UNDER": 0.48
+     "OVER": 0.597,
+     "UNDER": 0.403
     },
     "BTTS": {
      "YES": 0.52,
@@ -370,9 +370,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.541,
-     "DRAW": 0.221,
-     "AWAY": 0.238
+     "HOME": 0.496,
+     "DRAW": 0.235,
+     "AWAY": 0.269
     },
     "GOALS": {
      "OVER": 0.52,
@@ -394,13 +394,13 @@
    "kickoff": 1793241000,
    "probs": {
     "RESULT": {
-     "HOME": 0.432,
-     "DRAW": 0.258,
-     "AWAY": 0.31
+     "HOME": 0.42,
+     "DRAW": 0.261,
+     "AWAY": 0.319
     },
     "GOALS": {
-     "OVER": 0.597,
-     "UNDER": 0.403
+     "OVER": 0.589,
+     "UNDER": 0.411
     },
     "BTTS": {
      "YES": 0.52,
@@ -423,8 +423,8 @@
      "AWAY": 0.235
     },
     "GOALS": {
-     "OVER": 0.589,
-     "UNDER": 0.411
+     "OVER": 0.581,
+     "UNDER": 0.419
     },
     "BTTS": {
      "YES": 0.52,
@@ -442,9 +442,9 @@
    "kickoff": 1793241000,
    "probs": {
     "RESULT": {
-     "HOME": 0.654,
-     "DRAW": 0.185,
-     "AWAY": 0.161
+     "HOME": 0.655,
+     "DRAW": 0.184,
+     "AWAY": 0.16
     },
     "GOALS": {
      "OVER": 0.52,
@@ -495,8 +495,8 @@
      "AWAY": 0.312
     },
     "GOALS": {
-     "OVER": 0.592,
-     "UNDER": 0.408
+     "OVER": 0.597,
+     "UNDER": 0.403
     },
     "BTTS": {
      "YES": 0.52,
@@ -639,8 +639,8 @@
      "AWAY": 0.341
     },
     "GOALS": {
-     "OVER": 0.56,
-     "UNDER": 0.44
+     "OVER": 0.554,
+     "UNDER": 0.446
     },
     "BTTS": {
      "YES": 0.52,
@@ -730,9 +730,9 @@
    "kickoff": 1793449800,
    "probs": {
     "RESULT": {
-     "HOME": 0.601,
-     "DRAW": 0.22,
-     "AWAY": 0.18
+     "HOME": 0.613,
+     "DRAW": 0.215,
+     "AWAY": 0.172
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1023,8 +1023,8 @@
      "AWAY": 0.357
     },
     "GOALS": {
-     "OVER": 0.51,
-     "UNDER": 0.49
+     "OVER": 0.516,
+     "UNDER": 0.484
     },
     "BTTS": {
      "YES": 0.52,
@@ -1071,8 +1071,8 @@
      "AWAY": 0.401
     },
     "GOALS": {
-     "OVER": 0.554,
-     "UNDER": 0.446
+     "OVER": 0.541,
+     "UNDER": 0.459
     },
     "BTTS": {
      "YES": 0.52,
@@ -1114,8 +1114,8 @@
    "kickoff": 1793458800,
    "probs": {
     "RESULT": {
-     "HOME": 0.731,
-     "DRAW": 0.164,
+     "HOME": 0.737,
+     "DRAW": 0.158,
      "AWAY": 0.105
     },
     "GOALS": {
@@ -1210,13 +1210,13 @@
    "kickoff": 1793458800,
    "probs": {
     "RESULT": {
-     "HOME": 0.604,
-     "DRAW": 0.216,
-     "AWAY": 0.181
+     "HOME": 0.593,
+     "DRAW": 0.219,
+     "AWAY": 0.188
     },
     "GOALS": {
-     "OVER": 0.592,
-     "UNDER": 0.408
+     "OVER": 0.586,
+     "UNDER": 0.414
     },
     "BTTS": {
      "YES": 0.52,
@@ -1234,9 +1234,9 @@
    "kickoff": 1793458800,
    "probs": {
     "RESULT": {
-     "HOME": 0.583,
-     "DRAW": 0.215,
-     "AWAY": 0.202
+     "HOME": 0.572,
+     "DRAW": 0.219,
+     "AWAY": 0.209
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1474,9 +1474,9 @@
    "kickoff": 1793468700,
    "probs": {
     "RESULT": {
-     "HOME": 0.877,
-     "DRAW": 0.072,
-     "AWAY": 0.052
+     "HOME": 0.869,
+     "DRAW": 0.077,
+     "AWAY": 0.054
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1671,8 +1671,8 @@
      "AWAY": 0.27
     },
     "GOALS": {
-     "OVER": 0.563,
-     "UNDER": 0.437
+     "OVER": 0.554,
+     "UNDER": 0.446
     },
     "BTTS": {
      "YES": 0.52,
@@ -2055,8 +2055,8 @@
      "AWAY": 0.352
     },
     "GOALS": {
-     "OVER": 0.563,
-     "UNDER": 0.437
+     "OVER": 0.567,
+     "UNDER": 0.433
     },
     "BTTS": {
      "YES": 0.52,
@@ -2194,9 +2194,9 @@
    "kickoff": 1793550600,
    "probs": {
     "RESULT": {
-     "HOME": 0.315,
-     "DRAW": 0.266,
-     "AWAY": 0.419
+     "HOME": 0.319,
+     "DRAW": 0.273,
+     "AWAY": 0.409
     },
     "GOALS": {
      "OVER": 0.52,
@@ -2271,8 +2271,8 @@
      "AWAY": 0.319
     },
     "GOALS": {
-     "OVER": 0.49,
-     "UNDER": 0.51
+     "OVER": 0.484,
+     "UNDER": 0.516
     },
     "BTTS": {
      "YES": 0.52,
@@ -2698,9 +2698,9 @@
    "kickoff": 1793650500,
    "probs": {
     "RESULT": {
-     "HOME": 0.78,
-     "DRAW": 0.143,
-     "AWAY": 0.077
+     "HOME": 0.798,
+     "DRAW": 0.131,
+     "AWAY": 0.071
     },
     "GOALS": {
      "OVER": 0.52,
@@ -2722,13 +2722,13 @@
    "kickoff": 1793650500,
    "probs": {
     "RESULT": {
-     "HOME": 0.355,
+     "HOME": 0.336,
      "DRAW": 0.303,
-     "AWAY": 0.342
+     "AWAY": 0.362
     },
     "GOALS": {
-     "OVER": 0.425,
-     "UNDER": 0.575
+     "OVER": 0.428,
+     "UNDER": 0.572
     },
     "BTTS": {
      "YES": 0.52,
@@ -3730,9 +3730,9 @@
    "kickoff": 1793908800,
    "probs": {
     "RESULT": {
-     "HOME": 0.771,
-     "DRAW": 0.144,
-     "AWAY": 0.085
+     "HOME": 0.773,
+     "DRAW": 0.143,
+     "AWAY": 0.084
     },
     "GOALS": {
      "OVER": 0.52,
@@ -4064,6 +4064,1230 @@
    "comp": "Primeira Liga",
    "league": "por.1",
    "kickoff": 1793997900,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401878758",
+   "home": "Leeds United",
+   "away": "Tottenham Hotspur",
+   "comp": "Premier League",
+   "league": "eng.1",
+   "kickoff": 1794054600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.373,
+     "DRAW": 0.282,
+     "AWAY": 0.345
+    },
+    "GOALS": {
+     "OVER": 0.5,
+     "UNDER": 0.5
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880170",
+   "home": "Bristol City",
+   "away": "Norwich City",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794054600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880166",
+   "home": "Portsmouth",
+   "away": "Stoke City",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794054600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880161",
+   "home": "Wrexham",
+   "away": "Wolverhampton Wanderers",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794054600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401882812",
+   "home": "M\u00e1laga",
+   "away": "Racing Santander",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1794056400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.397,
+     "DRAW": 0.27,
+     "AWAY": 0.333
+    },
+    "GOALS": {
+     "OVER": 0.57,
+     "UNDER": 0.43
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401874791",
+   "home": "Cagliari",
+   "away": "Frosinone",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1794060000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401874811",
+   "home": "Torino",
+   "away": "Lecce",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1794060000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401884745",
+   "home": "Borussia Dortmund",
+   "away": "SV Elversberg",
+   "comp": "Bundesliga",
+   "league": "ger.1",
+   "kickoff": 1794061800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.708,
+     "DRAW": 0.164,
+     "AWAY": 0.128
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401884740",
+   "home": "Mainz",
+   "away": "Bayern Munich",
+   "comp": "Bundesliga",
+   "league": "ger.1",
+   "kickoff": 1794061800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.184,
+     "DRAW": 0.18,
+     "AWAY": 0.636
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401884744",
+   "home": "RB Leipzig",
+   "away": "FC Augsburg",
+   "comp": "Bundesliga",
+   "league": "ger.1",
+   "kickoff": 1794061800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.635,
+     "DRAW": 0.185,
+     "AWAY": 0.181
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401884737",
+   "home": "SC Paderborn 07",
+   "away": "Eintracht Frankfurt",
+   "comp": "Bundesliga",
+   "league": "ger.1",
+   "kickoff": 1794061800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.325,
+     "DRAW": 0.253,
+     "AWAY": 0.423
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401878760",
+   "home": "Arsenal",
+   "away": "Hull City",
+   "comp": "Premier League",
+   "league": "eng.1",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.825,
+     "DRAW": 0.117,
+     "AWAY": 0.058
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401879241",
+   "home": "Fulham",
+   "away": "Newcastle United",
+   "comp": "Premier League",
+   "league": "eng.1",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.426,
+     "DRAW": 0.267,
+     "AWAY": 0.307
+    },
+    "GOALS": {
+     "OVER": 0.558,
+     "UNDER": 0.442
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880172",
+   "home": "Birmingham City",
+   "away": "Swansea City",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880171",
+   "home": "Blackburn Rovers",
+   "away": "West Ham United",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880169",
+   "home": "Cardiff City",
+   "away": "Burnley",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880168",
+   "home": "Charlton Athletic",
+   "away": "Sheffield United",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880165",
+   "home": "Preston North End",
+   "away": "Southampton",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880164",
+   "home": "Queens Park Rangers",
+   "away": "Lincoln City",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880163",
+   "home": "Watford",
+   "away": "Middlesbrough",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880162",
+   "home": "West Bromwich Albion",
+   "away": "Millwall",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1794063600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401882813",
+   "home": "Espanyol",
+   "away": "Deportivo",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1794064500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.434,
+     "DRAW": 0.274,
+     "AWAY": 0.292
+    },
+    "GOALS": {
+     "OVER": 0.485,
+     "UNDER": 0.515
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401875555",
+   "home": "Fortuna Sittard",
+   "away": "Telstar",
+   "comp": "Eredivisie",
+   "league": "ned.1",
+   "kickoff": 1794065400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401885398",
+   "home": "C.D. Nacional",
+   "away": "Acad\u00e9mico de Viseu",
+   "comp": "Primeira Liga",
+   "league": "por.1",
+   "kickoff": 1794065400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401876411",
+   "home": "AJ Auxerre",
+   "away": "Paris FC",
+   "comp": "Ligue 1",
+   "league": "fra.1",
+   "kickoff": 1794068100,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.26,
+     "DRAW": 0.25,
+     "AWAY": 0.49
+    },
+    "GOALS": {
+     "OVER": 0.548,
+     "UNDER": 0.452
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401874974",
+   "home": "Parma",
+   "away": "Bologna",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1794070800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401878757",
+   "home": "Nottingham Forest",
+   "away": "Manchester City",
+   "comp": "Premier League",
+   "league": "eng.1",
+   "kickoff": 1794072600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.195,
+     "DRAW": 0.234,
+     "AWAY": 0.57
+    },
+    "GOALS": {
+     "OVER": 0.586,
+     "UNDER": 0.414
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401882811",
+   "home": "Osasuna",
+   "away": "Athletic Club",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1794072600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.283,
+     "DRAW": 0.283,
+     "AWAY": 0.434
+    },
+    "GOALS": {
+     "OVER": 0.465,
+     "UNDER": 0.535
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401884743",
+   "home": "VfB Stuttgart",
+   "away": "Werder Bremen",
+   "comp": "Bundesliga",
+   "league": "ger.1",
+   "kickoff": 1794072600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.632,
+     "DRAW": 0.188,
+     "AWAY": 0.18
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401875552",
+   "home": "ADO Den Haag",
+   "away": "Sparta Rotterdam",
+   "comp": "Eredivisie",
+   "league": "ned.1",
+   "kickoff": 1794073500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401885402",
+   "home": "Alverca",
+   "away": "Casa Pia",
+   "comp": "Primeira Liga",
+   "league": "por.1",
+   "kickoff": 1794074400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401874803",
+   "home": "AS Roma",
+   "away": "Sassuolo",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1794080700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401876407",
+   "home": "Paris Saint-Germain",
+   "away": "Troyes",
+   "comp": "Ligue 1",
+   "league": "fra.1",
+   "kickoff": 1794080700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.824,
+     "DRAW": 0.104,
+     "AWAY": 0.072
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401882808",
+   "home": "Valencia",
+   "away": "Real Madrid",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1794081600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.156,
+     "DRAW": 0.191,
+     "AWAY": 0.653
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401875554",
+   "home": "Excelsior",
+   "away": "Go Ahead Eagles",
+   "comp": "Eredivisie",
+   "league": "ned.1",
+   "kickoff": 1794081600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401885395",
+   "home": "Sporting CP",
+   "away": "Moreirense",
+   "comp": "Primeira Liga",
+   "league": "por.1",
+   "kickoff": 1794083400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761934",
+   "home": "CF Montr\u00e9al",
+   "away": "Vancouver Whitecaps",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761935",
+   "home": "Chicago Fire FC",
+   "away": "Columbus Crew",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761936",
+   "home": "D.C. United",
+   "away": "New York City FC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761937",
+   "home": "FC Cincinnati",
+   "away": "Nashville SC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761938",
+   "home": "Inter Miami CF",
+   "away": "Charlotte FC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761940",
+   "home": "Orlando City SC",
+   "away": "New England Revolution",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761941",
+   "home": "Philadelphia Union",
+   "away": "Toronto FC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761939",
+   "home": "Red Bull New York",
+   "away": "Atlanta United FC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794085200,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761942",
+   "home": "Austin FC",
+   "away": "Portland Timbers",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794096000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761943",
+   "home": "FC Dallas",
+   "away": "Colorado Rapids",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794096000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761944",
+   "home": "Houston Dynamo FC",
+   "away": "St. Louis CITY SC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794096000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761945",
+   "home": "Minnesota United FC",
+   "away": "San Jose Earthquakes",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794096000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761946",
+   "home": "Real Salt Lake",
+   "away": "LA Galaxy",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794096000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761947",
+   "home": "San Diego FC",
+   "away": "Sporting Kansas City",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794096000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "761948",
+   "home": "Seattle Sounders FC",
+   "away": "LAFC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1794096000,
    "probs": {
     "RESULT": {
      "HOME": 0.45,
