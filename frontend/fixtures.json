@@ -1,5 +1,5 @@
 {
- "updated": 1793166475,
+ "updated": 1793192471,
  "matches": [
   {
    "id": "401874993",
@@ -10,13 +10,13 @@
    "kickoff": 1793208600,
    "probs": {
     "RESULT": {
-     "HOME": 0.556,
-     "DRAW": 0.247,
-     "AWAY": 0.197
+     "HOME": 0.549,
+     "DRAW": 0.261,
+     "AWAY": 0.189
     },
     "GOALS": {
-     "OVER": 0.516,
-     "UNDER": 0.484
+     "OVER": 0.459,
+     "UNDER": 0.541
     },
     "BTTS": {
      "YES": 0.52,
@@ -34,13 +34,13 @@
    "kickoff": 1793208600,
    "probs": {
     "RESULT": {
-     "HOME": 0.34,
-     "DRAW": 0.306,
-     "AWAY": 0.353
+     "HOME": 0.349,
+     "DRAW": 0.308,
+     "AWAY": 0.343
     },
     "GOALS": {
-     "OVER": 0.453,
-     "UNDER": 0.547
+     "OVER": 0.463,
+     "UNDER": 0.537
     },
     "BTTS": {
      "YES": 0.52,
@@ -82,9 +82,9 @@
    "kickoff": 1793216700,
    "probs": {
     "RESULT": {
-     "HOME": 0.186,
-     "DRAW": 0.273,
-     "AWAY": 0.541
+     "HOME": 0.189,
+     "DRAW": 0.28,
+     "AWAY": 0.531
     },
     "GOALS": {
      "OVER": 0.401,
@@ -106,13 +106,13 @@
    "kickoff": 1793216700,
    "probs": {
     "RESULT": {
-     "HOME": 0.227,
-     "DRAW": 0.239,
-     "AWAY": 0.534
+     "HOME": 0.22,
+     "DRAW": 0.243,
+     "AWAY": 0.538
     },
     "GOALS": {
-     "OVER": 0.569,
-     "UNDER": 0.431
+     "OVER": 0.572,
+     "UNDER": 0.428
     },
     "BTTS": {
      "YES": 0.52,
@@ -154,9 +154,9 @@
    "kickoff": 1793230200,
    "probs": {
     "RESULT": {
-     "HOME": 0.622,
-     "DRAW": 0.193,
-     "AWAY": 0.185
+     "HOME": 0.634,
+     "DRAW": 0.189,
+     "AWAY": 0.177
     },
     "GOALS": {
      "OVER": 0.52,
@@ -250,9 +250,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.329,
-     "DRAW": 0.252,
-     "AWAY": 0.419
+     "HOME": 0.323,
+     "DRAW": 0.249,
+     "AWAY": 0.428
     },
     "GOALS": {
      "OVER": 0.597,
@@ -298,9 +298,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.441,
-     "DRAW": 0.25,
-     "AWAY": 0.309
+     "HOME": 0.44,
+     "DRAW": 0.246,
+     "AWAY": 0.313
     },
     "GOALS": {
      "OVER": 0.52,
@@ -322,9 +322,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.65,
-     "DRAW": 0.189,
-     "AWAY": 0.161
+     "HOME": 0.655,
+     "DRAW": 0.184,
+     "AWAY": 0.16
     },
     "GOALS": {
      "OVER": 0.52,
@@ -346,9 +346,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.53,
-     "DRAW": 0.234,
-     "AWAY": 0.237
+     "HOME": 0.531,
+     "DRAW": 0.237,
+     "AWAY": 0.231
     },
     "GOALS": {
      "OVER": 0.597,
@@ -370,9 +370,9 @@
    "kickoff": 1793233800,
    "probs": {
     "RESULT": {
-     "HOME": 0.496,
-     "DRAW": 0.235,
-     "AWAY": 0.269
+     "HOME": 0.493,
+     "DRAW": 0.24,
+     "AWAY": 0.267
     },
     "GOALS": {
      "OVER": 0.52,
@@ -394,13 +394,13 @@
    "kickoff": 1793241000,
    "probs": {
     "RESULT": {
-     "HOME": 0.42,
-     "DRAW": 0.261,
-     "AWAY": 0.319
+     "HOME": 0.413,
+     "DRAW": 0.262,
+     "AWAY": 0.326
     },
     "GOALS": {
-     "OVER": 0.589,
-     "UNDER": 0.411
+     "OVER": 0.578,
+     "UNDER": 0.422
     },
     "BTTS": {
      "YES": 0.52,
@@ -423,8 +423,8 @@
      "AWAY": 0.235
     },
     "GOALS": {
-     "OVER": 0.581,
-     "UNDER": 0.419
+     "OVER": 0.578,
+     "UNDER": 0.422
     },
     "BTTS": {
      "YES": 0.52,
@@ -495,8 +495,8 @@
      "AWAY": 0.312
     },
     "GOALS": {
-     "OVER": 0.597,
-     "UNDER": 0.403
+     "OVER": 0.589,
+     "UNDER": 0.411
     },
     "BTTS": {
      "YES": 0.52,
@@ -634,13 +634,13 @@
    "kickoff": 1793390700,
    "probs": {
     "RESULT": {
-     "HOME": 0.39,
+     "HOME": 0.383,
      "DRAW": 0.269,
-     "AWAY": 0.341
+     "AWAY": 0.348
     },
     "GOALS": {
-     "OVER": 0.554,
-     "UNDER": 0.446
+     "OVER": 0.56,
+     "UNDER": 0.44
     },
     "BTTS": {
      "YES": 0.52,
@@ -682,13 +682,13 @@
    "kickoff": 1793449800,
    "probs": {
     "RESULT": {
-     "HOME": 0.534,
-     "DRAW": 0.236,
-     "AWAY": 0.23
+     "HOME": 0.537,
+     "DRAW": 0.237,
+     "AWAY": 0.226
     },
     "GOALS": {
-     "OVER": 0.52,
-     "UNDER": 0.48
+     "OVER": 0.604,
+     "UNDER": 0.396
     },
     "BTTS": {
      "YES": 0.52,
@@ -706,13 +706,13 @@
    "kickoff": 1793449800,
    "probs": {
     "RESULT": {
-     "HOME": 0.286,
-     "DRAW": 0.274,
-     "AWAY": 0.44
+     "HOME": 0.284,
+     "DRAW": 0.272,
+     "AWAY": 0.443
     },
     "GOALS": {
-     "OVER": 0.5,
-     "UNDER": 0.5
+     "OVER": 0.495,
+     "UNDER": 0.505
     },
     "BTTS": {
      "YES": 0.52,
@@ -730,9 +730,9 @@
    "kickoff": 1793449800,
    "probs": {
     "RESULT": {
-     "HOME": 0.613,
-     "DRAW": 0.215,
-     "AWAY": 0.172
+     "HOME": 0.614,
+     "DRAW": 0.212,
+     "AWAY": 0.174
     },
     "GOALS": {
      "OVER": 0.52,
@@ -754,9 +754,9 @@
    "kickoff": 1793449800,
    "probs": {
     "RESULT": {
-     "HOME": 0.542,
-     "DRAW": 0.248,
-     "AWAY": 0.21
+     "HOME": 0.546,
+     "DRAW": 0.247,
+     "AWAY": 0.207
     },
     "GOALS": {
      "OVER": 0.5,
@@ -778,9 +778,9 @@
    "kickoff": 1793451600,
    "probs": {
     "RESULT": {
-     "HOME": 0.197,
-     "DRAW": 0.206,
-     "AWAY": 0.597
+     "HOME": 0.194,
+     "DRAW": 0.207,
+     "AWAY": 0.599
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1071,8 +1071,8 @@
      "AWAY": 0.401
     },
     "GOALS": {
-     "OVER": 0.541,
-     "UNDER": 0.459
+     "OVER": 0.531,
+     "UNDER": 0.469
     },
     "BTTS": {
      "YES": 0.52,
@@ -1162,9 +1162,9 @@
    "kickoff": 1793458800,
    "probs": {
     "RESULT": {
-     "HOME": 0.544,
-     "DRAW": 0.231,
-     "AWAY": 0.225
+     "HOME": 0.534,
+     "DRAW": 0.236,
+     "AWAY": 0.23
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1210,13 +1210,13 @@
    "kickoff": 1793458800,
    "probs": {
     "RESULT": {
-     "HOME": 0.593,
-     "DRAW": 0.219,
-     "AWAY": 0.188
+     "HOME": 0.579,
+     "DRAW": 0.229,
+     "AWAY": 0.192
     },
     "GOALS": {
-     "OVER": 0.586,
-     "UNDER": 0.414
+     "OVER": 0.575,
+     "UNDER": 0.425
     },
     "BTTS": {
      "YES": 0.52,
@@ -1282,9 +1282,9 @@
    "kickoff": 1793460600,
    "probs": {
     "RESULT": {
-     "HOME": 0.814,
+     "HOME": 0.808,
      "DRAW": 0.115,
-     "AWAY": 0.071
+     "AWAY": 0.077
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1383,8 +1383,8 @@
      "AWAY": 0.172
     },
     "GOALS": {
-     "OVER": 0.599,
-     "UNDER": 0.401
+     "OVER": 0.592,
+     "UNDER": 0.408
     },
     "BTTS": {
      "YES": 0.52,
@@ -1671,8 +1671,8 @@
      "AWAY": 0.27
     },
     "GOALS": {
-     "OVER": 0.554,
-     "UNDER": 0.446
+     "OVER": 0.563,
+     "UNDER": 0.437
     },
     "BTTS": {
      "YES": 0.52,
@@ -1767,8 +1767,8 @@
      "AWAY": 0.088
     },
     "GOALS": {
-     "OVER": 0.52,
-     "UNDER": 0.48
+     "OVER": 0.601,
+     "UNDER": 0.399
     },
     "BTTS": {
      "YES": 0.52,
@@ -2002,9 +2002,9 @@
    "kickoff": 1793541600,
    "probs": {
     "RESULT": {
-     "HOME": 0.661,
-     "DRAW": 0.208,
-     "AWAY": 0.131
+     "HOME": 0.642,
+     "DRAW": 0.218,
+     "AWAY": 0.141
     },
     "GOALS": {
      "OVER": 0.51,
@@ -2050,13 +2050,13 @@
    "kickoff": 1793543400,
    "probs": {
     "RESULT": {
-     "HOME": 0.382,
-     "DRAW": 0.266,
-     "AWAY": 0.352
+     "HOME": 0.372,
+     "DRAW": 0.264,
+     "AWAY": 0.364
     },
     "GOALS": {
-     "OVER": 0.567,
-     "UNDER": 0.433
+     "OVER": 0.572,
+     "UNDER": 0.428
     },
     "BTTS": {
      "YES": 0.52,
@@ -2295,8 +2295,8 @@
      "AWAY": 0.247
     },
     "GOALS": {
-     "OVER": 0.491,
-     "UNDER": 0.509
+     "OVER": 0.5,
+     "UNDER": 0.5
     },
     "BTTS": {
      "YES": 0.52,
@@ -2607,8 +2607,8 @@
      "AWAY": 0.151
     },
     "GOALS": {
-     "OVER": 0.535,
-     "UNDER": 0.465
+     "OVER": 0.554,
+     "UNDER": 0.446
     },
     "BTTS": {
      "YES": 0.52,
@@ -2626,9 +2626,9 @@
    "kickoff": 1793648700,
    "probs": {
     "RESULT": {
-     "HOME": 0.387,
-     "DRAW": 0.281,
-     "AWAY": 0.332
+     "HOME": 0.39,
+     "DRAW": 0.288,
+     "AWAY": 0.323
     },
     "GOALS": {
      "OVER": 0.471,
@@ -3178,9 +3178,9 @@
    "kickoff": 1793814300,
    "probs": {
     "RESULT": {
-     "HOME": 0.125,
-     "DRAW": 0.164,
-     "AWAY": 0.711
+     "HOME": 0.118,
+     "DRAW": 0.157,
+     "AWAY": 0.725
     },
     "GOALS": {
      "OVER": 0.52,
@@ -3663,8 +3663,8 @@
      "AWAY": 0.292
     },
     "GOALS": {
-     "OVER": 0.545,
-     "UNDER": 0.455
+     "OVER": 0.548,
+     "UNDER": 0.452
     },
     "BTTS": {
      "YES": 0.52,
@@ -4282,9 +4282,9 @@
    "kickoff": 1794061800,
    "probs": {
     "RESULT": {
-     "HOME": 0.184,
-     "DRAW": 0.18,
-     "AWAY": 0.636
+     "HOME": 0.197,
+     "DRAW": 0.172,
+     "AWAY": 0.631
     },
     "GOALS": {
      "OVER": 0.52,
@@ -4882,9 +4882,9 @@
    "kickoff": 1794081600,
    "probs": {
     "RESULT": {
-     "HOME": 0.156,
-     "DRAW": 0.191,
-     "AWAY": 0.653
+     "HOME": 0.169,
+     "DRAW": 0.186,
+     "AWAY": 0.645
     },
     "GOALS": {
      "OVER": 0.52,
