@@ -1,5 +1,5 @@
 {
- "updated": 1794295478,
+ "updated": 1794340033,
  "matches": [
   {
    "id": "401933535",
@@ -10,9 +10,9 @@
    "kickoff": 1795134600,
    "probs": {
     "RESULT": {
-     "HOME": 0.45,
-     "DRAW": 0.27,
-     "AWAY": 0.28
+     "HOME": 0.384,
+     "DRAW": 0.24,
+     "AWAY": 0.376
     },
     "GOALS": {
      "OVER": 0.52,
@@ -22,7 +22,7 @@
      "YES": 0.52,
      "NO": 0.48
     },
-    "source": "default"
+    "source": "feed"
    }
   },
   {
@@ -34,9 +34,9 @@
    "kickoff": 1795143600,
    "probs": {
     "RESULT": {
-     "HOME": 0.45,
-     "DRAW": 0.27,
-     "AWAY": 0.28
+     "HOME": 0.474,
+     "DRAW": 0.251,
+     "AWAY": 0.274
     },
     "GOALS": {
      "OVER": 0.52,
@@ -46,7 +46,7 @@
      "YES": 0.52,
      "NO": 0.48
     },
-    "source": "default"
+    "source": "feed"
    }
   },
   {
