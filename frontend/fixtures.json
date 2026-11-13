@@ -1,5 +1,5 @@
 {
- "updated": 1794513525,
+ "updated": 1794552662,
  "matches": [
   {
    "id": "401933535",
@@ -106,13 +106,13 @@
    "kickoff": 1795204800,
    "probs": {
     "RESULT": {
-     "HOME": 0.637,
-     "DRAW": 0.219,
+     "HOME": 0.635,
+     "DRAW": 0.22,
      "AWAY": 0.145
     },
     "GOALS": {
-     "OVER": 0.535,
-     "UNDER": 0.465
+     "OVER": 0.531,
+     "UNDER": 0.469
     },
     "BTTS": {
      "YES": 0.52,
@@ -682,8 +682,8 @@
    "kickoff": 1795273200,
    "probs": {
     "RESULT": {
-     "HOME": 0.782,
-     "DRAW": 0.133,
+     "HOME": 0.781,
+     "DRAW": 0.134,
      "AWAY": 0.085
     },
     "GOALS": {
@@ -1691,12 +1691,12 @@
    "probs": {
     "RESULT": {
      "HOME": 0.17,
-     "DRAW": 0.246,
-     "AWAY": 0.583
+     "DRAW": 0.242,
+     "AWAY": 0.588
     },
     "GOALS": {
-     "OVER": 0.465,
-     "UNDER": 0.535
+     "OVER": 0.475,
+     "UNDER": 0.525
     },
     "BTTS": {
      "YES": 0.52,
@@ -1760,6 +1760,102 @@
    "comp": "MLS",
    "league": "usa.1",
    "kickoff": 1795397400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401875009",
+   "home": "Monza",
+   "away": "Fiorentina",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1795463100,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.276,
+     "DRAW": 0.253,
+     "AWAY": 0.471
+    },
+    "GOALS": {
+     "OVER": 0.589,
+     "UNDER": 0.411
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401879237",
+   "home": "Brentford",
+   "away": "Everton",
+   "comp": "Premier League",
+   "league": "eng.1",
+   "kickoff": 1795464000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.466,
+     "DRAW": 0.259,
+     "AWAY": 0.274
+    },
+    "GOALS": {
+     "OVER": 0.548,
+     "UNDER": 0.452
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401882802",
+   "home": "Levante",
+   "away": "Elche",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1795464000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.437,
+     "DRAW": 0.261,
+     "AWAY": 0.303
+    },
+    "GOALS": {
+     "OVER": 0.558,
+     "UNDER": 0.442
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401933728",
+   "home": "St. Louis CITY SC",
+   "away": "LAFC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1795482000,
    "probs": {
     "RESULT": {
      "HOME": 0.45,
