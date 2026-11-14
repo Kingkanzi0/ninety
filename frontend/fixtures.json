@@ -1,5 +1,5 @@
 {
- "updated": 1794599188,
+ "updated": 1794637873,
  "matches": [
   {
    "id": "401933535",
@@ -130,9 +130,9 @@
    "kickoff": 1795264200,
    "probs": {
     "RESULT": {
-     "HOME": 0.665,
-     "DRAW": 0.19,
-     "AWAY": 0.146
+     "HOME": 0.676,
+     "DRAW": 0.189,
+     "AWAY": 0.135
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1018,9 +1018,9 @@
    "kickoff": 1795290300,
    "probs": {
     "RESULT": {
-     "HOME": 0.502,
-     "DRAW": 0.241,
-     "AWAY": 0.257
+     "HOME": 0.512,
+     "DRAW": 0.238,
+     "AWAY": 0.25
     },
     "GOALS": {
      "OVER": 0.578,
@@ -1090,9 +1090,9 @@
    "kickoff": 1795291200,
    "probs": {
     "RESULT": {
-     "HOME": 0.778,
-     "DRAW": 0.144,
-     "AWAY": 0.078
+     "HOME": 0.787,
+     "DRAW": 0.135,
+     "AWAY": 0.079
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1162,8 +1162,8 @@
    "kickoff": 1795294800,
    "probs": {
     "RESULT": {
-     "HOME": 0.491,
-     "DRAW": 0.237,
+     "HOME": 0.489,
+     "DRAW": 0.238,
      "AWAY": 0.273
     },
     "GOALS": {
@@ -1186,9 +1186,9 @@
    "kickoff": 1795302000,
    "probs": {
     "RESULT": {
-     "HOME": 0.569,
-     "DRAW": 0.205,
-     "AWAY": 0.226
+     "HOME": 0.572,
+     "DRAW": 0.204,
+     "AWAY": 0.224
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1738,9 +1738,9 @@
    "kickoff": 1795390200,
    "probs": {
     "RESULT": {
-     "HOME": 0.45,
-     "DRAW": 0.27,
-     "AWAY": 0.28
+     "HOME": 0.583,
+     "DRAW": 0.211,
+     "AWAY": 0.206
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1750,7 +1750,7 @@
      "YES": 0.52,
      "NO": 0.48
     },
-    "source": "default"
+    "source": "feed"
    }
   },
   {
@@ -1858,6 +1858,78 @@
    "kickoff": 1795482000,
    "probs": {
     "RESULT": {
+     "HOME": 0.378,
+     "DRAW": 0.259,
+     "AWAY": 0.363
+    },
+    "GOALS": {
+     "OVER": 0.597,
+     "UNDER": 0.403
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915380",
+   "home": "Bodo/Glimt",
+   "away": "LASK Linz",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795542300,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.621,
+     "DRAW": 0.192,
+     "AWAY": 0.188
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915300",
+   "home": "Galatasaray",
+   "away": "Aston Villa",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795542300,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.368,
+     "DRAW": 0.25,
+     "AWAY": 0.383
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880148",
+   "home": "Bristol City",
+   "away": "Wrexham",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795549500,
+   "probs": {
+    "RESULT": {
      "HOME": 0.45,
      "DRAW": 0.27,
      "AWAY": 0.28
@@ -1871,6 +1943,366 @@
      "NO": 0.48
     },
     "source": "default"
+   }
+  },
+  {
+   "id": "401880147",
+   "home": "Cardiff City",
+   "away": "Preston North End",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795549500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880146",
+   "home": "Charlton Athletic",
+   "away": "Lincoln City",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795549500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880145",
+   "home": "Middlesbrough",
+   "away": "Swansea City",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795549500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880144",
+   "home": "Norwich City",
+   "away": "Queens Park Rangers",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795549500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880143",
+   "home": "Portsmouth",
+   "away": "West Ham United",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795549500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880142",
+   "home": "Sheffield United",
+   "away": "Southampton",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795549500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401915295",
+   "home": "Arsenal",
+   "away": "Borussia Dortmund",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.669,
+     "DRAW": 0.198,
+     "AWAY": 0.133
+    },
+    "GOALS": {
+     "OVER": 0.575,
+     "UNDER": 0.425
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915296",
+   "home": "Como",
+   "away": "AEK Athens",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.711,
+     "DRAW": 0.156,
+     "AWAY": 0.133
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915294",
+   "home": "Feyenoord Rotterdam",
+   "away": "FC Porto",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.334,
+     "DRAW": 0.26,
+     "AWAY": 0.406
+    },
+    "GOALS": {
+     "OVER": 0.597,
+     "UNDER": 0.403
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915379",
+   "home": "Manchester City",
+   "away": "Napoli",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.758,
+     "DRAW": 0.144,
+     "AWAY": 0.099
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915299",
+   "home": "RB Leipzig",
+   "away": "Lens",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.66,
+     "DRAW": 0.178,
+     "AWAY": 0.162
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915298",
+   "home": "Real Madrid",
+   "away": "PSV Eindhoven",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.783,
+     "DRAW": 0.124,
+     "AWAY": 0.093
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915297",
+   "home": "Slovan Bratislava",
+   "away": "Real Betis",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.11,
+     "DRAW": 0.156,
+     "AWAY": 0.734
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880141",
+   "home": "Wolverhampton Wanderers",
+   "away": "Derby County",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795550400,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401933738",
+   "home": "San Jose Earthquakes",
+   "away": "Houston Dynamo FC",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1795575600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.44,
+     "DRAW": 0.265,
+     "AWAY": 0.295
+    },
+    "GOALS": {
+     "OVER": 0.567,
+     "UNDER": 0.433
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
    }
   }
  ]
