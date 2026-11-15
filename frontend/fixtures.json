@@ -1,5 +1,5 @@
 {
- "updated": 1794695358,
+ "updated": 1794724778,
  "matches": [
   {
    "id": "401933535",
@@ -946,13 +946,13 @@
    "kickoff": 1795287600,
    "probs": {
     "RESULT": {
-     "HOME": 0.308,
-     "DRAW": 0.26,
-     "AWAY": 0.433
+     "HOME": 0.31,
+     "DRAW": 0.265,
+     "AWAY": 0.425
     },
     "GOALS": {
-     "OVER": 0.52,
-     "UNDER": 0.48
+     "OVER": 0.604,
+     "UNDER": 0.396
     },
     "BTTS": {
      "YES": 0.52,
@@ -1143,8 +1143,8 @@
      "AWAY": 0.28
     },
     "GOALS": {
-     "OVER": 0.583,
-     "UNDER": 0.417
+     "OVER": 0.567,
+     "UNDER": 0.433
     },
     "BTTS": {
      "YES": 0.52,
@@ -1282,9 +1282,9 @@
    "kickoff": 1795352400,
    "probs": {
     "RESULT": {
-     "HOME": 0.761,
-     "DRAW": 0.145,
-     "AWAY": 0.094
+     "HOME": 0.778,
+     "DRAW": 0.136,
+     "AWAY": 0.086
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1738,9 +1738,9 @@
    "kickoff": 1795390200,
    "probs": {
     "RESULT": {
-     "HOME": 0.583,
-     "DRAW": 0.211,
-     "AWAY": 0.206
+     "HOME": 0.589,
+     "DRAW": 0.208,
+     "AWAY": 0.203
     },
     "GOALS": {
      "OVER": 0.52,
@@ -2303,6 +2303,318 @@
      "NO": 0.48
     },
     "source": "feed"
+   }
+  },
+  {
+   "id": "401915378",
+   "home": "Sabah FK",
+   "away": "Barcelona",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795628700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.058,
+     "DRAW": 0.078,
+     "AWAY": 0.864
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915293",
+   "home": "Slavia Prague",
+   "away": "Villarreal",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795628700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.314,
+     "DRAW": 0.244,
+     "AWAY": 0.442
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880140",
+   "home": "Bolton Wanderers",
+   "away": "West Bromwich Albion",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795635900,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880139",
+   "home": "Burnley",
+   "away": "Birmingham City",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795635900,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401880137",
+   "home": "Watford",
+   "away": "Blackburn Rovers",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795635900,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401915291",
+   "home": "Atl\u00e9tico Madrid",
+   "away": "Viking FK",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.854,
+     "DRAW": 0.094,
+     "AWAY": 0.052
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915292",
+   "home": "Club Brugge",
+   "away": "Liverpool",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.229,
+     "DRAW": 0.208,
+     "AWAY": 0.563
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915376",
+   "home": "Internazionale",
+   "away": "VfB Stuttgart",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.65,
+     "DRAW": 0.179,
+     "AWAY": 0.171
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915377",
+   "home": "Lille",
+   "away": "Bayern Munich",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.133,
+     "DRAW": 0.162,
+     "AWAY": 0.705
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915374",
+   "home": "Paris Saint-Germain",
+   "away": "AS Roma",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.696,
+     "DRAW": 0.17,
+     "AWAY": 0.134
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915375",
+   "home": "Shakhtar Donetsk",
+   "away": "Fenerbahce",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.359,
+     "DRAW": 0.275,
+     "AWAY": 0.366
+    },
+    "GOALS": {
+     "OVER": 0.545,
+     "UNDER": 0.455
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401915373",
+   "home": "Sporting CP",
+   "away": "Manchester United",
+   "comp": "Champions League",
+   "league": "uefa.champions",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.374,
+     "DRAW": 0.26,
+     "AWAY": 0.367
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880138",
+   "home": "Stoke City",
+   "away": "Millwall",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795636800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
    }
   }
  ]
