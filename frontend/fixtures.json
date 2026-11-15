@@ -1,5 +1,5 @@
 {
- "updated": 1794724778,
+ "updated": 1794768879,
  "matches": [
   {
    "id": "401933535",
@@ -1138,13 +1138,13 @@
    "kickoff": 1795291200,
    "probs": {
     "RESULT": {
-     "HOME": 0.463,
-     "DRAW": 0.257,
-     "AWAY": 0.28
+     "HOME": 0.453,
+     "DRAW": 0.265,
+     "AWAY": 0.281
     },
     "GOALS": {
-     "OVER": 0.567,
-     "UNDER": 0.433
+     "OVER": 0.552,
+     "UNDER": 0.448
     },
     "BTTS": {
      "YES": 0.52,
@@ -1282,9 +1282,9 @@
    "kickoff": 1795352400,
    "probs": {
     "RESULT": {
-     "HOME": 0.778,
-     "DRAW": 0.136,
-     "AWAY": 0.086
+     "HOME": 0.781,
+     "DRAW": 0.134,
+     "AWAY": 0.085
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1402,9 +1402,9 @@
    "kickoff": 1795356000,
    "probs": {
     "RESULT": {
-     "HOME": 0.366,
-     "DRAW": 0.282,
-     "AWAY": 0.352
+     "HOME": 0.341,
+     "DRAW": 0.283,
+     "AWAY": 0.376
     },
     "GOALS": {
      "OVER": 0.49,
@@ -1786,9 +1786,9 @@
    "kickoff": 1795463100,
    "probs": {
     "RESULT": {
-     "HOME": 0.276,
+     "HOME": 0.271,
      "DRAW": 0.253,
-     "AWAY": 0.471
+     "AWAY": 0.476
     },
     "GOALS": {
      "OVER": 0.589,
@@ -1858,9 +1858,9 @@
    "kickoff": 1795482000,
    "probs": {
     "RESULT": {
-     "HOME": 0.378,
-     "DRAW": 0.259,
-     "AWAY": 0.363
+     "HOME": 0.385,
+     "DRAW": 0.266,
+     "AWAY": 0.348
     },
     "GOALS": {
      "OVER": 0.597,
@@ -2146,9 +2146,9 @@
    "kickoff": 1795550400,
    "probs": {
     "RESULT": {
-     "HOME": 0.334,
-     "DRAW": 0.26,
-     "AWAY": 0.406
+     "HOME": 0.348,
+     "DRAW": 0.261,
+     "AWAY": 0.391
     },
     "GOALS": {
      "OVER": 0.597,
@@ -2295,8 +2295,8 @@
      "AWAY": 0.295
     },
     "GOALS": {
-     "OVER": 0.567,
-     "UNDER": 0.433
+     "OVER": 0.558,
+     "UNDER": 0.442
     },
     "BTTS": {
      "YES": 0.52,
@@ -2530,9 +2530,9 @@
    "kickoff": 1795636800,
    "probs": {
     "RESULT": {
-     "HOME": 0.696,
-     "DRAW": 0.17,
-     "AWAY": 0.134
+     "HOME": 0.711,
+     "DRAW": 0.164,
+     "AWAY": 0.125
     },
     "GOALS": {
      "OVER": 0.52,
