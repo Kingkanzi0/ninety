@@ -1,5 +1,5 @@
 {
- "updated": 1794867012,
+ "updated": 1794902338,
  "matches": [
   {
    "id": "401933535",
@@ -10,9 +10,9 @@
    "kickoff": 1795134600,
    "probs": {
     "RESULT": {
-     "HOME": 0.383,
-     "DRAW": 0.242,
-     "AWAY": 0.375
+     "HOME": 0.384,
+     "DRAW": 0.239,
+     "AWAY": 0.376
     },
     "GOALS": {
      "OVER": 0.52,
@@ -34,9 +34,9 @@
    "kickoff": 1795143600,
    "probs": {
     "RESULT": {
-     "HOME": 0.478,
+     "HOME": 0.474,
      "DRAW": 0.25,
-     "AWAY": 0.272
+     "AWAY": 0.276
     },
     "GOALS": {
      "OVER": 0.52,
@@ -951,8 +951,8 @@
      "AWAY": 0.425
     },
     "GOALS": {
-     "OVER": 0.604,
-     "UNDER": 0.396
+     "OVER": 0.602,
+     "UNDER": 0.398
     },
     "BTTS": {
      "YES": 0.52,
@@ -1023,8 +1023,8 @@
      "AWAY": 0.239
     },
     "GOALS": {
-     "OVER": 0.583,
-     "UNDER": 0.417
+     "OVER": 0.575,
+     "UNDER": 0.425
     },
     "BTTS": {
      "YES": 0.52,
@@ -1066,9 +1066,9 @@
    "kickoff": 1795290300,
    "probs": {
     "RESULT": {
-     "HOME": 0.437,
-     "DRAW": 0.254,
-     "AWAY": 0.308
+     "HOME": 0.428,
+     "DRAW": 0.258,
+     "AWAY": 0.314
     },
     "GOALS": {
      "OVER": 0.575,
@@ -1738,9 +1738,9 @@
    "kickoff": 1795390200,
    "probs": {
     "RESULT": {
-     "HOME": 0.589,
-     "DRAW": 0.208,
-     "AWAY": 0.203
+     "HOME": 0.572,
+     "DRAW": 0.214,
+     "AWAY": 0.214
     },
     "GOALS": {
      "OVER": 0.52,
@@ -2122,9 +2122,9 @@
    "kickoff": 1795550400,
    "probs": {
     "RESULT": {
-     "HOME": 0.716,
-     "DRAW": 0.158,
-     "AWAY": 0.126
+     "HOME": 0.702,
+     "DRAW": 0.164,
+     "AWAY": 0.134
     },
     "GOALS": {
      "OVER": 0.52,
@@ -2290,13 +2290,13 @@
    "kickoff": 1795575600,
    "probs": {
     "RESULT": {
-     "HOME": 0.44,
-     "DRAW": 0.265,
-     "AWAY": 0.295
+     "HOME": 0.437,
+     "DRAW": 0.266,
+     "AWAY": 0.296
     },
     "GOALS": {
-     "OVER": 0.558,
-     "UNDER": 0.442
+     "OVER": 0.554,
+     "UNDER": 0.446
     },
     "BTTS": {
      "YES": 0.52,
@@ -3047,6 +3047,246 @@
      "NO": 0.48
     },
     "source": "feed"
+   }
+  },
+  {
+   "id": "401875536",
+   "home": "FC Groningen",
+   "away": "Willem II",
+   "comp": "Eredivisie",
+   "league": "ned.1",
+   "kickoff": 1795806000,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401884720",
+   "home": "Werder Bremen",
+   "away": "Borussia M\u00f6nchengladbach",
+   "comp": "Bundesliga",
+   "league": "ger.1",
+   "kickoff": 1795807800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.536,
+     "DRAW": 0.226,
+     "AWAY": 0.238
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401875004",
+   "home": "Venezia",
+   "away": "Bologna",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1795808700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.269,
+     "DRAW": 0.269,
+     "AWAY": 0.462
+    },
+    "GOALS": {
+     "OVER": 0.525,
+     "UNDER": 0.475
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401876392",
+   "home": "Brest",
+   "away": "Paris FC",
+   "comp": "Ligue 1",
+   "league": "fra.1",
+   "kickoff": 1795808700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.301,
+     "DRAW": 0.283,
+     "AWAY": 0.415
+    },
+    "GOALS": {
+     "OVER": 0.529,
+     "UNDER": 0.471
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401879225",
+   "home": "Nottingham Forest",
+   "away": "Chelsea",
+   "comp": "Premier League",
+   "league": "eng.1",
+   "kickoff": 1795809600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.333,
+     "DRAW": 0.27,
+     "AWAY": 0.397
+    },
+    "GOALS": {
+     "OVER": 0.548,
+     "UNDER": 0.452
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401882791",
+   "home": "Levante",
+   "away": "Racing Santander",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1795809600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.454,
+     "DRAW": 0.245,
+     "AWAY": 0.3
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401880129",
+   "home": "Southampton",
+   "away": "Middlesbrough",
+   "comp": "Championship",
+   "league": "eng.2",
+   "kickoff": 1795809600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401885389",
+   "home": "Maritimo",
+   "away": "C.D. Nacional",
+   "comp": "Primeira Liga",
+   "league": "por.1",
+   "kickoff": 1795810500,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.43,
+     "DRAW": 0.289,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.458,
+     "UNDER": 0.542
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401933727",
+   "home": "Columbus Crew",
+   "away": "Inter Miami CF",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1795827600,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
+   }
+  },
+  {
+   "id": "401933725",
+   "home": "TBD Home",
+   "away": "Vancouver Whitecaps",
+   "comp": "MLS",
+   "league": "usa.1",
+   "kickoff": 1795834800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.45,
+     "DRAW": 0.27,
+     "AWAY": 0.28
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "default"
    }
   }
  ]
