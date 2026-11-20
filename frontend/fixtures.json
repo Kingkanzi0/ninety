@@ -1,54 +1,6 @@
 {
- "updated": 1795120889,
+ "updated": 1795159329,
  "matches": [
-  {
-   "id": "401933535",
-   "home": "Orlando City SC",
-   "away": "FC Cincinnati",
-   "comp": "MLS",
-   "league": "usa.1",
-   "kickoff": 1795134600,
-   "probs": {
-    "RESULT": {
-     "HOME": 0.396,
-     "DRAW": 0.239,
-     "AWAY": 0.365
-    },
-    "GOALS": {
-     "OVER": 0.52,
-     "UNDER": 0.48
-    },
-    "BTTS": {
-     "YES": 0.52,
-     "NO": 0.48
-    },
-    "source": "feed"
-   }
-  },
-  {
-   "id": "401933555",
-   "home": "Seattle Sounders FC",
-   "away": "Real Salt Lake",
-   "comp": "MLS",
-   "league": "usa.1",
-   "kickoff": 1795143600,
-   "probs": {
-    "RESULT": {
-     "HOME": 0.461,
-     "DRAW": 0.256,
-     "AWAY": 0.283
-    },
-    "GOALS": {
-     "OVER": 0.597,
-     "UNDER": 0.403
-    },
-    "BTTS": {
-     "YES": 0.52,
-     "NO": 0.48
-    },
-    "source": "feed"
-   }
-  },
   {
    "id": "401884736",
    "home": "Bayern Munich",
@@ -58,9 +10,9 @@
    "kickoff": 1795203000,
    "probs": {
     "RESULT": {
-     "HOME": 0.874,
+     "HOME": 0.871,
      "DRAW": 0.077,
-     "AWAY": 0.05
+     "AWAY": 0.051
     },
     "GOALS": {
      "OVER": 0.52,
@@ -178,9 +130,9 @@
    "kickoff": 1795264200,
    "probs": {
     "RESULT": {
-     "HOME": 0.531,
+     "HOME": 0.539,
      "DRAW": 0.217,
-     "AWAY": 0.252
+     "AWAY": 0.244
     },
     "GOALS": {
      "OVER": 0.52,
@@ -298,9 +250,9 @@
    "kickoff": 1795271400,
    "probs": {
     "RESULT": {
-     "HOME": 0.176,
-     "DRAW": 0.206,
-     "AWAY": 0.618
+     "HOME": 0.168,
+     "DRAW": 0.205,
+     "AWAY": 0.626
     },
     "GOALS": {
      "OVER": 0.52,
@@ -346,9 +298,9 @@
    "kickoff": 1795271400,
    "probs": {
     "RESULT": {
-     "HOME": 0.186,
-     "DRAW": 0.211,
-     "AWAY": 0.603
+     "HOME": 0.189,
+     "DRAW": 0.215,
+     "AWAY": 0.596
     },
     "GOALS": {
      "OVER": 0.52,
@@ -442,9 +394,9 @@
    "kickoff": 1795273200,
    "probs": {
     "RESULT": {
-     "HOME": 0.533,
-     "DRAW": 0.249,
-     "AWAY": 0.218
+     "HOME": 0.54,
+     "DRAW": 0.248,
+     "AWAY": 0.212
     },
     "GOALS": {
      "OVER": 0.537,
@@ -538,9 +490,9 @@
    "kickoff": 1795273200,
    "probs": {
     "RESULT": {
-     "HOME": 0.342,
-     "DRAW": 0.282,
-     "AWAY": 0.376
+     "HOME": 0.335,
+     "DRAW": 0.276,
+     "AWAY": 0.389
     },
     "GOALS": {
      "OVER": 0.516,
@@ -639,8 +591,8 @@
      "AWAY": 0.388
     },
     "GOALS": {
-     "OVER": 0.469,
-     "UNDER": 0.531
+     "OVER": 0.453,
+     "UNDER": 0.547
     },
     "BTTS": {
      "YES": 0.52,
@@ -730,9 +682,9 @@
    "kickoff": 1795274100,
    "probs": {
     "RESULT": {
-     "HOME": 0.487,
-     "DRAW": 0.272,
-     "AWAY": 0.241
+     "HOME": 0.491,
+     "DRAW": 0.27,
+     "AWAY": 0.239
     },
     "GOALS": {
      "OVER": 0.474,
@@ -1618,9 +1570,9 @@
    "kickoff": 1795368600,
    "probs": {
     "RESULT": {
-     "HOME": 0.528,
-     "DRAW": 0.26,
-     "AWAY": 0.211
+     "HOME": 0.519,
+     "DRAW": 0.264,
+     "AWAY": 0.216
     },
     "GOALS": {
      "OVER": 0.474,
@@ -1708,7 +1660,7 @@
   {
    "id": "401933731",
    "home": "Nashville SC",
-   "away": "TBD Away",
+   "away": "FC Cincinnati",
    "comp": "MLS",
    "league": "usa.1",
    "kickoff": 1795381200,
@@ -1739,8 +1691,8 @@
    "probs": {
     "RESULT": {
      "HOME": 0.578,
-     "DRAW": 0.213,
-     "AWAY": 0.209
+     "DRAW": 0.216,
+     "AWAY": 0.206
     },
     "GOALS": {
      "OVER": 0.52,
@@ -1756,7 +1708,7 @@
   {
    "id": "401933729",
    "home": "Vancouver Whitecaps",
-   "away": "TBD Away",
+   "away": "Real Salt Lake",
    "comp": "MLS",
    "league": "usa.1",
    "kickoff": 1795397400,
@@ -2103,8 +2055,8 @@
      "AWAY": 0.125
     },
     "GOALS": {
-     "OVER": 0.581,
-     "UNDER": 0.419
+     "OVER": 0.575,
+     "UNDER": 0.425
     },
     "BTTS": {
      "YES": 0.52,
@@ -2559,8 +2511,8 @@
      "AWAY": 0.363
     },
     "GOALS": {
-     "OVER": 0.545,
-     "UNDER": 0.455
+     "OVER": 0.554,
+     "UNDER": 0.446
     },
     "BTTS": {
      "YES": 0.52,
@@ -3267,7 +3219,7 @@
   },
   {
    "id": "401933725",
-   "home": "TBD Home",
+   "home": "Real Salt Lake",
    "away": "Vancouver Whitecaps",
    "comp": "MLS",
    "league": "usa.1",
@@ -3898,9 +3850,9 @@
    "kickoff": 1795887000,
    "probs": {
     "RESULT": {
-     "HOME": 0.19,
-     "DRAW": 0.222,
-     "AWAY": 0.587
+     "HOME": 0.2,
+     "DRAW": 0.223,
+     "AWAY": 0.577
     },
     "GOALS": {
      "OVER": 0.604,
@@ -4251,7 +4203,7 @@
   },
   {
    "id": "401933722",
-   "home": "TBD Home",
+   "home": "FC Cincinnati",
    "away": "Nashville SC",
    "comp": "MLS",
    "league": "usa.1",
@@ -4985,6 +4937,126 @@
     "GOALS": {
      "OVER": 0.509,
      "UNDER": 0.491
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401875095",
+   "home": "Lecce",
+   "away": "Atalanta",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1796059800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.266,
+     "DRAW": 0.251,
+     "AWAY": 0.483
+    },
+    "GOALS": {
+     "OVER": 0.586,
+     "UNDER": 0.414
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401875019",
+   "home": "Cagliari",
+   "away": "AC Milan",
+   "comp": "Serie A",
+   "league": "ita.1",
+   "kickoff": 1796067900,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.205,
+     "DRAW": 0.247,
+     "AWAY": 0.548
+    },
+    "GOALS": {
+     "OVER": 0.515,
+     "UNDER": 0.485
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401882792",
+   "home": "Espanyol",
+   "away": "Getafe",
+   "comp": "LaLiga",
+   "league": "esp.1",
+   "kickoff": 1796068800,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.448,
+     "DRAW": 0.298,
+     "AWAY": 0.254
+    },
+    "GOALS": {
+     "OVER": 0.396,
+     "UNDER": 0.604
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401885386",
+   "home": "Benfica",
+   "away": "FC Famalicao",
+   "comp": "Primeira Liga",
+   "league": "por.1",
+   "kickoff": 1796069700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.784,
+     "DRAW": 0.132,
+     "AWAY": 0.084
+    },
+    "GOALS": {
+     "OVER": 0.52,
+     "UNDER": 0.48
+    },
+    "BTTS": {
+     "YES": 0.52,
+     "NO": 0.48
+    },
+    "source": "feed"
+   }
+  },
+  {
+   "id": "401885391",
+   "home": "Casa Pia",
+   "away": "Braga",
+   "comp": "Primeira Liga",
+   "league": "por.1",
+   "kickoff": 1796069700,
+   "probs": {
+    "RESULT": {
+     "HOME": 0.133,
+     "DRAW": 0.211,
+     "AWAY": 0.656
+    },
+    "GOALS": {
+     "OVER": 0.5,
+     "UNDER": 0.5
     },
     "BTTS": {
      "YES": 0.52,
